@@ -1,2 +1,9 @@
 # CinePhysicsHQ-Labs
-Interactive Physics Simulations using HTML5, JavaScript and AI-assisted development
+
+Created by Abhijit Singh
+Interactive Physics simulations for modern learning.
+
+Technologies:
+HTML5 Canvas
+JavaScript
+AI-assisted development
