@@ -1,1855 +1,980 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CinePhysicsHQ Lab: Interactive Lorentz Force Explorer</title>
-  <style>
-    :root {
-      color-scheme: dark;
-      --bg: #08111f;
-      --panel: #101827;
-      --panel-soft: #172033;
-      --line: #31415f;
-      --text: #f8fafc;
-      --muted: #b7c3d7;
-      --cyan: #38bdf8;
-      --green: #86efac;
-      --yellow: #fde047;
-      --red: #fb7185;
-      --blue: #60a5fa;
-      --white: #f8fafc;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Parallel Conductors & Ampere's Law Lab</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #0f1115;
+            color: #e3e8ef;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-    body.high-contrast {
-      --bg: #000;
-      --panel: #050505;
-      --panel-soft: #111;
-      --line: #f8fafc;
-      --text: #fff;
-      --muted: #f1f5f9;
-      --cyan: #67e8f9;
-      --green: #bbf7d0;
-      --yellow: #fef08a;
-    }
+        h1 {
+            color: #ffffff;
+            margin: 5px 0 2px 0;
+            font-size: 1.6rem;
+            text-align: center;
+        }
 
-    * {
-      box-sizing: border-box;
-    }
+        .subtitle {
+            margin: 0 0 15px 0;
+            color: #94a3b8;
+            max-width: 1100px;
+            text-align: center;
+            font-size: 0.85rem;
+        }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      display: grid;
-      grid-template-columns: minmax(300px, 360px) 1fr;
-      overflow: hidden;
-      background: var(--bg);
-      color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
-    }
+        .main-layout {
+            display: flex;
+            flex-direction: row;
+            gap: 15px;
+            max-width: 1200px;
+            width: 100%;
+        }
 
-    #panel {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-      height: 100vh;
-      overflow-y: auto;
-      padding: 22px;
-      background: var(--panel);
-      border-right: 1px solid var(--line);
-    }
+        @media (max-width: 950px) {
+            .main-layout { flex-direction: column; }
+        }
 
-    .title {
-      margin: 0;
-      color: var(--text);
-      font-size: 26px;
-      line-height: 1.1;
-    }
+        #canvas-container {
+            position: relative;
+            background-color: #161b22;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+            border: 1px solid #21262d;
+            flex: 1.3;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            width: 100%;
+        }
 
-    .subtitle {
-      margin: 6px 0 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.5;
-    }
+        canvas { 
+            display: block; 
+            width: 100%;
+            height: auto;
+            max-width: 600px;
+            background-color: #161b22;
+            cursor: crosshair;
+        }
 
-    .credit {
-      margin: 8px 0 0;
-      color: var(--cyan);
-      font-size: 13px;
-      font-weight: 700;
-    }
+        .sidebar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+        }
 
-    .control {
-      display: grid;
-      gap: 8px;
-    }
+        .panel {
+            background-color: #161b22;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #21262d;
+        }
 
-    label {
-      display: flex;
-      justify-content: space-between;
-      gap: 14px;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 700;
-    }
+        .presets-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
 
-    output {
-      color: var(--text);
-      font-variant-numeric: tabular-nums;
-    }
+        button {
+            background-color: #21262d;
+            color: #c9d1d9;
+            border: 1px solid #30363d;
+            padding: 10px; 
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
 
-    input[type="range"] {
-      width: 100%;
-      accent-color: var(--cyan);
-    }
+        button:hover {
+            background-color: #30363d;
+            color: #ffffff;
+            border-color: #8b949e;
+        }
 
-    input[type="number"] {
-      width: 100%;
-      min-height: 38px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--panel-soft);
-      color: var(--text);
-      padding: 8px 10px;
-      font-size: 14px;
-    }
+        .ampere-lock-btn {
+            background: linear-gradient(135deg, #3b2d54, #4c2d6b);
+            border-color: #7928ca;
+            color: #f1e6ff;
+            grid-column: span 2;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
 
-    select {
-      width: 100%;
-      min-height: 40px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--panel-soft);
-      color: var(--text);
-      padding: 8px 10px;
-      font-size: 14px;
-    }
+        .ampere-lock-btn:hover {
+            background: linear-gradient(135deg, #4c2d6b, #63368c);
+            border-color: #ab47bc;
+        }
 
-    .hint {
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.4;
-    }
+        .control-group {
+            margin-bottom: 12px;
+        }
 
-    .button-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
 
-    .button-row.three {
-      grid-template-columns: 1fr 1fr 1fr;
-    }
+        .val-disp { color: #58a6ff; font-family: monospace; font-size: 0.9rem; }
 
-    .compact-actions {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
+        input[type="range"] {
+            width: 100%;
+            accent-color: #58a6ff;
+            height: 8px; 
+        }
 
-    .number-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      align-items: end;
-    }
+        .toggle-row {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+            flex-wrap: wrap;
+            margin-top: 5px;
+        }
 
-    .number-field {
-      display: grid;
-      gap: 5px;
-    }
+        .conceptual-box {
+            font-size: 0.88rem;
+            line-height: 1.5;
+            color: #e3e8ef;
+        }
 
-    .number-field span {
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-    }
+        .narrative-step {
+            margin-bottom: 6px;
+            padding-left: 12px;
+            border-left: 2px solid #30363d;
+        }
 
-    .field-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
-    }
+        .narrative-step strong {
+            color: #ff7b72;
+        }
 
-    .entry-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
-    }
+        .math-toggle-btn {
+            width: 100%;
+            background-color: #1f242c;
+            border: 1px solid #30363d;
+            color: #58a6ff;
+            padding: 6px;
+            font-size: 0.82rem;
+            margin-top: 8px;
+            margin-bottom: 8px;
+        }
 
-    .field-button,
-    .entry-button,
-    .quick-button {
-      min-height: 36px;
-      padding: 8px 6px;
-      font-size: 13px;
-    }
+        .formula-box {
+            background-color: #0d1117;
+            padding: 14px;
+            border-radius: 6px;
+            border-left: 4px solid #ff7b72;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            overflow-x: auto;
+            display: none; 
+        }
 
-    button {
-      min-height: 42px;
-      border: 1px solid transparent;
-      border-radius: 8px;
-      background: var(--cyan);
-      color: #04111d;
-      font-size: 15px;
-      font-weight: 800;
-      cursor: pointer;
-    }
+        .math-step { margin-bottom: 12px; }
+        .math-header { color: #8b949e; font-size: 0.78rem; font-weight: bold; text-transform: uppercase; margin-bottom: 2px; }
+        .math-line { font-weight: 500; color: #e3e8ef; font-family: monospace; font-size: 0.82rem; }
+        .math-result { font-weight: bold; color: #58a6ff; font-family: monospace; font-size: 0.85rem; }
 
-    button.secondary {
-      background: var(--panel-soft);
-      border-color: var(--line);
-      color: var(--text);
-    }
+        .monitor-row {
+            display: flex;
+            justify-content: space-between;
+            font-family: monospace;
+            font-size: 0.85rem;
+            padding: 4px 0;
+            border-bottom: 1px dashed #21262d;
+        }
 
-    button[aria-selected="true"],
-    button.active {
-      outline: 2px solid var(--yellow);
-      outline-offset: 2px;
-    }
+        .explanation-card {
+            background-color: #1f242c;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            border-left: 4px solid #58a6ff;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
 
-    .readout,
-    .card {
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--panel-soft);
-      padding: 14px;
-    }
+        .challenge-panel {
+            background-color: #1c1622;
+            border: 1px solid #4c2d6b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
 
-    .readout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
+        #challenge-status {
+            padding: 8px;
+            border-radius: 4px;
+            margin-top: 6px;
+            font-size: 0.82rem;
+            line-height: 1.4;
+            border: 1px dashed #4c2d6b;
+            font-family: monospace;
+        }
 
-    .metric span {
-      display: block;
-      color: var(--muted);
-      font-size: 12px;
-      margin-bottom: 4px;
-    }
+        .mapping-container {
+            background-color: #0d1117;
+            border: 1px solid #21262d;
+            border-radius: 6px;
+            margin-top: 8px;
+            max-height: 160px;
+            overflow-y: auto;
+        }
 
-    .metric strong {
-      font-size: 17px;
-      font-variant-numeric: tabular-nums;
-    }
+        .mapping-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: monospace;
+            font-size: 0.78rem;
+            text-align: left;
+            color: #c9d1d9;
+        }
 
-    .card h3 {
-      margin: 0 0 10px;
-      color: var(--cyan);
-      font-size: 16px;
-    }
+        .mapping-table th {
+            background-color: #161b22;
+            color: #8b949e;
+            padding: 6px;
+            font-weight: bold;
+            border-bottom: 1px solid #21262d;
+            position: sticky;
+            top: 0;
+        }
 
-    .card p {
-      margin: 8px 0;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.45;
-    }
+        .mapping-table td {
+            padding: 5px 6px;
+            border-bottom: 1px solid #21262d;
+        }
 
-    .card ul,
-    .card ol {
-      margin: 8px 0 0;
-      padding-left: 20px;
-      color: var(--muted);
-      font-size: 14px;
-      line-height: 1.45;
-    }
+        .mapping-table tr:hover {
+            background-color: #1f242c;
+        }
 
-    .card li {
-      margin: 7px 0;
-    }
-
-    .tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
-
-    .tab-panel {
-      display: none;
-    }
-
-    .tab-panel.active {
-      display: block;
-    }
-
-    .check-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .check-row input {
-      width: auto;
-    }
-
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
-
-    .legend {
-      display: grid;
-      gap: 8px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-
-    .legend-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .swatch {
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      background: var(--white);
-    }
-
-    .red { background: var(--red); }
-    .blue { background: var(--blue); }
-    .white { background: var(--white); }
-    .yellow { background: var(--yellow); }
-    .green { background: var(--green); }
-
-    #stage {
-      position: relative;
-      min-width: 0;
-      background:
-        linear-gradient(rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(148, 163, 184, 0.08) 1px, transparent 1px),
-        radial-gradient(circle at 45% 40%, #17345f, #08111f 62%);
-      background-size: 42px 42px, 42px 42px, cover;
-    }
-
-    body.high-contrast #stage {
-      background:
-        linear-gradient(rgba(255, 255, 255, 0.22) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.22) 1px, transparent 1px),
-        #000;
-      background-size: 42px 42px, 42px 42px, cover;
-    }
-
-    canvas {
-      display: block;
-      width: 100%;
-      height: 100%;
-      cursor: crosshair;
-      touch-action: none;
-    }
-
-    .badge {
-      position: absolute;
-      top: 18px;
-      left: 18px;
-      max-width: min(410px, calc(100% - 36px));
-      padding: 10px 12px;
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      border-radius: 8px;
-      background: rgba(8, 17, 31, 0.74);
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.4;
-      backdrop-filter: blur(8px);
-    }
-
-    .status {
-      position: absolute;
-      right: 18px;
-      bottom: 18px;
-      max-width: min(340px, calc(100% - 36px));
-      padding: 10px 12px;
-      border: 1px solid rgba(148, 163, 184, 0.3);
-      border-radius: 8px;
-      background: rgba(8, 17, 31, 0.74);
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.4;
-      backdrop-filter: blur(8px);
-    }
-
-    .simulation-credit {
-      position: absolute;
-      right: 12px;
-      top: 10px;
-      max-width: min(260px, calc(100% - 24px));
-      padding: 6px 8px;
-      border: 1px solid rgba(253, 224, 71, 0.26);
-      border-radius: 6px;
-      background: rgba(8, 17, 31, 0.58);
-      color: var(--yellow);
-      font-size: 10px;
-      font-weight: 700;
-      line-height: 1.25;
-      text-align: right;
-      backdrop-filter: blur(8px);
-    }
-
-    @media (max-width: 760px) {
-      body {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr;
-        overflow: auto;
-      }
-
-      #panel {
-        height: auto;
-        max-height: none;
-        border-right: 0;
-        border-bottom: 1px solid var(--line);
-      }
-
-      #stage {
-        min-height: 55vh;
-      }
-
-      .badge {
-        top: 8px;
-        left: 8px;
-        max-width: calc(100% - 16px);
-        font-size: 12px;
-      }
-
-      .status {
-        right: 8px;
-        bottom: 8px;
-        max-width: calc(100% - 16px);
-        font-size: 12px;
-      }
-
-      .simulation-credit {
-        display: none;
-      }
-    }
-  </style>
+        .creator-footer {
+            margin-top: 25px;
+            color: #8b949e;
+            font-size: 0.85rem;
+            text-align: center;
+            letter-spacing: 0.5px;
+            border-top: 1px solid #21262d;
+            padding-top: 15px;
+            width: 100%;
+            max-width: 1200px;
+        }
+    </style>
 </head>
 <body>
-  <aside id="panel">
-    <div>
-      <h1 class="title">CinePhysicsHQ Lab: Interactive Lorentz Force Explorer</h1>
-      <p class="credit">Created by Abhijit Singh / CinePhysicsHQ</p>
-      <p class="subtitle">Change charge, magnetic field, speed, and mass to see how a moving particle bends in a uniform magnetic field.</p>
+
+    <h1>Magnetic Force Between Parallel Conductors</h1>
+    <p class="subtitle">Interactive Physics Exploration Lab. Click multiple points inside the Transverse viewport to dynamically drop coordinates and chart a regional magnetic field superposition map.</p>
+
+    <div class="main-layout">
+        <div id="canvas-container">
+            <canvas id="labCanvas" width="600" height="500"></canvas>
+        </div>
+
+        <div class="sidebar">
+            <div class="panel">
+                <div style="font-weight:bold; margin-bottom:4px; font-size:0.9rem; color: #58a6ff;">LABORATORY VIEW MODE</div>
+                <div class="view-selectors">
+                    <label><input type="radio" name="viewMode" value="cross" checked onchange="updateLab()"> Cross Section (2D)</label>
+                    <label><input type="radio" name="viewMode" value="side" onchange="updateLab()"> Longitudinal Profile</label>
+                    <label><input type="radio" name="viewMode" value="split" onchange="updateLab()"> Split Perspective</label>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div style="font-weight:bold; margin-bottom:8px; font-size:0.9rem;">QUICK DEMO PRESETS</div>
+                <div class="presets-grid">
+                    <button onclick="loadPreset('attract')">Attraction</button>
+                    <button onclick="loadPreset('repel')">Repulsion</button>
+                    <button onclick="loadPreset('zero')">Zero Interaction</button>
+                    <button onclick="loadPreset('clearMap')" style="color: #ffae19;">Clear Map Grid</button>
+                    <button class="ampere-lock-btn" onclick="loadPreset('ampereLock')">🔓 LOCK SI AMPERE BENCHMARK PRESCRIPTION</button>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="control-group">
+                    <label>Current I₁ (Left Wire): <span id="lbl-i1" class="val-disp">5.0 A</span></label>
+                    <input type="range" id="slip-i1" min="-10" max="10" step="0.5" value="5">
+                </div>
+                <div class="control-group">
+                    <label>Current I₂ (Right Wire): <span id="lbl-i2" class="val-disp">5.0 A</span></label>
+                    <input type="range" id="slip-i2" min="-10" max="10" step="0.5" value="5">
+                </div>
+                <div class="control-group">
+                    <label>Distance d: <span id="lbl-d" class="val-disp">1.0 m</span></label>
+                    <input type="range" id="slip-d" min="0.4" max="2.0" step="0.1" value="1">
+                </div>
+                <div class="toggle-row">
+                    <label style="cursor:pointer;"><input type="checkbox" id="chk-fields" checked> Show Field B-Rings</label>
+                    <label style="cursor:pointer;"><input type="checkbox" id="chk-rhr" checked> Show Right-Hand Rule</label>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div style="font-weight:bold; margin-bottom:8px; font-size:0.9rem; color: #58a6ff;">PHYSICS REASONING CHAIN</div>
+                <div class="conceptual-box" id="narrative-box"></div>
+                <button class="math-toggle-btn" onclick="toggleMathPanel()" id="math-btn">Show Mathematical Derivations ↓</button>
+                <div class="formula-box" id="formula-render"></div>
+            </div>
+
+            <div class="panel">
+                <div class="monitor-row"><span>Interaction Mode:</span><span id="mon-mode" style="font-weight:bold;">-</span></div>
+                <div class="monitor-row"><span>Force per Unit Length (|F/L|):</span><span id="mon-force">-</span></div>
+                
+                <div style="font-weight:bold; font-size:0.82rem; color:#ffae19; margin-top:8px; margin-bottom:2px;">📋 REGIONAL MAGNETIC FIELD MAP ($B_{\text{net}}$):</div>
+                <div class="mapping-container">
+                    <table class="mapping-table" id="data-map-table">
+                        <thead>
+                            <tr>
+                                <th>Node</th>
+                                <th>Position (m)</th>
+                                <th>r₁ | r₂ (m)</th>
+                                <th>Field Strength (T)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="data-map-body">
+                            <tr>
+                                <td colspan="4" style="text-align:center; color:#6e7681; padding:15px;">No active data points mapped yet. Click on canvas to record.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="rule-box" class="explanation-card"></div>
+
+                <div class="challenge-panel">
+                    <div style="font-weight:bold; font-size:0.82rem; color:#b088f5;">🎯 ACTIVE STUDENT CHALLENGE:</div>
+                    <div style="font-size:0.78rem; color:#94a3b8; margin-top:2px;">Adjust variables to achieve a force magnitude of exactly 2.00 × 10⁻⁷ N/m.</div>
+                    <div id="challenge-status">Searching for target equilibrium...</div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="control">
-      <label for="charge">Charge q <output id="qText"></output></label>
-      <input id="charge" type="range" min="-5" max="5" step="1" value="1">
-      <div class="compact-actions">
-        <button class="secondary quick-button" id="positiveQuick">Positive Charge</button>
-        <button class="secondary quick-button" id="negativeQuick">Negative Charge</button>
-      </div>
-      <div class="hint">Positive and negative charges curve in opposite directions. Zero charge moves straight.</div>
+    <div class="creator-footer">
+        <strong>CinePhysics</strong><br>
+        Interactive Physics Simulations by Abhijit Singh<br>
+        <span style="font-size: 0.75rem; color: #6e7681;">Version 5.9 (Mobile Platform Stability Build)</span>
     </div>
 
-    <div class="control">
-      <label for="field">Magnetic field strength B <output id="bText"></output></label>
-      <input id="field" type="range" min="0" max="5" step="0.5" value="2">
-      <div class="number-grid">
-        <label class="number-field" for="fieldNumber">
-          <span>Custom B</span>
-      <input id="fieldNumber" type="number" min="0" step="0.1" value="2">
-        </label>
-      </div>
-      <div class="hint">Type larger values when needed. Changes affect the next particle you launch; existing particles stay for comparison.</div>
-    </div>
+    <script>
+        "use strict";
 
-    <div class="control" aria-label="Magnetic field direction">
-      <label>Magnetic field direction</label>
-      <div class="field-grid">
-        <button class="secondary field-button active" data-field-dir="into">Into</button>
-        <button class="secondary field-button" data-field-dir="out">Out</button>
-        <button class="secondary field-button" data-field-dir="up">Up</button>
-        <button class="secondary field-button" data-field-dir="down">Down</button>
-        <button class="secondary field-button" data-field-dir="left">Left</button>
-        <button class="secondary field-button" data-field-dir="right">Right</button>
-      </div>
-      <div class="hint">In-plane fields can push particles into or out of the screen, so the particle size and force label show depth.</div>
-    </div>
+        const canvas = document.getElementById('labCanvas');
+        const ctx = canvas.getContext('2d');
 
-    <div class="control">
-      <label for="speed">Velocity v <output id="vText"></output></label>
-      <input id="speed" type="range" min="0" max="12" step="0.5" value="5">
-      <div class="number-grid">
-        <label class="number-field" for="speedNumber">
-          <span>Custom v</span>
-          <input id="speedNumber" type="number" min="0" step="0.1" value="5">
-        </label>
-      </div>
-      <div class="hint">Set v = 0 to show no magnetic force. Changes affect the next particle you launch; existing particles keep their original speed.</div>
-      <label for="angle">Entry angle v to B <output id="angleText"></output></label>
-      <input id="angle" type="range" min="0" max="180" step="5" value="90">
-      <div class="hint">This controls the angle the velocity vector makes with the magnetic field at the entrance. Entry direction chooses which side of that angle the particle uses.</div>
-    </div>
+        // Hardcoded Context Hook Diagnostics Check
+        ctx.fillStyle = "#238636";
+        ctx.fillRect(0, 0, 10, 10);
 
-    <div class="control">
-      <label for="mass">Mass m <output id="mText"></output></label>
-      <input id="mass" type="range" min="5" max="60" step="1" value="25">
-      <div class="hint">More mass makes the same force bend the particle less.</div>
-    </div>
+        // Capture Nodes
+        const sI1 = document.getElementById('slip-i1');
+        const sI2 = document.getElementById('slip-i2');
+        const sD = document.getElementById('slip-d');
+        const cFields = document.getElementById('chk-fields');
+        const cRHR = document.getElementById('chk-rhr');
 
-    <div class="control">
-      <label for="scenario">Simulation setup</label>
-      <select id="scenario">
-        <option value="orbit">Full magnetic field: circular path</option>
-        <option value="entry">Entry from non-magnetic area</option>
-      </select>
-      <div class="hint">Entry mode shows a particle traveling straight before it enters the magnetic field region.</div>
-    </div>
+        const lI1 = document.getElementById('lbl-i1');
+        const lI2 = document.getElementById('lbl-i2');
+        const lD = document.getElementById('lbl-d');
 
-    <div class="control" aria-label="Particle entry direction">
-      <label>Particle entry direction</label>
-      <div class="entry-grid">
-        <button class="secondary entry-button active" data-entry-dir="left">From left</button>
-        <button class="secondary entry-button" data-entry-dir="top">From top</button>
-        <button class="secondary entry-button" data-entry-dir="bottom">From bottom</button>
-      </div>
-      <div class="hint">Use From left with Up/Down field to show z deflection from an x-axis velocity. Use From top or bottom with Left/Right field to compare the two possible paths at the same v-B angle.</div>
-    </div>
+        const fRender = document.getElementById('formula-render');
+        const nBox = document.getElementById('narrative-box');
+        const mMode = document.getElementById('mon-mode');
+        const mForce = document.getElementById('mon-force');
+        const ruleBox = document.getElementById('rule-box');
+        const challengeStatus = document.getElementById('challenge-status');
+        const mathBtn = document.getElementById('math-btn');
+        const dataMapBody = document.getElementById('data-map-body');
 
-    <div class="control" aria-label="Fixed particle simulations">
-      <label for="presetSelect">Particle preset</label>
-      <select id="presetSelect">
-        <option value="positive">Positive charge</option>
-        <option value="negative">Negative charge</option>
-        <option value="heavyPositive">Heavy positive</option>
-        <option value="heavyNegative">Heavy negative</option>
-        <option value="fastPositive">Fast positive</option>
-        <option value="fastNegative">Fast negative</option>
-        <option value="electron">Electron</option>
-        <option value="positron">Positron</option>
-        <option value="alpha">Alpha particle</option>
-        <option value="proton">Proton</option>
-        <option value="beta">Beta particle</option>
-        <option value="custom">Custom</option>
-      </select>
-      <div class="hint">Choose a preset or adjust the sliders for a custom particle.</div>
-    </div>
+        const MU_0 = 4 * Math.PI * 1e-7;
+        const SCALE_PIXELS = 150; 
+        const MAX_NODES = 50; 
 
-    <div class="button-row">
-      <button id="toggle">Pause</button>
-      <button id="stop" class="secondary">Stop</button>
-      <button id="reset" class="secondary">Reset</button>
-      <button id="clear" class="secondary">Clear All</button>
-    </div>
+        // State Containers
+        let globalTime = 0;
+        let isMathVisible = false;
+        let mappedNodes = []; 
 
-    <div class="button-row">
-      <button id="exportPng" class="secondary">Export Graph PNG</button>
-      <button id="exportCsv" class="secondary">Export Data CSV</button>
-    </div>
-
-    <div class="card">
-      <h3>Accessibility</h3>
-      <label class="check-row" for="measureToggle">
-        <input id="measureToggle" type="checkbox" checked>
-        Show radius measurement
-      </label>
-      <label class="check-row" for="motionToggle">
-        <input id="motionToggle" type="checkbox">
-        Reduce motion
-      </label>
-      <label class="check-row" for="contrastToggle">
-        <input id="contrastToggle" type="checkbox">
-        High contrast
-      </label>
-      <p>Keyboard: Space pauses or resumes, R resets, C clears all particles, and S advances one frame while paused.</p>
-    </div>
-
-    <section class="readout" aria-label="Simulation readouts">
-      <div class="metric"><span>Force |qvB|</span><strong id="forceText">0</strong></div>
-      <div class="metric"><span>Radius mv/|qB|</span><strong id="radiusText">0</strong></div>
-      <div class="metric"><span>Cyclotron frequency</span><strong id="frequencyText">0</strong></div>
-      <div class="metric"><span>Radius on screen</span><strong id="screenRadiusText">0</strong></div>
-      <div class="metric"><span>Direction</span><strong id="directionText">Straight</strong></div>
-      <div class="metric"><span>Field view</span><strong id="fieldText">Into page</strong></div>
-    </section>
-
-    <div class="tabs" role="tablist" aria-label="Learning sections">
-      <button class="secondary active" id="tabObjectives" role="tab" aria-selected="true" aria-controls="objectivesPanel">Objectives</button>
-      <button class="secondary" id="tabTheory" role="tab" aria-selected="false" aria-controls="theoryPanel">Theory</button>
-      <button class="secondary" id="tabChallenge" role="tab" aria-selected="false" aria-controls="challengePanel">Challenges</button>
-      <button class="secondary" id="tabTeacher" role="tab" aria-selected="false" aria-controls="teacherPanel">Teacher</button>
-      <button class="secondary" id="tabReferences" role="tab" aria-selected="false" aria-controls="referencesPanel">References</button>
-    </div>
-
-    <section class="card tab-panel active" id="objectivesPanel" role="tabpanel" aria-labelledby="tabObjectives">
-      <h3>Learning Objectives</h3>
-      <ul>
-        <li>Predict how charge sign changes the direction of magnetic deflection.</li>
-        <li>Explain why magnetic force changes direction but not speed.</li>
-        <li>Use F = |q|vB, r = mv / |qB|, and f = |qB| / 2πm to connect numbers with motion.</li>
-        <li>Compare simulated motion with the right-hand rule.</li>
-      </ul>
-    </section>
-
-    <section class="card tab-panel" id="theoryPanel" role="tabpanel" aria-labelledby="tabTheory">
-      <h3>Theory</h3>
-      <p>A moving charged particle in a magnetic field experiences the Lorentz magnetic force, F = q(v x B). In this lab the velocity is drawn in the screen plane and the magnetic field points into or out of the screen.</p>
-      <p>Because the force is perpendicular to velocity, it acts as a centripetal force. That gives circular motion when q and B are nonzero: r = mv / |qB|.</p>
-      <p>The angular speed is omega = qB / m, and the cyclotron frequency shown here is f = |qB| / 2πm.</p>
-    </section>
-
-    <section class="card tab-panel" id="challengePanel" role="tabpanel" aria-labelledby="tabChallenge">
-      <h3>Student Challenge Questions</h3>
-      <ol>
-        <li>Set q = +1 and B = +2. Which way does the particle bend? Now change q to -1. What reverses?</li>
-        <li>Keep q and B fixed. Double the mass. What happens to the measured radius?</li>
-        <li>Increase velocity from 4 to 8. Does force increase, radius increase, or both?</li>
-        <li>Find two different settings that produce the same radius. Record your values.</li>
-        <li>Set q = 0. Explain why the magnetic field symbols are still visible but the path is straight.</li>
-      </ol>
-    </section>
-
-    <section class="card tab-panel" id="teacherPanel" role="tabpanel" aria-labelledby="tabTeacher">
-      <h3>Teacher Worksheet</h3>
-      <ol>
-        <li>Warm-up: Ask students to predict the path before pressing Reset.</li>
-        <li>Guided test: q = +2, B = +2, v = 6, m = 24. Students calculate F, r, and f, then compare with readouts.</li>
-        <li>Concept check: Ask why magnetic force cannot increase the particle speed in this setup.</li>
-        <li>Extension: Ask students to export the CSV trail data and plot x versus y in a spreadsheet.</li>
-        <li>Exit ticket: One sentence explaining how mass affects curvature.</li>
-      </ol>
-    </section>
-
-    <section class="card tab-panel" id="referencesPanel" role="tabpanel" aria-labelledby="tabReferences">
-      <h3>Citations and References</h3>
-      <ul>
-        <li>OpenStax University Physics Volume 2, Magnetic Forces and Fields.</li>
-        <li>HyperPhysics, Georgia State University, Magnetic Force on a Moving Charge.</li>
-        <li>The Physics Classroom, Circular Motion and Magnetism teaching resources.</li>
-      </ul>
-    </section>
-
-    <section class="card">
-      <h3>What to Notice</h3>
-      <p>The force is always at right angles to the velocity, so the particle turns instead of speeding up.</p>
-      <p>When q or B is zero, there is no magnetic force and the trail becomes a straight line.</p>
-    </section>
-
-    <section class="card">
-      <h3>Legend</h3>
-      <div class="legend">
-        <div class="legend-row"><span class="swatch red"></span>Positive charge</div>
-        <div class="legend-row"><span class="swatch blue"></span>Negative charge</div>
-        <div class="legend-row"><span class="swatch white"></span>Neutral particle</div>
-        <div class="legend-row"><span class="swatch yellow"></span>Velocity vector</div>
-        <div class="legend-row"><span class="swatch green"></span>Magnetic force vector</div>
-      </div>
-    </section>
-  </aside>
-
-  <main id="stage">
-    <div class="badge">Tap to place a particle. X and dot show fields through the page; arrows show in-plane fields with a separate z-screen.</div>
-    <div class="simulation-credit">Created by Abhijit Singh | CinePhysicsHQ Labs © 2026</div>
-    <div class="status" id="statusText" aria-live="polite">Simulation running. Radius measurement is visible.</div>
-    <canvas id="canvas" role="img" aria-label="Animated Lorentz force simulation showing a charged particle, velocity vector, force vector, magnetic field symbols, and radius measurement."></canvas>
-  </main>
-
-  <script>
-    const canvas = document.getElementById("canvas");
-    const ctx = canvas.getContext("2d");
-    const stage = document.getElementById("stage");
-
-    const charge = document.getElementById("charge");
-    const field = document.getElementById("field");
-    const fieldNumber = document.getElementById("fieldNumber");
-    const speed = document.getElementById("speed");
-    const speedNumber = document.getElementById("speedNumber");
-    const mass = document.getElementById("mass");
-    const angle = document.getElementById("angle");
-    const scenario = document.getElementById("scenario");
-    const presetSelect = document.getElementById("presetSelect");
-    const positiveQuick = document.getElementById("positiveQuick");
-    const negativeQuick = document.getElementById("negativeQuick");
-    const toggleButton = document.getElementById("toggle");
-    const stopButton = document.getElementById("stop");
-    const resetButton = document.getElementById("reset");
-    const clearButton = document.getElementById("clear");
-    const exportPngButton = document.getElementById("exportPng");
-    const exportCsvButton = document.getElementById("exportCsv");
-    const measureToggle = document.getElementById("measureToggle");
-    const motionToggle = document.getElementById("motionToggle");
-    const contrastToggle = document.getElementById("contrastToggle");
-
-    const qText = document.getElementById("qText");
-    const bText = document.getElementById("bText");
-    const vText = document.getElementById("vText");
-    const mText = document.getElementById("mText");
-    const angleText = document.getElementById("angleText");
-    const forceText = document.getElementById("forceText");
-    const radiusText = document.getElementById("radiusText");
-    const frequencyText = document.getElementById("frequencyText");
-    const screenRadiusText = document.getElementById("screenRadiusText");
-    const directionText = document.getElementById("directionText");
-    const fieldText = document.getElementById("fieldText");
-    const statusText = document.getElementById("statusText");
-
-    const state = {
-      particle: null,
-      particles: [],
-      center: null,
-      trail: [],
-      running: true,
-      lastTime: 0,
-      timeScale: 1,
-      pixelsPerUnit: 4,
-      sampleIndex: 0,
-      lastStatusUpdate: 0,
-      lastStatusText: "",
-      activePreset: "positive",
-      fieldDirection: "into",
-      entryDirection: "left",
-      maxTrail: 900
-    };
-
-    const presets = {
-      positive: { q: 1, m: 25, b: 2, v: 5, label: "Positive charge" },
-      negative: { q: -1, m: 25, b: 2, v: 5, label: "Negative charge" },
-      heavyPositive: { q: 1, m: 60, b: 2, v: 5, label: "Heavy positive" },
-      heavyNegative: { q: -1, m: 60, b: 2, v: 5, label: "Heavy negative" },
-      fastPositive: { q: 1, m: 25, b: 2, v: 10, label: "Fast positive" },
-      fastNegative: { q: -1, m: 25, b: 2, v: 10, label: "Fast negative" },
-      electron: { q: -1, m: 5, b: 2, v: 5, label: "Electron" },
-      proton: { q: 1, m: 35, b: 2, v: 5, label: "Proton" },
-      alpha: { q: 2, m: 60, b: 2, v: 5, label: "Alpha particle" },
-      beta: { q: -1, m: 5, b: 2, v: 7, label: "Beta particle" },
-      positron: { q: 1, m: 5, b: 2, v: 5, label: "Positron" }
-    };
-
-    function resize() {
-      const rect = stage.getBoundingClientRect();
-      const ratio = window.devicePixelRatio || 1;
-      canvas.width = Math.max(1, Math.floor(rect.width * ratio));
-      canvas.height = Math.max(1, Math.floor(rect.height * ratio));
-      ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-    }
-
-    function width() {
-      return canvas.width / (window.devicePixelRatio || 1);
-    }
-
-    function height() {
-      return canvas.height / (window.devicePixelRatio || 1);
-    }
-
-    function fieldBoundaryX() {
-      return width() * 0.32;
-    }
-
-    function fieldBoundaryY() {
-      return height() * 0.22;
-    }
-
-    function magneticRegion() {
-      if (!isEntryMode()) {
-        return { x: 0, y: 0, width: width(), height: height() };
-      }
-      if (state.entryDirection === "top" || state.entryDirection === "bottom") {
-        const top = height() * 0.18;
-        const bottom = height() * 0.86;
-        return { x: 0, y: top, width: width(), height: bottom - top };
-      }
-      const left = fieldBoundaryX();
-      const right = Math.max(left + 120, width() - 24);
-      return { x: left, y: 0, width: right - left, height: height() };
-    }
-
-    function isEntryMode() {
-      return scenario.value === "entry";
-    }
-
-    function inMagneticRegion(particle) {
-      if (!isEntryMode()) return true;
-      const region = magneticRegion();
-      return particle.x >= region.x &&
-        particle.x <= region.x + region.width &&
-        particle.y >= region.y &&
-        particle.y <= region.y + region.height;
-    }
-
-    function fieldLabel() {
-      const labels = {
-        into: "Into page",
-        out: "Out of page",
-        up: "Up",
-        down: "Down",
-        left: "Left",
-        right: "Right"
-      };
-      return labels[state.fieldDirection] || "Into page";
-    }
-
-    function fieldVector(direction, strength) {
-      if (direction === "out") return { x: 0, y: 0, z: -strength };
-      if (direction === "up") return { x: 0, y: -strength, z: 0 };
-      if (direction === "down") return { x: 0, y: strength, z: 0 };
-      if (direction === "left") return { x: -strength, y: 0, z: 0 };
-      if (direction === "right") return { x: strength, y: 0, z: 0 };
-      return { x: 0, y: 0, z: strength };
-    }
-
-    function fieldVectorForParticle(particle) {
-      if (!inMagneticRegion(particle)) return { x: 0, y: 0, z: 0 };
-      return fieldVector(particle.fieldDirection, particle.b);
-    }
-
-    function fieldStrengthFor({ b }) {
-      return Math.abs(b);
-    }
-
-    function cross(a, b) {
-      return {
-        x: a.y * b.z - a.z * b.y,
-        y: a.z * b.x - a.x * b.z,
-        z: a.x * b.y - a.y * b.x
-      };
-    }
-
-    function normalizeDegrees(degrees) {
-      return ((degrees % 360) + 360) % 360;
-    }
-
-    function entryDirectionMatches(degrees, entryDirection) {
-      const radians = degrees * Math.PI / 180;
-      const vx = Math.cos(radians);
-      const vy = Math.sin(radians);
-      if (entryDirection === "top") return vy > 0.05;
-      if (entryDirection === "bottom") return vy < -0.05;
-      return vx > 0.05;
-    }
-
-    function launchAngleFromField(relativeAngle = Number(angle.value)) {
-      if (state.fieldDirection === "into" || state.fieldDirection === "out") {
-        return {
-          left: 0,
-          top: 90,
-          bottom: 270
-        }[state.entryDirection] ?? 0;
-      }
-
-      const B = fieldVector(state.fieldDirection, 1);
-      const fieldAngle = Math.atan2(B.y, B.x) * 180 / Math.PI;
-      const candidates = [
-        normalizeDegrees(fieldAngle + relativeAngle),
-        normalizeDegrees(fieldAngle - relativeAngle)
-      ];
-      return candidates.find((candidate) => entryDirectionMatches(candidate, state.entryDirection)) ?? candidates[0];
-    }
-
-    function angleBetweenVelocityAndField(velocity, B) {
-      const vMag = Math.hypot(velocity.x, velocity.y, velocity.z || 0);
-      const bMag = Math.hypot(B.x, B.y, B.z);
-      if (vMag < 0.001 || bMag < 0.001) return 0;
-      const dot = velocity.x * B.x + velocity.y * B.y + (velocity.z || 0) * B.z;
-      const clamped = Math.max(-1, Math.min(1, dot / (vMag * bMag)));
-      return Math.acos(clamped) * 180 / Math.PI;
-    }
-
-    function displayScaleFor({ q, b, speed: v, mass: m }) {
-      const launchAngle = launchAngleFromField(Number(angle.value)) * Math.PI / 180;
-      const velocity = { x: v * Math.cos(launchAngle), y: v * Math.sin(launchAngle), z: 0 };
-      const B = fieldVector(state.fieldDirection, b);
-      const bMag = Math.hypot(B.x, B.y, B.z);
-      const bUnit = bMag < 0.001 ? { x: 0, y: 0, z: 0 } : { x: B.x / bMag, y: B.y / bMag, z: B.z / bMag };
-      const speedMag = Math.hypot(velocity.x, velocity.y, velocity.z);
-      const vParallel = velocity.x * bUnit.x + velocity.y * bUnit.y + velocity.z * bUnit.z;
-      const vPerpendicular = Math.sqrt(Math.max(0, speedMag * speedMag - vParallel * vParallel));
-      const radiusUnits = Math.abs(q * bMag) < 0.0001 || vPerpendicular < 0.0001 ? Infinity : (m * vPerpendicular) / Math.abs(q * bMag);
-      const region = magneticRegion();
-      const usableSize = Math.min(region.width, region.height, width(), height());
-      const targetRadiusPixels = Math.max(86, usableSize * 0.24);
-      if (!Number.isFinite(radiusUnits)) return 4;
-
-      const perpendicularFraction = speedMag < 0.0001 ? 1 : Math.max(0.08, vPerpendicular / speedMag);
-      const referenceRadiusUnits = Math.abs(q * bMag) < 0.0001 ? radiusUnits : (m * 5 * perpendicularFraction) / Math.abs(q * bMag);
-      const normalScale = targetRadiusPixels / Math.max(0.001, referenceRadiusUnits);
-      const maxVisibleRadius = Math.max(120, usableSize * 0.58);
-      const visibleScale = Math.min(normalScale, maxVisibleRadius / radiusUnits);
-      return Math.max(0.05, Math.min(90, visibleScale));
-    }
-
-    function updateDisplayScale() {
-      state.pixelsPerUnit = displayScaleFor(values());
-    }
-
-    function resetParticle() {
-      state.particles = [];
-      let startX = width() * 0.5;
-      let startY = height() * 0.5;
-      if (isEntryMode()) {
-        if (state.entryDirection === "top") {
-          startX = width() * 0.5;
-          startY = Math.max(24, magneticRegion().y - height() * 0.16);
-        } else if (state.entryDirection === "bottom") {
-          startX = width() * 0.5;
-          startY = Math.min(height() - 24, magneticRegion().y + magneticRegion().height + height() * 0.16);
-        } else {
-          startX = Math.max(24, magneticRegion().x - width() * 0.18);
-          startY = height() * 0.5;
+        // Scientific Notation Mapped Formatting Engine
+        function sciFormat(x) {
+            if (x === 0) return "0.00";
+            let rawExp = x.toExponential(2); 
+            const superscripts = { '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹' };
+            return rawExp.replace(/e\+?([-\d]+)/, (match, power) => {
+                let unicodePower = power.split('').map(char => superscripts[char] || char).join('');
+                return ` × 10${unicodePower}`;
+            });
         }
-      }
-      launchParticleAt(startX, startY, { keepExisting: false, stayPaused: !state.running });
-    }
 
-    function createParticle(x, y) {
-      const config = values();
-      const { q, b, speed: v, mass: m } = config;
-      const effectiveB = state.fieldDirection === "into" ? b : state.fieldDirection === "out" ? -b : 0;
-      const omega = (q * effectiveB) / m;
-      const pixelsPerUnit = displayScaleFor(config);
-      const radiusPixels = Math.abs(omega) < 0.0001 ? 0 : (v / Math.abs(omega)) * pixelsPerUnit;
-      const launchAngleDegrees = launchAngleFromField(config.angle);
-      const launchAngle = launchAngleDegrees * Math.PI / 180;
-      const vx = v * Math.cos(launchAngle);
-      const vy = v * Math.sin(launchAngle);
-      let center = null;
-      let startX = x;
-      let startY = y;
+        // Primary Event Observers
+        canvas.addEventListener('mousedown', handleFieldPointDrop);
+        canvas.addEventListener('touchstart', handleFieldPointDropTouch, {passive: true});
 
-      if (!isEntryMode() && Math.abs(omega) >= 0.0001) {
-        if (x === undefined || y === undefined) {
-          center = { x: width() / 2, y: height() / 2 };
-          startX = center.x - (vy / omega) * pixelsPerUnit;
-          startY = center.y + (vx / omega) * pixelsPerUnit;
-        } else {
-          center = {
-            x: x + (vy / omega) * pixelsPerUnit,
-            y: y - (vx / omega) * pixelsPerUnit
-          };
+        [sI1, sI2, sD].forEach(el => el.addEventListener('input', updateLab));
+        cFields.addEventListener('change', updateLab);
+        cRHR.addEventListener('change', updateLab);
+
+        function handleFieldPointDrop(e) {
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const dropX = (e.clientX - rect.left) * scaleX;
+            const dropY = (e.clientY - rect.top) * scaleY;
+
+            registerTargetNode(dropX, dropY);
         }
-      }
 
-      return {
-        id: Date.now() + Math.random(),
-        label: presets[state.activePreset]?.label || "Custom charge",
-        q,
-        b,
-        mass: m,
-        speed: v,
-        angle: config.angle,
-        launchAngle: launchAngleDegrees,
-        pixelsPerUnit,
-        x: startX ?? width() * 0.18,
-        y: startY ?? height() * 0.52,
-        vx,
-        vy,
-        z: 0,
-        vz: 0,
-        center,
-        fieldDirection: state.fieldDirection,
-        entryDirection: state.entryDirection,
-        hasEnteredField: false,
-        trail: [],
-        sampleIndex: 0
-      };
-    }
+        function handleFieldPointDropTouch(e) {
+            if (e.touches.length === 0) return;
+            const rect = canvas.getBoundingClientRect();
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const touchX = (e.touches[0].clientX - rect.left) * scaleX;
+            const touchY = (e.touches[0].clientY - rect.top) * scaleY;
 
-    function launchParticleAt(x, y, options = {}) {
-      const particle = createParticle(x, y);
-      if (!options.keepExisting) {
-        state.particles = [];
-      }
-      state.particles.push(particle);
-      while (state.particles.length > 3) {
-        state.particles.shift();
-      }
-      state.particle = particle;
-      state.center = particle.center;
-      state.trail = particle.trail;
-      state.sampleIndex = particle.sampleIndex;
-      state.pixelsPerUnit = particle.pixelsPerUnit;
-      if (!options.stayPaused) setRunning(true);
-      draw();
-    }
-
-    function canvasPoint(event) {
-      const rect = canvas.getBoundingClientRect();
-      return {
-        x: event.clientX - rect.left,
-        y: event.clientY - rect.top
-      };
-    }
-
-    function clearTrail() {
-      state.particles = [];
-      state.particle = null;
-      state.center = null;
-      state.trail = [];
-      state.sampleIndex = 0;
-    }
-
-    function customNumberValue(input, fallback) {
-      const next = Number(input.value);
-      return Number.isFinite(next) ? Math.max(0, next) : fallback;
-    }
-
-    function syncRangeToNumber(rangeInput, numberInput) {
-      const next = customNumberValue(numberInput, Number(rangeInput.value));
-      numberInput.value = String(next);
-      const max = Number(rangeInput.max);
-      rangeInput.value = String(Math.min(max, next));
-    }
-
-    function syncNumberToRange(rangeInput, numberInput) {
-      numberInput.value = rangeInput.value;
-    }
-
-    function values() {
-      return {
-        q: Number(charge.value),
-        b: customNumberValue(fieldNumber, Number(field.value)),
-        speed: customNumberValue(speedNumber, Number(speed.value)),
-        mass: Number(mass.value),
-        angle: Number(angle.value)
-      };
-    }
-
-    function derivedValues() {
-      const { q, b, speed: v, mass: m, angle: relativeAngle } = values();
-      const launchAngle = launchAngleFromField(relativeAngle);
-      const theta = launchAngle * Math.PI / 180;
-      const velocity = { x: v * Math.cos(theta), y: v * Math.sin(theta), z: 0 };
-      const B = fieldVector(state.fieldDirection, b);
-      const forceVector = cross(velocity, B);
-      const force = Math.abs(q) * Math.hypot(forceVector.x, forceVector.y, forceVector.z);
-      const bMag = Math.hypot(B.x, B.y, B.z);
-      const bUnit = bMag < 0.001 ? { x: 0, y: 0, z: 0 } : { x: B.x / bMag, y: B.y / bMag, z: B.z / bMag };
-      const vParallel = velocity.x * bUnit.x + velocity.y * bUnit.y + velocity.z * bUnit.z;
-      const vPerpendicular = Math.sqrt(Math.max(0, v * v - vParallel * vParallel));
-      const radius = Math.abs(q * bMag) < 0.001 || vPerpendicular < 0.001 ? Infinity : (m * vPerpendicular) / Math.abs(q * bMag);
-      const frequency = Math.abs(q * bMag) < 0.001 ? 0 : Math.abs(q * bMag) / (2 * Math.PI * m);
-      const vToB = angleBetweenVelocityAndField(velocity, B);
-      return { force, radius, frequency, screenRadius: radius * displayScaleFor(values()), launchAngle, vToB };
-    }
-
-    function orbitCenter() {
-      const particle = state.particle;
-      if (!particle) return null;
-      if (particle.fieldDirection !== "into" && particle.fieldDirection !== "out") return null;
-      const { q, b, mass: m } = particle;
-      const signedB = particle.fieldDirection === "out" ? -b : b;
-      const omega = (q * signedB) / m;
-      if (isEntryMode()) {
-        if (Math.abs(omega) < 0.0001 || !inMagneticRegion(particle)) return null;
-        return {
-          x: particle.x + (particle.vy / omega) * particle.pixelsPerUnit,
-          y: particle.y - (particle.vx / omega) * particle.pixelsPerUnit
-        };
-      }
-      if (Math.abs(omega) < 0.0001) return null;
-      return particle.center;
-    }
-
-    function updateReadouts() {
-      const { q, b, speed: v, mass: m } = values();
-      const { force, radius, frequency, screenRadius, launchAngle, vToB } = derivedValues();
-      const activeForce = state.particle
-        ? Math.abs(state.particle.q) * Math.hypot(...Object.values(cross(
-          { x: state.particle.vx, y: state.particle.vy, z: state.particle.vz || 0 },
-          fieldVectorForParticle(state.particle)
-        )))
-        : force;
-      const signedB = state.fieldDirection === "out" ? -b : b;
-      const turn = q * signedB;
-
-      qText.textContent = q === 0 ? "0 neutral" : q > 0 ? `+${q}` : q;
-      bText.textContent = b === 0 ? "0 off" : `${b} ${fieldLabel().toLowerCase()}`;
-      vText.textContent = `${v.toFixed(1)} units/s`;
-      mText.textContent = `${m} units`;
-      angleText.textContent = `${vToB.toFixed(0)} deg to B, launch ${launchAngle.toFixed(0)} deg`;
-      angle.disabled = state.fieldDirection === "into" || state.fieldDirection === "out";
-      angle.setAttribute("aria-disabled", String(angle.disabled));
-      forceText.textContent = activeForce.toFixed(1);
-      radiusText.textContent = Number.isFinite(radius) ? radius.toFixed(1) : "infinite";
-      frequencyText.textContent = `${frequency.toFixed(3)} cycles/s`;
-      screenRadiusText.textContent = state.fieldDirection === "into" || state.fieldDirection === "out" ? (Number.isFinite(screenRadius) ? `${screenRadius.toFixed(0)} px` : "infinite") : "3D z path";
-      directionText.textContent = b === 0 ? "Straight" : state.fieldDirection === "into" || state.fieldDirection === "out" ? (turn === 0 ? "Straight" : turn > 0 ? "Counterclockwise" : "Clockwise") : "Into/out of screen";
-      fieldText.textContent = b === 0 ? "Off" : fieldLabel();
-
-      const nextStatus = `${state.running ? "Simulation running" : "Simulation paused"}. ${state.particles.length} particle${state.particles.length === 1 ? "" : "s"} on screen. Next launch: ${presets[state.activePreset]?.label || "custom charge"}. Current magnetic force ${activeForce.toFixed(1)}, radius ${Number.isFinite(radius) ? radius.toFixed(1) : "infinite"}, cyclotron frequency ${frequency.toFixed(3)} cycles/s.`;
-      const now = Date.now();
-      if (nextStatus !== state.lastStatusText && now - state.lastStatusUpdate > 1500) {
-        statusText.textContent = nextStatus;
-        state.lastStatusText = nextStatus;
-        state.lastStatusUpdate = now;
-      }
-    }
-
-    function stepOneParticle(particle, dt) {
-      const inField = inMagneticRegion(particle);
-      if (inField) particle.hasEnteredField = true;
-      const B = fieldVectorForParticle(particle);
-      const bMag = Math.hypot(B.x, B.y, B.z);
-      const vx = particle.vx;
-      const vy = particle.vy;
-      const vz = particle.vz || 0;
-
-      if (bMag < 0.0001 || Math.abs(particle.q) < 0.0001) {
-        particle.x += vx * dt * particle.pixelsPerUnit;
-        particle.y += vy * dt * particle.pixelsPerUnit;
-        particle.z += vz * dt * particle.pixelsPerUnit;
-      } else if (Math.abs(B.x) < 0.0001 && Math.abs(B.y) < 0.0001) {
-        const omega = (particle.q * B.z) / particle.mass;
-        const theta = omega * dt;
-        const cos = Math.cos(theta);
-        const sin = Math.sin(theta);
-        particle.x += ((vx * sin + vy * (1 - cos)) / omega) * particle.pixelsPerUnit;
-        particle.y += ((vx * (cos - 1) + vy * sin) / omega) * particle.pixelsPerUnit;
-        particle.vx = vx * cos + vy * sin;
-        particle.vy = -vx * sin + vy * cos;
-        particle.z += vz * dt * particle.pixelsPerUnit;
-      } else {
-        const axis = { x: B.x / bMag, y: B.y / bMag, z: B.z / bMag };
-        const theta = -(particle.q * bMag / particle.mass) * dt;
-        const cos = Math.cos(theta);
-        const sin = Math.sin(theta);
-        const dot = vx * axis.x + vy * axis.y + vz * axis.z;
-        const rotated = {
-          x: vx * cos + (axis.y * vz - axis.z * vy) * sin + axis.x * dot * (1 - cos),
-          y: vy * cos + (axis.z * vx - axis.x * vz) * sin + axis.y * dot * (1 - cos),
-          z: vz * cos + (axis.x * vy - axis.y * vx) * sin + axis.z * dot * (1 - cos)
-        };
-
-        particle.vx = rotated.x;
-        particle.vy = rotated.y;
-        particle.vz = rotated.z;
-        particle.x += ((vx + particle.vx) / 2) * dt * particle.pixelsPerUnit;
-        particle.y += ((vy + particle.vy) / 2) * dt * particle.pixelsPerUnit;
-        particle.z += ((vz + particle.vz) / 2) * dt * particle.pixelsPerUnit;
-      }
-
-      particle.trail.push({
-        sample: particle.sampleIndex,
-        x: particle.x,
-        y: particle.y,
-        z: particle.z,
-        vx: particle.vx,
-        vy: particle.vy,
-        vz: particle.vz,
-        inField,
-        wrapped: false
-      });
-      particle.sampleIndex += 1;
-      if (particle.trail.length > state.maxTrail) particle.trail.shift();
-    }
-
-    function stepPhysics(dt) {
-      state.particles.forEach((particle) => stepOneParticle(particle, dt));
-      if (state.particle) {
-        state.center = state.particle.center;
-        state.trail = state.particle.trail;
-        state.sampleIndex = state.particle.sampleIndex;
-        state.pixelsPerUnit = state.particle.pixelsPerUnit;
-      }
-    }
-
-    function drawField() {
-      const b = values().b;
-      if (b === 0) return;
-
-      ctx.save();
-      const region = magneticRegion();
-      if (isEntryMode()) {
-        ctx.fillStyle = "rgba(56, 189, 248, 0.08)";
-        ctx.fillRect(region.x, region.y, region.width, region.height);
-        ctx.strokeStyle = "rgba(253, 224, 71, 0.8)";
-        ctx.lineWidth = 3;
-        ctx.setLineDash([10, 8]);
-        ctx.strokeRect(region.x, region.y, region.width, region.height);
-        ctx.beginPath();
-        if (state.entryDirection === "top") {
-          ctx.moveTo(region.x, region.y);
-          ctx.lineTo(region.x + region.width, region.y);
-        } else if (state.entryDirection === "bottom") {
-          ctx.moveTo(region.x, region.y + region.height);
-          ctx.lineTo(region.x + region.width, region.y + region.height);
-        } else {
-          ctx.moveTo(region.x, region.y);
-          ctx.lineTo(region.x, region.y + region.height);
+            registerTargetNode(touchX, touchY);
         }
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.fillStyle = "rgba(253, 224, 71, 0.95)";
-        ctx.font = "700 13px Arial";
-        ctx.fillText("magnetic field starts here", region.x + 12, Math.min(height() - 24, region.y + region.height - 24));
-        ctx.fillText("field ends here", Math.max(region.x + 12, region.x + region.width - 108), Math.max(24, region.y + 22));
-      }
 
-      ctx.strokeStyle = "rgba(183, 195, 215, 0.55)";
-      ctx.fillStyle = "rgba(183, 195, 215, 0.72)";
-      ctx.lineWidth = 1.8;
+        function registerTargetNode(x, y) {
+            const selectedMode = document.querySelector('input[name="viewMode"]:checked').value;
+            if (selectedMode === "side") return; 
+            if (selectedMode === "split" && y < 245) return; 
 
-      for (let x = region.x + 34; x < region.x + region.width; x += 58) {
-        for (let y = region.y + 34; y < region.y + region.height; y += 58) {
-          ctx.beginPath();
-          ctx.arc(x, y, 9, 0, Math.PI * 2);
-          ctx.stroke();
+            if (verifySafeProximity(x, y)) {
+                if (mappedNodes.length >= MAX_NODES) {
+                    mappedNodes.shift();
+                }
+                mappedNodes.push({ x: x, y: y });
+                updateLab();
+            }
+        }
 
-          if (state.fieldDirection === "into") {
-            ctx.beginPath();
-            ctx.moveTo(x - 5, y - 5);
-            ctx.lineTo(x + 5, y + 5);
-            ctx.moveTo(x + 5, y - 5);
-            ctx.lineTo(x - 5, y + 5);
+        function verifySafeProximity(x, y) {
+            const d = parseFloat(sD.value);
+            const I1 = parseFloat(sI1.value);
+            const I2 = parseFloat(sI2.value);
+            const forcePerLength = (MU_0 * I1 * I2) / (2 * Math.PI * d);
+
+            const centerX = canvas.width / 2;
+            const selectedMode = document.querySelector('input[name="viewMode"]:checked').value;
+            const compactMode = selectedMode === "split";
+            const midY = compactMode ? 245 + 255 * 0.56 : canvas.height / 2;
+
+            const w1x = (centerX - (d * SCALE_PIXELS) / 2) + Math.sign(forcePerLength) * Math.min(40, Math.log10(Math.abs(forcePerLength) * 1e8 + 1) * 12);
+            const w2x = (centerX + (d * SCALE_PIXELS) / 2) - Math.sign(forcePerLength) * Math.min(40, Math.log10(Math.abs(forcePerLength) * 1e8 + 1) * 12);
+
+            const d1 = Math.sqrt((x - w1x)**2 + (y - midY)**2);
+            const d2 = Math.sqrt((x - w2x)**2 + (y - midY)**2);
+
+            return (d1 > 14 && d2 > 14); 
+        }
+
+        function toggleMathPanel() {
+            isMathVisible = !isMathVisible;
+            fRender.style.display = isMathVisible ? "block" : "none";
+            mathBtn.innerText = isMathVisible ? "Hide Mathematical Derivations ↑" : "Show Mathematical Derivations ↓";
+        }
+
+        function loadPreset(mode) {
+            switch(mode) {
+                case 'attract': sI1.value = 6; sI2.value = 6; sD.value = 1.2; break;
+                case 'repel':   sI1.value = 6; sI2.value = -6; sD.value = 1.2; break;
+                case 'zero':    sI1.value = 0; sI2.value = 8; sD.value = 1.0; break;
+                case 'clearMap': mappedNodes = []; break;
+                case 'ampereLock': sI1.value = 1.0; sI2.value = 1.0; sD.value = 1.0; break;
+            }
+            updateLab();
+        }
+
+        function updateLab() {
+            const I1 = parseFloat(sI1.value);
+            const I2 = parseFloat(sI2.value);
+            const d = parseFloat(sD.value);
+
+            lI1.innerText = `${I1.toFixed(1)} A`;
+            lI2.innerText = `${I2.toFixed(1)} A`;
+            lD.innerText = `${d.toFixed(1)} m`;
+
+            const B1_mag = (MU_0 * Math.abs(I1)) / (2 * Math.PI * d);
+            const forcePerLength = (MU_0 * I1 * I2) / (2 * Math.PI * d);
+            const forceMag = Math.abs(forcePerLength);
+
+            mForce.innerText = `${sciFormat(forceMag)} N/m`;
+
+            let forceVectorColor = "#94a3b8"; 
+            let interactionSummary = "";
+            let currentProductDirectionSign = "No Force Profile Pattern Detected";
+
+            if (I1 === 0 || I2 === 0) {
+                mMode.innerText = "No Interaction";
+                mMode.style.color = "#94a3b8";
+                ruleBox.style.borderLeftColor = "#94a3b8";
+                ruleBox.innerHTML = `<strong>No Interaction</strong><br>One wire carries zero current, so no force is produced.`;
+            } else if (forcePerLength > 0) {
+                forceVectorColor = "#238636"; 
+                mMode.innerText = "Attraction";
+                mMode.style.color = forceVectorColor;
+                ruleBox.style.borderLeftColor = forceVectorColor;
+                ruleBox.innerHTML = `<strong>Parallel Currents Attraction</strong><br>Currents flow in the same direction, pulling the wires together.`;
+                interactionSummary = "The currents are in the same direction, so the wires attract each other.";
+                currentProductDirectionSign = `I₁ · I₂ = (${I1} × ${I2}) > 0 &rarr; Attractive Vector Force`;
+            } else {
+                forceVectorColor = "#f78166"; 
+                mMode.innerText = "Repulsion";
+                mMode.style.color = forceVectorColor;
+                ruleBox.style.borderLeftColor = forceVectorColor;
+                ruleBox.innerHTML = `<strong>Antiparallel Currents Repulsion</strong><br>Currents flow in opposite directions, pushing the wires apart.`;
+                interactionSummary = "The currents are in opposite directions, so the wires repel each other.";
+                currentProductDirectionSign = `I₁ · I₂ = (${I1} × ${I2}) < 0 &rarr; Repulsive Vector Force`;
+            }
+
+            if (I1 === 0 || I2 === 0) {
+                nBox.innerHTML = `
+                    <div class="narrative-step" style="border-left-color: #94a3b8;">• At least one wire carries no current.</div>
+                    <div class="narrative-step" style="border-left-color: #94a3b8;">• No magnetic field interaction is generated between them.</div>
+                    <div class="narrative-step" style="border-left-color: #94a3b8;">• Therefore, no magnetic force acts between the wires.</div>
+                `;
+            } else {
+                nBox.innerHTML = `
+                    <div class="narrative-step" style="border-left-color: #58a6ff;">1. Electric current flows through <strong>Wire 1</strong>.</div>
+                    <div class="narrative-step" style="border-left-color: #db6d28;">2. Wire 1 creates a magnetic field around itself.</div>
+                    <div class="narrative-step" style="border-left-color: #a371f7;">3. This magnetic field reaches <strong>Wire 2</strong>.</div>
+                    <div class="narrative-step" style="border-left-color: #79c0ff;">4. The magnetic field produced by Wire 1 acts on Wire 2.</div>
+                    <div class="narrative-step" style="border-left-color: ${forceVectorColor};">5. As a result, Wire 2 experiences a force.</div>
+                    <div class="narrative-step" style="border-left-color: ${forceVectorColor};">6. ${interactionSummary}</div>
+                `;
+            }
+
+            if (Math.abs(forceMag - 2.00e-7) < 1.0e-9) {
+                challengeStatus.style.backgroundColor = "#1b2f20";
+                challengeStatus.style.color = "#7ee787";
+                challengeStatus.style.borderColor = "#238636";
+                challengeStatus.innerHTML = "<strong>🎯 BENCHMARK UNLOCKED!</strong><br>Historical Definition: Two parallel conductors 1 meter apart carrying 1 Ampere each exert exactly 2 × 10⁻⁷ N/m of mutual force.";
+            } else {
+                challengeStatus.style.backgroundColor = "#211b27";
+                challengeStatus.style.color = "#d1b3f0";
+                challengeStatus.style.borderColor = "#4c2d6b";
+                challengeStatus.innerHTML = `Current Force: ${sciFormat(forceMag)} N/m<br>Target Force: 2.00 × 10⁻⁷ N/m`;
+            }
+
+            refreshDataMapTable(I1, I2, d, forcePerLength);
+
+            fRender.innerHTML = `
+<div class="math-step">
+    <div class="math-header">Step 1: Lorentz Force Foundation</div>
+    <div class="math-line">F = I · (L × B) &rarr; |F/L| = |I₂| · |B₁| · sin(&theta;)</div>
+    <div class="math-line">Since conductors are parallel, field lines cross orthogonally: &theta; = 90&deg;</div>
+    <div class="math-line">sin(90&deg;) = 1 &rarr; |F/L| = |I₂| · |B₁|</div>
+</div>
+<div class="math-step">
+    <div class="math-header">Step 2: Field Magnitudes computation (At Wire 2)</div>
+    <div class="math-line">|B₁| = &mu;₀|I₁| / 2&pi;d</div>
+    <div class="math-line">|B₁| = (4&pi; × 10⁻⁷ × ${Math.abs(I1).toFixed(1)}) / (2&pi; × ${d.toFixed(1)})</div>
+    <div class="math-result">|B₁| = ${sciFormat(B1_mag)} T</div>
+</div>
+<div class="math-step">
+    <div class="math-header">Step 3: Linear Interaction Substitution</div>
+    <div class="math-line">|F/L| = |I₂| · |B₁|</div>
+    <div class="math-line">|F/L| = ${Math.abs(I2).toFixed(1)} × ${sciFormat(B1_mag)}</div>
+    <div class="math-result">|F/L| = ${sciFormat(forceMag)} N/m</div>
+</div>
+<div class="math-step">
+    <div class="math-header">Step 4: Vector Direction Validation</div>
+    <div class="math-line">${currentProductDirectionSign}</div>
+</div>
+`;
+        }
+
+        function refreshDataMapTable(I1, I2, d, forcePerLength) {
+            if (mappedNodes.length === 0) {
+                dataMapBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:#6e7681; padding:15px;">No active data points mapped yet. Click on canvas to record.</td></tr>`;
+                return;
+            }
+
+            const centerX = canvas.width / 2;
+            const selectedMode = document.querySelector('input[name="viewMode"]:checked').value;
+            const compactMode = selectedMode === "split";
+            const midY = compactMode ? 245 + 255 * 0.56 : canvas.height / 2;
+
+            const w1x = (centerX - (d * SCALE_PIXELS) / 2) + Math.sign(forcePerLength) * Math.min(40, Math.log10(Math.abs(forcePerLength) * 1e8 + 1) * 12);
+            const w2x = (centerX + (d * SCALE_PIXELS) / 2) - Math.sign(forcePerLength) * Math.min(40, Math.log10(Math.abs(forcePerLength) * 1e8 + 1) * 12);
+
+            let tableHTML = "";
+            mappedNodes.forEach((node, idx) => {
+                const r1 = Math.sqrt((node.x - w1x)**2 + (node.y - midY)**2);
+                const r2 = Math.sqrt((node.x - w2x)**2 + (node.y - midY)**2);
+
+                const m_r1 = r1 / SCALE_PIXELS;
+                const m_r2 = r2 / SCALE_PIXELS;
+
+                const B1 = (MU_0 * I1) / (2 * Math.PI * m_r1);
+                const B2 = (MU_0 * I2) / (2 * Math.PI * m_r2);
+
+                const b1x = -B1 * ((node.y - midY) / r1);
+                const b1y = B1 * ((node.x - w1x) / r1);
+                const b2x = -B2 * ((node.y - midY) / r2);
+                const b2y = B2 * ((node.x - w2x) / r2);
+
+                const bnet_mag = Math.sqrt((b1x + b2x)**2 + (b1y + b2y)**2);
+                const displayX = ((node.x - centerX) / SCALE_PIXELS).toFixed(2);
+                const displayY = (-(node.y - midY) / SCALE_PIXELS).toFixed(2);
+
+                tableHTML += `
+                    <tr>
+                        <td style="color:#ffae19; font-weight:bold;">P${idx + 1}</td>
+                        <td>(${displayX}, ${displayY})</td>
+                        <td>${m_r1.toFixed(2)} | ${m_r2.toFixed(2)}</td>
+                        <td style="color:#58a6ff; font-weight:bold;">${sciFormat(bnet_mag)}</td>
+                    </tr>
+                `;
+            });
+            dataMapBody.innerHTML = tableHTML;
+        }
+
+        // --- INTERNAL CORE PERSPECTIVE RENDER VIEWS ENGINE ---
+
+        function drawCrossSectionView(boxY, boxHeight, showOrientationCompass) {
+            const I1 = parseFloat(sI1.value);
+            const I2 = parseFloat(sI2.value);
+            const d = parseFloat(sD.value);
+            const forcePerLength = (MU_0 * I1 * I2) / (2 * Math.PI * d);
+            const forceMag = Math.abs(forcePerLength);
+
+            const compactMode = boxHeight < 300;
+            const midY = compactMode ? boxY + boxHeight * 0.56 : boxY + boxHeight / 2;
+            const centerX = canvas.width / 2;
+            const w1_X_start = centerX - (d * SCALE_PIXELS) / 2;
+            const w2_X_start = centerX + (d * SCALE_PIXELS) / 2;
+
+            drawDistanceBracket(w1_X_start, w2_X_start, midY + (compactMode ? 55 : 80), d);
+
+            const shift = Math.sign(forcePerLength) * Math.min(40, Math.log10(forceMag * 1e8 + 1) * 12);
+            const w1x = w1_X_start + shift;
+            const w2x = w2_X_start - shift;
+
+            if (cFields.checked) {
+                drawAdvancedFieldCircles(w1x, midY, I1, boxY, boxHeight);
+                drawAdvancedFieldCircles(w2x, midY, I2, boxY, boxHeight);
+            }
+
+            const vectorColor = forcePerLength > 0 ? '#238636' : '#f78166';
+
+            if (I1 !== 0 && I2 !== 0) {
+                const vectorScale = Math.sign(forcePerLength) * Math.max(12, Math.min(95, Math.log10(forceMag * 1e8 + 1) * 12));
+                drawArrow(w1x, midY, w1x + vectorScale, midY, vectorColor, 4);
+                ctx.fillStyle = vectorColor; ctx.font = 'bold 11px sans-serif';
+                ctx.fillText("F₁₂", w1x + (vectorScale > 0 ? 10 : -14), midY + 4);
+
+                drawArrow(w2x, midY, w2x - vectorScale, midY, vectorColor, 4);
+                ctx.fillText("F₂₁", w2x - (vectorScale > 0 ? 14 : -10), midY + 4);
+            }
+
+            if (cRHR.checked) {
+                if (I1 !== 0) {
+                    const b1Dir = I1 > 0 ? -1 : 1; 
+                    drawArrow(w2x, midY, w2x, midY + (b1Dir * 35), '#db6d28', 2.5);
+                    ctx.fillStyle = '#db6d28'; ctx.font = 'bold 11px monospace';
+                    ctx.fillText('B₁', w2x + 10, midY + (b1Dir * 22));
+                }
+                if (I2 !== 0) {
+                    const b2Dir = I2 > 0 ? 1 : -1;
+                    drawArrow(w1x, midY, w1x, midY + (b2Dir * 35), '#79c0ff', 2.5);
+                    ctx.fillStyle = '#79c0ff'; ctx.font = 'bold 11px monospace';
+                    ctx.fillText('B₂', w1x - 20, midY + (b2Dir * 22));
+                }
+            }
+
+            drawWireCrossSection(w1x, midY, I1, compactMode ? "W1" : "Wire 1 (Left)", '#ff7b72', compactMode);
+            drawWireCrossSection(w2x, midY, I2, compactMode ? "W2" : "Wire 2 (Right)", '#58a6ff', compactMode);
+
+            if (mappedNodes.length > 0) {
+                drawPersistentGridMapNodes(w1x, w2x, midY, I1, I2);
+            }
+
+            if (showOrientationCompass) {
+                drawSectionLabel("CROSS SECTION VIEW (TRANSVERSE PLANE)", 12, boxY + 20);
+                drawCompassIndicator(42, midY + 50, "out", "left/right");
+            }
+        }
+
+        function drawPersistentGridMapNodes(w1x, w2x, midY, I1, I2) {
+            mappedNodes.forEach((node, idx) => {
+                ctx.save();
+                ctx.fillStyle = '#ffae19';
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, 4, 0, 2 * Math.PI);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.font = 'bold 10px sans-serif';
+                ctx.fillText(`P${idx + 1}`, node.x + 8, node.y - 4);
+
+                const r1x = node.x - w1x; const r1y = node.y - midY;
+                const d1 = Math.sqrt(r1x*r1x + r1y*r1y);
+                const r2x = node.x - w2x; const r2y = node.y - midY;
+                const d2 = Math.sqrt(r2x*r2x + r2y*r2y);
+
+                if (d1 > 12 && d2 > 12) {
+                    const m_d1 = d1 / SCALE_PIXELS; const m_d2 = d2 / SCALE_PIXELS;
+                    const B1 = (MU_0 * I1) / (2 * Math.PI * m_d1);
+                    const B2 = (MU_0 * I2) / (2 * Math.PI * m_d2);
+
+                    const b1x = -B1 * (r1y / d1); const b1y = B1 * (r1x / d1);
+                    const b2x = -B2 * (r2y / d2); const b2y = B2 * (r2x / d2);
+
+                    const bnetx = b1x + b2x; const bnety = b1y + b2y;
+                    
+                    const drawScale = 3.5e5; 
+                    if (Math.sqrt(bnetx**2 + bnety**2) > 1e-9) {
+                        drawArrow(node.x, node.y, node.x + bnetx * drawScale, node.y + bnety * drawScale, 'rgba(255, 174, 25, 0.75)', 1.8);
+                    }
+                }
+                ctx.restore();
+            });
+        }
+
+        function drawSideProfileView(boxY, boxHeight, showOrientationCompass) {
+            const I1 = parseFloat(sI1.value);
+            const I2 = parseFloat(sI2.value);
+            const d = parseFloat(sD.value);
+            const forcePerLength = (MU_0 * I1 * I2) / (2 * Math.PI * d);
+            const forceMag = Math.abs(forcePerLength);
+
+            const centerX = canvas.width / 2;
+            const w1_X_start = centerX - (d * SCALE_PIXELS) / 2;
+            const w2_X_start = centerX + (d * SCALE_PIXELS) / 2;
+
+            const shift = Math.sign(forcePerLength) * Math.min(40, Math.log10(forceMag * 1e8 + 1) * 12);
+            const w1_currX = w1_X_start + shift;
+            const w2_currX = w2_X_start - shift;
+
+            const compactMode = boxHeight < 300;
+
+            if (cFields.checked) {
+                if (I1 !== 0) drawLongitudinalFieldLines(w1_currX, boxY, boxHeight, I1, '#db6d28', compactMode);
+                if (I2 !== 0) drawLongitudinalFieldLines(w2_currX, boxY, boxHeight, I2, '#79c0ff', compactMode);
+            }
+
+            drawVerticalWireStraight(w1_currX, boxY, boxHeight, I1, '#ff7b72');
+            drawVerticalWireStraight(w2_currX, boxY, boxHeight, I2, '#58a6ff');
+
+            const canvasMidY = boxY + boxHeight / 2;
+            const vectorColor = forcePerLength > 0 ? '#238636' : '#f78166';
+
+            if (I1 !== 0 && I2 !== 0) {
+                const vectorScale = Math.sign(forcePerLength) * Math.max(12, Math.min(95, Math.log10(forceMag * 1e8 + 1) * 12));
+                drawArrow(w1_currX, canvasMidY, w1_currX + vectorScale, canvasMidY, vectorColor, 4);
+                ctx.fillStyle = vectorColor; ctx.font = 'bold 11px sans-serif';
+                ctx.fillText("F₁₂", w1_currX + (vectorScale > 0 ? 8 : -24), canvasMidY + 4);
+
+                drawArrow(w2_currX, canvasMidY, w2_currX - vectorScale, canvasMidY, vectorColor, 4);
+                ctx.fillText("F₂₁", w2_currX - (vectorScale > 0 ? 24 : -8), canvasMidY + 4);
+            }
+
+            if (I1 !== 0 || I2 !== 0) {
+                ctx.save();
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; ctx.font = '10px sans-serif';
+                ctx.beginPath(); ctx.arc(20, boxY + boxHeight - 16, 3, 0, 2 * Math.PI);
+                ctx.fillStyle = '#ffffff'; ctx.fill();
+                ctx.fillText("= Moving Charge Carriers (Electrons, e⁻)", 30, boxY + boxHeight - 13);
+                ctx.restore();
+            }
+
+            if (showOrientationCompass) {
+                drawSectionLabel("LONGITUDINAL PROFILE (VERTICAL PLANE)", 12, boxY + 20);
+                drawCompassIndicator(42, canvasMidY + 50, "up/down", "left/right");
+            }
+        }
+
+        function drawLongitudinalFieldLines(sourceX, baseY, height, current, hexColor, compactMode) {
+            ctx.save(); ctx.setLineDash([4, 4]);
+            const stepY = height / 6;
+            const absI = Math.abs(current);
+            const opacity = Math.min(0.22, absI * 0.04);
+            
+            ctx.strokeStyle = hexColor === '#db6d28' ? `rgba(219, 109, 40, ${opacity})` : `rgba(121, 192, 255, ${opacity})`;
+            ctx.lineWidth = 1.5;
+
+            const ellipseHeight = compactMode ? 12 : 24;
+            const particleRadius = compactMode ? 2.0 : 3.2;
+
+            for (let ringIndex = 1; ringIndex <= 3; ringIndex++) {
+                const radiusX = ringIndex * 28 * (compactMode ? 0.8 : 1.0); 
+
+                for (let i = 1; i < 6; i++) {
+                    const y = baseY + i * stepY;
+                    ctx.beginPath(); ctx.ellipse(sourceX, y, radiusX, ellipseHeight, 0, 0, 2 * Math.PI); ctx.stroke();
+
+                    const rhrDirection = current > 0 ? 1 : -1;
+                    const circulationSpeed = rhrDirection * (0.015 + (1.2 / radiusX));
+                    const currentPhaseAngle = globalTime * circulationSpeed + (i * Math.PI / 3);
+
+                    ctx.save(); ctx.setLineDash([]); 
+                    ctx.fillStyle = hexColor === '#db6d28' ? `rgba(255, 150, 80, ${opacity + 0.5})` : `rgba(150, 210, 255, ${opacity + 0.5})`;
+                    ctx.beginPath();
+                    ctx.arc(sourceX + radiusX * Math.cos(currentPhaseAngle), y + ellipseHeight * Math.sin(currentPhaseAngle), particleRadius, 0, 2 * Math.PI);
+                    ctx.fill(); ctx.restore();
+                }
+            }
+            ctx.restore();
+        }
+
+        function drawCompassIndicator(x, y, verticalLabel, horizontalLabel) {
+            ctx.save(); ctx.strokeStyle = '#4b5563'; ctx.fillStyle = '#8b949e'; ctx.font = '9px monospace'; ctx.textAlign = 'center'; ctx.lineWidth = 1.2;
+            ctx.beginPath(); ctx.moveTo(x - 20, y); ctx.lineTo(x + 20, y); ctx.stroke();
+            drawArrowHead(x + 20, y, 0, 4, '#4b5563');
+            ctx.fillText(horizontalLabel, x, y + 12);
+            ctx.beginPath(); ctx.moveTo(x, y - 20); ctx.lineTo(x, y + 20); ctx.stroke();
+            drawArrowHead(x, y - 20, -Math.PI/2, 4, '#4b5563');
+            ctx.save(); ctx.translate(x, y - 25);
+            if (verticalLabel === "out") {
+                ctx.beginPath(); ctx.arc(0, 5, 5, 0, 2 * Math.PI); ctx.stroke();
+                ctx.fillStyle = '#4b5563'; ctx.font = 'bold 8px sans-serif'; ctx.fillText('⊙', 0, 5);
+                ctx.fillStyle = '#8b949e'; ctx.fillText("Current Perpendicular (⊙/⊗)", 65, 8);
+            } else {
+                ctx.fillText("Current Up/Down (↑/↓)", 52, 8);
+            }
+            ctx.restore(); ctx.restore();
+        }
+
+        // FIXED MOBILE SYSTEM COMPATIBILITY BUG: Dropped experimental .letterSpacing property layer to enforce Android Chrome wrapper stability
+        function drawSectionLabel(text, x, y) {
+            ctx.save(); 
+            ctx.fillStyle = '#8b949e'; 
+            ctx.font = 'bold 10px sans-serif';
+            ctx.fillText(text, x, y); 
+            ctx.restore();
+        }
+
+        function drawVerticalWireStraight(x, baseY, height, current, color) {
+            ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = 3 + Math.min(Math.abs(current) * 0.4, 5);
+            ctx.beginPath(); ctx.moveTo(x, baseY); ctx.lineTo(x, baseY + height); ctx.stroke();
+            if (current !== 0) {
+                ctx.fillStyle = '#ffffff'; const particleCount = 6; const dir = current > 0 ? -1 : 1; 
+                for (let i = 0; i < particleCount; i++) {
+                    let t = ((globalTime * 0.02 + i / particleCount) % 1.0);
+                    if (dir === -1) t = 1.0 - t;
+                    ctx.beginPath(); ctx.arc(x, baseY + t * height, 2.5, 0, 2 * Math.PI); ctx.fill();
+                }
+                ctx.fillStyle = color; ctx.font = 'bold 10px monospace';
+                ctx.fillText(current > 0 ? "↑ I" : "↓ I", x + (current > 0 ? 12 : -24), baseY + height / 2 - 20);
+            }
+            ctx.restore();
+        }
+
+        function drawWireCrossSection(x, y, current, label, color, compactMode) {
+            const radius = 16 + Math.min(Math.abs(current) * 0.8, 10);
+            ctx.beginPath(); ctx.arc(x, y, radius, 0, 2 * Math.PI); ctx.fillStyle = '#1f242c'; ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.fill(); ctx.stroke();
+            ctx.fillStyle = color; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            if (current > 0) { ctx.font = 'bold 16px sans-serif'; ctx.fillText('⊙', x, y); } 
+            else if (current < 0) { ctx.font = 'bold 14px sans-serif'; ctx.fillText('⊗', x, y); } 
+            else { ctx.font = '10px monospace'; ctx.fillText('0A', x, y); }
+            ctx.fillStyle = '#94a3b8'; ctx.font = '11px sans-serif';
+            ctx.fillText(label, x, y - radius - (compactMode ? 12 : 24));
+            ctx.fillStyle = color; ctx.font = '11px monospace'; ctx.fillText(`${current.toFixed(1)}A`, x, y + radius + 14);
+        }
+
+        function drawAdvancedFieldCircles(x, y, current, limitY, limitHeight) {
+            if (current === 0) return;
+            const maxRadius = Math.max(canvas.width, canvas.height);
+            const absCurrent = Math.abs(current);
+            ctx.save(); ctx.rect(0, limitY, canvas.width, limitHeight); ctx.clip();
+
+            const compactMode = limitHeight < 300;
+            const startRadius = compactMode ? 18 : 25; const stepRadius = compactMode ? 24 : 32;
+            const particleSize = compactMode ? 2.2 : 3.2;
+
+            for (let r = startRadius; r < maxRadius; r += stepRadius) {
+                const fieldStrength = absCurrent / (r * 0.05);
+                const opacity = Math.min(0.75, (fieldStrength * 0.15) / Math.sqrt(r * 0.05));
+                if (opacity < 0.015) break; 
+                ctx.beginPath(); ctx.arc(x, y, r, 0, 2 * Math.PI); ctx.lineWidth = Math.max(0.4, Math.min(3.0, fieldStrength * 0.5));
+                ctx.strokeStyle = current > 0 ? `rgba(219, 109, 40, ${opacity})` : `rgba(121, 192, 255, ${opacity})`; ctx.stroke();
+                const angularVelocity = (current > 0 ? -1 : 1) * (0.015 + (1.5 / r));
+                const currentAngle = globalTime * angularVelocity;
+                ctx.fillStyle = current > 0 ? `rgba(255, 150, 80, ${opacity + 0.35})` : `rgba(150, 210, 255, ${opacity + 0.35})`;
+                ctx.beginPath(); ctx.arc(x + r * Math.cos(currentAngle), y + r * Math.sin(currentAngle), particleSize, 0, 2 * Math.PI); ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        function drawDistanceBracket(x1, x2, y, distanceValue) {
+            ctx.save(); ctx.strokeStyle = '#4b5563'; ctx.lineWidth = 1.5; ctx.fillStyle = '#94a3b8'; ctx.font = '12px monospace'; ctx.textAlign = 'center';
+            
+            ctx.beginPath(); 
+            ctx.moveTo(x1, y - 6); ctx.lineTo(x1, y + 6);
+            ctx.moveTo(x2, y - 6); ctx.lineTo(x2, y + 6); 
+            ctx.moveTo(x1, y);     ctx.lineTo(x2, y); 
             ctx.stroke();
-          } else if (state.fieldDirection === "out") {
-            ctx.beginPath();
-            ctx.arc(x, y, 3, 0, Math.PI * 2);
-            ctx.fill();
-          } else {
-            const arrow = {
-              up: { x: 0, y: -8 },
-              down: { x: 0, y: 8 },
-              left: { x: -8, y: 0 },
-              right: { x: 8, y: 0 }
-            }[state.fieldDirection];
-            ctx.beginPath();
-            ctx.moveTo(x - arrow.x, y - arrow.y);
-            ctx.lineTo(x + arrow.x, y + arrow.y);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(x + arrow.x, y + arrow.y);
-            ctx.lineTo(x + arrow.x - Math.sign(arrow.x || 1) * 5 - Math.abs(arrow.y) / 2, y + arrow.y - Math.sign(arrow.y || 1) * 5 - Math.abs(arrow.x) / 2);
-            ctx.lineTo(x + arrow.x - Math.sign(arrow.x || 1) * 5 + Math.abs(arrow.y) / 2, y + arrow.y - Math.sign(arrow.y || 1) * 5 + Math.abs(arrow.x) / 2);
-            ctx.closePath();
-            ctx.fill();
-          }
+
+            drawArrowHead(x1, y, Math.PI, 8, '#4b5563'); drawArrowHead(x2, y, 0, 8, '#4b5563');
+            const textString = `d = ${distanceValue.toFixed(1)} m`; const labelWidth = ctx.measureText(textString).width + 12; 
+            ctx.fillStyle = '#161b22'; ctx.fillRect((x1 + x2) / 2 - labelWidth / 2, y - 10, labelWidth, 20); 
+            ctx.fillStyle = '#58a6ff'; ctx.fillText(textString, (x1 + x2) / 2, y + 4); ctx.restore();
         }
-      }
-      ctx.restore();
-    }
 
-    function drawArrow(x, y, vx, vy, color, label) {
-      const length = Math.hypot(vx, vy);
-      if (length < 0.01) return;
-
-      const ux = vx / length;
-      const uy = vy / length;
-      const endX = x + vx;
-      const endY = y + vy;
-
-      ctx.save();
-      ctx.strokeStyle = color;
-      ctx.fillStyle = color;
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(x, y);
-      ctx.lineTo(endX, endY);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(endX, endY);
-      ctx.lineTo(endX - ux * 10 - uy * 5, endY - uy * 10 + ux * 5);
-      ctx.lineTo(endX - ux * 10 + uy * 5, endY - uy * 10 - ux * 5);
-      ctx.closePath();
-      ctx.fill();
-
-      ctx.font = "700 13px Arial";
-      ctx.fillText(label, endX + 8, endY - 8);
-      ctx.restore();
-    }
-
-    function particleColor(q) {
-      if (q > 0) return "#fb7185";
-      if (q < 0) return "#60a5fa";
-      return "#f8fafc";
-    }
-
-    function trailColor(q, alpha) {
-      if (q > 0) return `rgba(251, 113, 133, ${alpha})`;
-      if (q < 0) return `rgba(96, 165, 250, ${alpha})`;
-      return `rgba(248, 250, 252, ${alpha})`;
-    }
-
-    function usesDepthView(particle = state.particle) {
-      if (!particle) return state.fieldDirection !== "into" && state.fieldDirection !== "out";
-      return particle.fieldDirection !== "into" && particle.fieldDirection !== "out";
-    }
-
-    function projectPoint(x, y, z, particle = state.particle) {
-      if (!usesDepthView(particle)) return { x, y };
-      return {
-        x: x + (z || 0) * 0.34,
-        y: y - (z || 0) * 0.16
-      };
-    }
-
-    function projectVector(x, y, z, particle = state.particle) {
-      if (!usesDepthView(particle)) return { x, y };
-      return {
-        x: x + (z || 0) * 0.34,
-        y: y - (z || 0) * 0.16
-      };
-    }
-
-    function drawDepthGuide() {
-      if (!usesDepthView() || values().b === 0) return;
-
-      const origin = { x: width() - 138, y: Math.max(112, height() - 122) };
-      ctx.save();
-      ctx.globalAlpha = 0.92;
-      ctx.strokeStyle = "rgba(248, 250, 252, 0.62)";
-      ctx.fillStyle = "rgba(248, 250, 252, 0.82)";
-      ctx.lineWidth = 2;
-      drawArrow(origin.x, origin.y, 46, 0, "#fde047", "x");
-      drawArrow(origin.x, origin.y, 0, -38, "#60a5fa", "y");
-      drawArrow(origin.x, origin.y, 34, -18, "#86efac", "z");
-      ctx.fillStyle = "rgba(8, 17, 31, 0.74)";
-      ctx.strokeStyle = "rgba(134, 239, 172, 0.55)";
-      ctx.strokeRect(origin.x - 14, origin.y - 58, 112, 76);
-      ctx.fillStyle = "rgba(134, 239, 172, 0.95)";
-      ctx.font = "700 12px Arial";
-      ctx.fillText("3D path view", origin.x - 6, origin.y + 34);
-      ctx.restore();
-    }
-
-    function drawDepthInset() {
-      const particle = state.particle;
-      if (!particle || !usesDepthView(particle)) return;
-
-      const insetWidth = Math.min(420, Math.max(300, Math.min(width() - 36, width() * 0.36)));
-      const insetHeight = Math.min(230, Math.max(190, height() * 0.34));
-      const insetX = Math.max(18, width() - insetWidth - 18);
-      const insetY = 58;
-      const plotX = insetX + 48;
-      const plotY = insetY + 34;
-      const plotW = insetWidth - 70;
-      const plotH = insetHeight - 76;
-      const trail = particle.trail.length ? particle.trail : [{ x: particle.x, y: particle.y, z: particle.z, inField: inMagneticRegion(particle) }];
-      const horizontalKey = particle.fieldDirection === "left" || particle.fieldDirection === "right" ? "y" : "x";
-      const horizontalLabel = horizontalKey === "x" ? "x path" : "y path";
-      const hValues = trail.map((point) => point[horizontalKey] || 0).concat([particle[horizontalKey] || 0]);
-      const zValues = trail.map((point) => point.z || 0).concat([particle.z || 0]);
-      let hMin = Math.min(...hValues);
-      let hMax = Math.max(...hValues);
-      let zMin = Math.min(...zValues);
-      let zMax = Math.max(...zValues);
-      if (Math.abs(hMax - hMin) < 1) {
-        hMin -= 1;
-        hMax += 1;
-      }
-      if (Math.abs(zMax - zMin) < 1) {
-        zMin -= 30;
-        zMax += 30;
-      }
-      const hPad = (hMax - hMin) * 0.08;
-      const zPad = (zMax - zMin) * 0.12;
-      hMin -= hPad;
-      hMax += hPad;
-      zMin -= zPad;
-      zMax += zPad;
-      const zeroY = zMin <= 0 && zMax >= 0 ? plotY + plotH - ((0 - zMin) / (zMax - zMin)) * plotH : plotY + plotH / 2;
-      const currentInField = inMagneticRegion(particle);
-      const fieldState = currentInField ? "B on" : particle.hasEnteredField ? "B off after exit" : "B off before entry";
-      const pointX = (point) => plotX + (((point[horizontalKey] || 0) - hMin) / (hMax - hMin)) * plotW;
-      const pointY = (point) => plotY + plotH - (((point.z || 0) - zMin) / (zMax - zMin)) * plotH;
-
-      ctx.save();
-      ctx.fillStyle = "rgba(8, 17, 31, 0.86)";
-      ctx.strokeStyle = "rgba(134, 239, 172, 0.48)";
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.rect(insetX, insetY, insetWidth, insetHeight);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.fillStyle = "rgba(248, 250, 252, 0.94)";
-      ctx.font = "800 13px Arial";
-      ctx.fillText("Third dimension path screen", insetX + 12, insetY + 19);
-      ctx.fillStyle = currentInField ? "#86efac" : "#fde047";
-      ctx.font = "700 12px Arial";
-      ctx.fillText(fieldState, insetX + insetWidth - 116, insetY + 19);
-
-      ctx.strokeStyle = "rgba(183, 195, 215, 0.22)";
-      ctx.fillStyle = "rgba(183, 195, 215, 0.62)";
-      ctx.lineWidth = 1;
-      ctx.strokeRect(plotX, plotY, plotW, plotH);
-      ctx.beginPath();
-      ctx.moveTo(plotX, zeroY);
-      ctx.lineTo(plotX + plotW, zeroY);
-      ctx.stroke();
-      ctx.font = "700 11px Arial";
-      ctx.fillText("out", insetX + 12, plotY + 9);
-      ctx.fillText("in", insetX + 19, plotY + plotH - 4);
-      ctx.fillText("z = 0", plotX + 4, Math.max(plotY + 12, Math.min(plotY + plotH - 4, zeroY - 4)));
-      ctx.fillText(horizontalLabel, plotX + plotW - 44, plotY + plotH + 18);
-
-      if (trail.length > 1) {
-        for (let i = 1; i < trail.length; i++) {
-          const a = trail[i - 1];
-          const b = trail[i];
-          ctx.strokeStyle = b.inField ? trailColor(particle.q, 0.9) : "rgba(253, 224, 71, 0.72)";
-          ctx.lineWidth = b.inField ? 2.2 : 1.6;
-          ctx.beginPath();
-          ctx.moveTo(pointX(a), pointY(a));
-          ctx.lineTo(pointX(b), pointY(b));
-          ctx.stroke();
+        function drawArrow(fromx, fromy, tox, toy, color, thickness) {
+            ctx.strokeStyle = color; ctx.lineWidth = thickness; ctx.beginPath(); ctx.moveTo(fromx, fromy); ctx.lineTo(tox, toy); ctx.stroke();
+            const angle = Math.atan2(toy - fromy, tox - fromx);
+            drawArrowHead(tox, toy, angle, thickness * 2.5, color);
         }
-      }
 
-      const currentPoint = { x: particle.x, y: particle.y, z: particle.z };
-      const currentX = pointX(currentPoint);
-      const currentY = pointY(currentPoint);
-      ctx.fillStyle = particleColor(particle.q);
-      ctx.strokeStyle = "#f8fafc";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(currentX, currentY, 6, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.stroke();
-
-      ctx.fillStyle = "rgba(183, 195, 215, 0.86)";
-      ctx.font = "700 11px Arial";
-      ctx.fillText(`z ${((particle.z || 0) / particle.pixelsPerUnit).toFixed(1)} units`, insetX + 12, insetY + insetHeight - 18);
-      ctx.fillText("curved segment = inside B", insetX + 116, insetY + insetHeight - 18);
-      ctx.restore();
-    }
-
-    function drawTrail(particle) {
-      if (particle.trail.length < 2) return;
-
-      ctx.save();
-      ctx.lineWidth = 2;
-      for (let i = 1; i < particle.trail.length; i++) {
-        const a = particle.trail[i - 1];
-        const b = particle.trail[i];
-        if (a.wrapped || b.wrapped) continue;
-        const alpha = (i / particle.trail.length) * 0.75;
-        ctx.strokeStyle = trailColor(particle.q, alpha);
-        const start = projectPoint(a.x, a.y, a.z, particle);
-        const end = projectPoint(b.x, b.y, b.z, particle);
-        ctx.beginPath();
-        ctx.moveTo(start.x, start.y);
-        ctx.lineTo(end.x, end.y);
-        ctx.stroke();
-      }
-      ctx.restore();
-    }
-
-    function drawRadiusMeasurement() {
-      if (!measureToggle.checked) return;
-
-      const center = orbitCenter();
-      if (!center) return;
-
-      const active = state.particle;
-      if (!active) return;
-      if (active.fieldDirection !== "into" && active.fieldDirection !== "out") return;
-      const radius = Math.abs(active.q * active.b) < 0.001 ? Infinity : (active.mass * active.speed) / Math.abs(active.q * active.b);
-      const screenRadius = Number.isFinite(radius) ? radius * active.pixelsPerUnit : Infinity;
-      if (!Number.isFinite(screenRadius) || screenRadius > Math.max(width(), height()) * 1.8) return;
-
-      const particle = active;
-      ctx.save();
-      ctx.strokeStyle = "rgba(253, 224, 71, 0.78)";
-      ctx.fillStyle = "rgba(253, 224, 71, 0.95)";
-      ctx.lineWidth = 2;
-      ctx.setLineDash([8, 7]);
-
-      ctx.beginPath();
-      ctx.arc(center.x, center.y, screenRadius, 0, Math.PI * 2);
-      ctx.stroke();
-
-      ctx.beginPath();
-      ctx.moveTo(center.x, center.y);
-      ctx.lineTo(particle.x, particle.y);
-      ctx.stroke();
-
-      ctx.setLineDash([]);
-      ctx.beginPath();
-      ctx.arc(center.x, center.y, 4, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.font = "700 14px Arial";
-      ctx.fillText(`r = ${radius.toFixed(1)} units`, (center.x + particle.x) / 2 + 8, (center.y + particle.y) / 2 - 8);
-      ctx.restore();
-    }
-
-    function drawParticle(particle) {
-      const { q, b } = particle;
-      const depthScale = Math.max(0.72, Math.min(1.35, 1 + (particle.z || 0) / 420));
-      const projected = projectPoint(particle.x, particle.y, particle.z, particle);
-      const radius = 16 * depthScale;
-      ctx.save();
-      ctx.shadowColor = "rgba(255, 255, 255, 0.28)";
-      ctx.shadowBlur = 16;
-      ctx.beginPath();
-      ctx.arc(projected.x, projected.y, radius, 0, Math.PI * 2);
-      ctx.fillStyle = particleColor(q);
-      ctx.fill();
-      ctx.shadowBlur = 0;
-
-      ctx.fillStyle = "#07111f";
-      ctx.font = `800 ${Math.max(16, 22 * depthScale)}px Arial`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(q > 0 ? "+" : q < 0 ? "-" : "0", projected.x, projected.y + 1);
-      ctx.restore();
-
-      ctx.save();
-      ctx.fillStyle = particleColor(q);
-      ctx.font = "700 12px Arial";
-      ctx.textAlign = "center";
-      ctx.fillText(particle.label, projected.x, projected.y - 24);
-      ctx.restore();
-
-      const projectedVelocity = projectVector(particle.vx * 9, particle.vy * 9, (particle.vz || 0) * 9, particle);
-      drawArrow(projected.x, projected.y, projectedVelocity.x, projectedVelocity.y, "#fde047", "v");
-      const activeField = fieldVectorForParticle(particle);
-      const force = cross({ x: particle.vx, y: particle.vy, z: particle.vz || 0 }, activeField);
-      const projectedForce = projectVector(q * force.x * 2.8, q * force.y * 2.8, q * force.z * 2.8, particle);
-      drawArrow(projected.x, projected.y, projectedForce.x, projectedForce.y, "#86efac", "F");
-      if (isEntryMode() && particle.hasEnteredField && Math.hypot(activeField.x, activeField.y, activeField.z) < 0.001) {
-        ctx.save();
-        ctx.fillStyle = "#fde047";
-        ctx.font = "700 12px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText("F_B = 0, continues with previous velocity", projected.x, projected.y + radius + 18);
-        ctx.restore();
-      }
-      if (Math.abs(force.z) > Math.max(Math.abs(force.x), Math.abs(force.y), 0.2)) {
-        ctx.save();
-        ctx.fillStyle = "#86efac";
-        ctx.font = "700 12px Arial";
-        ctx.textAlign = "center";
-        ctx.fillText(q * force.z > 0 ? "F into screen" : "F out of screen", projected.x, projected.y + radius + 18);
-        ctx.restore();
-      }
-    }
-
-    function drawParticles() {
-      state.particles.forEach((particle) => drawTrail(particle));
-      state.particles.forEach((particle) => drawParticle(particle));
-    }
-
-    function draw() {
-      ctx.clearRect(0, 0, width(), height());
-      drawField();
-      drawDepthGuide();
-      drawRadiusMeasurement();
-      drawParticles();
-      drawDepthInset();
-      updateReadouts();
-    }
-
-    function animate(time) {
-      const elapsed = Math.min(0.032, ((time - state.lastTime) || 16) / 1000);
-      state.lastTime = time;
-
-      if (state.running) {
-        stepPhysics(elapsed * state.timeScale);
-      }
-      draw();
-      requestAnimationFrame(animate);
-    }
-
-    function downloadFile(name, type, content) {
-      const blob = new Blob([content], { type });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = name;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
-    }
-
-    function exportCsv() {
-      const header = [
-        "particle",
-        "label",
-        "sample",
-        "x_pixels",
-        "y_pixels",
-        "z_depth_pixels",
-        "vx",
-        "vy",
-        "vz",
-        "charge_q",
-        "magnetic_field_B",
-        "magnetic_field_direction",
-        "in_magnetic_region",
-        "speed_v",
-        "mass_m",
-        "entry_angle_v_to_B_degrees",
-        "launch_direction_degrees",
-        "force",
-        "radius",
-        "cyclotron_frequency"
-      ];
-      const rows = state.particles.flatMap((particle, index) => {
-        return particle.trail.map((point) => [
-          index + 1,
-          particle.label,
-          point.sample,
-          point.x.toFixed(3),
-          point.y.toFixed(3),
-          (point.z || 0).toFixed(3),
-          point.vx.toFixed(3),
-          point.vy.toFixed(3),
-          (point.vz || 0).toFixed(3),
-          particle.q,
-          particle.b,
-          particle.fieldDirection,
-          point.inField ? "yes" : "no",
-          particle.speed,
-          particle.mass,
-          particle.angle,
-          particle.launchAngle,
-          (() => {
-            const B = point.inField ? fieldVector(particle.fieldDirection, particle.b) : { x: 0, y: 0, z: 0 };
-            const forceVector = cross({ x: point.vx, y: point.vy, z: point.vz || 0 }, B);
-            return (Math.abs(particle.q) * Math.hypot(forceVector.x, forceVector.y, forceVector.z)).toFixed(3);
-          })(),
-          (() => {
-            const B = point.inField ? fieldVector(particle.fieldDirection, particle.b) : { x: 0, y: 0, z: 0 };
-            const bMag = Math.hypot(B.x, B.y, B.z);
-            const bUnit = bMag < 0.001 ? { x: 0, y: 0, z: 0 } : { x: B.x / bMag, y: B.y / bMag, z: B.z / bMag };
-            const pointSpeed = Math.hypot(point.vx, point.vy, point.vz || 0);
-            const vParallel = point.vx * bUnit.x + point.vy * bUnit.y + (point.vz || 0) * bUnit.z;
-            const vPerpendicular = Math.sqrt(Math.max(0, pointSpeed * pointSpeed - vParallel * vParallel));
-            const radius = Math.abs(particle.q * bMag) < 0.001 || vPerpendicular < 0.001 ? Infinity : (particle.mass * vPerpendicular) / Math.abs(particle.q * bMag);
-            return Number.isFinite(radius) ? radius.toFixed(3) : "infinite";
-          })(),
-          (() => {
-            const B = point.inField ? fieldVector(particle.fieldDirection, particle.b) : { x: 0, y: 0, z: 0 };
-            const bMag = Math.hypot(B.x, B.y, B.z);
-            const frequency = Math.abs(particle.q * bMag) < 0.001 ? 0 : Math.abs(particle.q * bMag) / (2 * Math.PI * particle.mass);
-            return frequency.toFixed(6);
-          })()
-        ]);
-      });
-      downloadFile("cinephysicshq-lorentz-trail.csv", "text/csv", [header, ...rows].map((row) => row.join(",")).join("\n"));
-    }
-
-    function exportPng() {
-      draw();
-      const link = document.createElement("a");
-      link.href = canvas.toDataURL("image/png");
-      link.download = "cinephysicshq-lorentz-graph.png";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    }
-
-    function setRunning(nextRunning) {
-      state.running = nextRunning;
-      toggleButton.textContent = state.running ? "Pause" : "Resume";
-      updateReadouts();
-    }
-
-    function markPreset(name) {
-      state.activePreset = name;
-      if (presetSelect) presetSelect.value = name;
-      positiveQuick.classList.toggle("active", name === "positive");
-      negativeQuick.classList.toggle("active", name === "negative");
-      positiveQuick.setAttribute("aria-pressed", String(name === "positive"));
-      negativeQuick.setAttribute("aria-pressed", String(name === "negative"));
-    }
-
-    function setChargeSign(sign) {
-      const magnitude = Math.max(1, Math.abs(Number(charge.value)));
-      charge.value = String(sign * magnitude);
-      markPreset(sign > 0 ? "positive" : "negative");
-      updateReadouts();
-      draw();
-    }
-
-    function markFieldDirection(direction) {
-      state.fieldDirection = direction;
-      state.particles = [];
-      state.particle = null;
-      state.trail = [];
-      document.querySelectorAll(".field-button").forEach((button) => {
-        const active = button.dataset.fieldDir === direction;
-        button.classList.toggle("active", active);
-        button.setAttribute("aria-pressed", String(active));
-      });
-      resetParticle();
-      updateReadouts();
-      draw();
-    }
-
-    function markEntryDirection(direction) {
-      state.entryDirection = direction;
-      document.querySelectorAll(".entry-button").forEach((button) => {
-        const active = button.dataset.entryDir === direction;
-        button.classList.toggle("active", active);
-        button.setAttribute("aria-pressed", String(active));
-      });
-      resetParticle();
-      updateReadouts();
-      draw();
-    }
-
-    function switchTab(button) {
-      const targetId = button.getAttribute("aria-controls");
-      document.querySelectorAll("[role='tab']").forEach((tabButton) => {
-        const selected = tabButton === button;
-        tabButton.classList.toggle("active", selected);
-        tabButton.setAttribute("aria-selected", String(selected));
-      });
-      document.querySelectorAll(".tab-panel").forEach((panel) => {
-        panel.classList.toggle("active", panel.id === targetId);
-      });
-    }
-
-    function applyPreset(name) {
-      if (name === "custom") {
-        markPreset("custom");
-        updateReadouts();
-        draw();
-        return;
-      }
-      if (!presets[name]) return;
-      const selected = presets[name];
-      charge.value = selected.q;
-      mass.value = selected.m;
-      field.value = selected.b;
-      fieldNumber.value = selected.b;
-      speed.value = selected.v;
-      speedNumber.value = selected.v;
-      markPreset(name);
-      updateReadouts();
-      draw();
-    }
-
-    [charge, field, speed, mass, angle].forEach((input) => {
-      input.addEventListener("input", () => {
-        if (input === field) syncNumberToRange(field, fieldNumber);
-        if (input === speed) syncNumberToRange(speed, speedNumber);
-        if (input !== angle) {
-          markPreset("custom");
+        function drawArrowHead(x, y, angle, size, color) {
+            ctx.save(); ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(x, y);
+            ctx.lineTo(x - size * Math.cos(angle - Math.PI / 6), y - size * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(x - size * Math.cos(angle + Math.PI / 6), y - size * Math.sin(angle + Math.PI / 6));
+            ctx.closePath(); ctx.fill(); ctx.restore();
         }
-        updateReadouts();
-        draw();
-      });
-    });
 
-    [fieldNumber, speedNumber].forEach((input) => {
-      input.addEventListener("input", () => {
-        if (input === fieldNumber) syncRangeToNumber(field, fieldNumber);
-        if (input === speedNumber) syncRangeToNumber(speed, speedNumber);
-        markPreset("custom");
-        updateReadouts();
-        draw();
-      });
-    });
+        function runMainMasterEngine() {
+            globalTime += 0.5;
+            const selectedMode = document.querySelector('input[name="viewMode"]:checked').value;
 
-    scenario.addEventListener("change", () => {
-      resetParticle();
-      draw();
-    });
+            if (selectedMode === "cross") {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawCrossSectionView(0, canvas.height, true);
+            } else if (selectedMode === "side") {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawSideProfileView(0, canvas.height, true);
+            } else if (selectedMode === "split") {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const splitY = 245;
+                drawSideProfileView(0, splitY, false);
+                drawCrossSectionView(splitY, canvas.height - splitY, false);
+                ctx.save(); ctx.strokeStyle = '#21262d'; ctx.lineWidth = 3; ctx.beginPath(); ctx.moveTo(0, splitY); ctx.lineTo(canvas.width, splitY); ctx.stroke();
+                drawSectionLabel("LONGITUDINAL PROFILE (VERTICAL PLANE)", 12, 20); drawSectionLabel("CROSS SECTION VIEW (TRANSVERSE PLANE)", 12, splitY + 20); ctx.restore();
+            }
 
-    presetSelect.addEventListener("change", () => {
-      applyPreset(presetSelect.value);
-    });
+            // Canvas Core diagnostics light tracking trace indicator 
+            ctx.fillStyle = "rgba(35, 134, 54, 0.4)";
+            ctx.fillRect(5, canvas.height - 15, 6, 6);
 
-    positiveQuick.addEventListener("click", () => {
-      setChargeSign(1);
-    });
+            ctx.save(); ctx.fillStyle = 'rgba(88, 166, 255, 0.25)'; ctx.font = '12px sans-serif'; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+            ctx.fillText('CinePhysics | Abhijit Singh', canvas.width - 10, canvas.height - 10); ctx.restore();
+            requestAnimationFrame(runMainMasterEngine);
+        }
 
-    negativeQuick.addEventListener("click", () => {
-      setChargeSign(-1);
-    });
-
-    document.querySelectorAll(".field-button").forEach((button) => {
-      button.addEventListener("click", () => {
-        markFieldDirection(button.dataset.fieldDir);
-      });
-    });
-
-    document.querySelectorAll(".entry-button").forEach((button) => {
-      button.addEventListener("click", () => {
-        markEntryDirection(button.dataset.entryDir);
-      });
-    });
-
-    toggleButton.addEventListener("click", () => {
-      setRunning(!state.running);
-    });
-
-    stopButton.addEventListener("click", () => {
-      setRunning(false);
-    });
-
-    resetButton.addEventListener("click", () => {
-      resetParticle();
-      draw();
-    });
-
-    clearButton.addEventListener("click", () => {
-      clearTrail();
-      draw();
-    });
-
-    canvas.addEventListener("pointerdown", (event) => {
-      const point = canvasPoint(event);
-      launchParticleAt(point.x, point.y, { keepExisting: true });
-    });
-
-    exportPngButton.addEventListener("click", exportPng);
-    exportCsvButton.addEventListener("click", exportCsv);
-
-    measureToggle.addEventListener("change", draw);
-    motionToggle.addEventListener("change", () => {
-      if (motionToggle.checked) {
-        setRunning(false);
-      }
-    });
-    contrastToggle.addEventListener("change", () => {
-      document.body.classList.toggle("high-contrast", contrastToggle.checked);
-      draw();
-    });
-
-    document.querySelectorAll("[role='tab']").forEach((button) => {
-      button.addEventListener("click", () => switchTab(button));
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.target.matches("input, button")) return;
-      const key = event.key.toLowerCase();
-      if (event.code === "Space") {
-        event.preventDefault();
-        setRunning(!state.running);
-      } else if (key === "r") {
-        resetParticle();
-        draw();
-      } else if (key === "c") {
-        clearTrail();
-        draw();
-      } else if (key === "s") {
-        setRunning(false);
-        stepPhysics(1 / 30);
-        draw();
-      }
-    });
-
-    window.addEventListener("resize", () => {
-      resize();
-      resetParticle();
-      draw();
-    });
-
-    resize();
-    markPreset("positive");
-    resetParticle();
-    updateReadouts();
-    requestAnimationFrame(animate);
-  </script>
+        // Initialize Suite Execution Engine
+        updateLab(); 
+        runMainMasterEngine();
+    </script>
 </body>
 </html>
