@@ -151,6 +151,7 @@
         .site-footer a { color: var(--text-main); text-decoration: none; font-weight: bold; transition: color 0.2s;}
         .site-footer a:hover { color: var(--accent); }
 
+        /* Mobile Optimization */
         @media (max-width: 768px) {
             .mobile-menu-btn { display: block; }
             .tabs { display: none; flex-direction: column; }
@@ -184,7 +185,7 @@
     <header>
         <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙 Theme</button>
         <h1>⚡ CinePhysicsHQ-Labs</h1>
-        <div class="version-tag">VERSION 3.0 (MASTER BUILD)</div>
+        <div class="version-tag">VERSION 3.1 (MASTER BUILD)</div>
         <p>Interactive Physics Learning • Research • Exploration</p>
     </header>
 
@@ -222,7 +223,7 @@
             <div class="preset-buttons">
                 <button onclick="loadPreset('v = sqrt(2*KE / m)')">Robust Math: v = sqrt(2*KE / m)</button>
                 <button onclick="loadPreset('F = k_e * Q1*Q2 / r^2')">Coulomb's Law</button>
-                <button onclick="loadPreset('E = h * f')">Constants: E = h f</button>
+                <button onclick="loadPreset('g = G*M / R^2')">Gravity: g = GM/R²</button>
             </div>
             
             <label>Constants & Quantities:</label>
@@ -394,18 +395,14 @@
     <footer class="site-footer">
         <p>Created by <strong>Abhijit Singh</strong> | Physics Educator</p>
         <p>CinePhysicsHQ</p>
-        <p style="margin-top: 0.5rem;">
-            Instagram: <a href="https://instagram.com/abhijitsingh.io" target="_blank">@abhijitsingh.io</a> | 
-            YouTube: <a href="https://youtube.com/@CinePhysicsHQ" target="_blank">@CinePhysicsHQ</a>
-        </p>
     </footer>
 
     <script>
-        // --- DATA & DICTIONARY ---
+        // --- 1. CORE DICTIONARY (Data) ---
         window.createDim = (M, L, T, I=0, K=0, mol=0) => ({ M, L, T, I, K, mol });
 
         window.dimDict = {
-            'm': { name: 'Mass', concept: ['Fundamental'], breakdown: ['[M]'], units: ['kg', 'g'], app: 'Inertia modeling', chapter: 'mechanics', diff: 'easy', mistake: 'Confusing mass with weight (a force).', jeeTip: 'Always standardise to kg in SI calculations.', ...window.createDim(1, 0, 0) },
+            'm': { name: 'Mass', concept: ['Fundamental'], breakdown: ['[M]'], units: ['kg', 'g'], app: 'Inertia modeling', chapter: 'mechanics', diff: 'easy', mistake: 'Confusing mass with weight.', jeeTip: 'Always standardise to kg in SI calculations.', ...window.createDim(1, 0, 0) },
             's': { name: 'Displacement', concept: ['Fundamental'], breakdown: ['[L]'], units: ['m', 'cm'], app: 'Trajectory planning', chapter: 'mechanics', diff: 'easy', mistake: 'Using path length instead of shortest distance.', jeeTip: 'Displacement can be negative; distance cannot.', ...window.createDim(0, 1, 0) },
             'l': { name: 'Length', concept: ['Fundamental'], breakdown: ['[L]'], units: ['m', 'cm'], app: 'Structural engineering', chapter: 'mechanics', diff: 'easy', mistake: 'Forgetting to convert cm to m.', jeeTip: 'Dimensional analysis treats all lengths (radius, height, breadth) as [L].', ...window.createDim(0, 1, 0) },
             'd': { name: 'Distance', concept: ['Fundamental'], breakdown: ['[L]'], units: ['m', 'cm'], app: 'Kinematics', chapter: 'mechanics', diff: 'easy', mistake: 'Using path length instead of shortest distance.', jeeTip: 'Same dimensional treatment as displacement.', ...window.createDim(0, 1, 0) },
@@ -477,7 +474,7 @@
         }
 
         window.aliasMap = {
-            'm1': 'm', 'm2': 'm', 'M1': 'm', 'M2': 'm':'M':, 
+            'm1': 'm', 'm2': 'm', 'M1': 'm', 'M2': 'm', 'M': 'm',
             'r': 'd', 'R': 'd', 'x': 's', 'y': 's', 'l': 's',
             'P': 'Pr', 'T': 'Temp', 'Rg': 'R_gas', 'Rgas': 'R_gas', 'c': 'v',
             'K': 'k_e', 'k_e': 'k_e',
@@ -499,6 +496,8 @@
             "a,f,rho,v": "Cd = F / (ρAv²)  (Drag Coefficient)",
             "g,h,v": "Fr = v / √(gh)  (Froude Number)"
         };
+
+        window.mathFuncNames = ['sin', 'cos', 'tan', 'log', 'ln', 'exp', 'sqrt', 'pi', 'π'];
 
         // --- MODULE: UI & THEMES ---
         window.toggleTheme = function() {
@@ -654,71 +653,63 @@
             return res;
         }
 
-        const mathFuncNames = ['sin', 'cos', 'tan', 'log', 'ln', 'exp', 'sqrt', 'pi', 'π'];
-
         window.parseFlatMultiplication = function(expr) {
-    let result = {M:0, L:0, T:0, I:0, K:0, mol:0};
-    
-    // Auto-insert multiplication between numbers and letters
-    expr = expr.replace(/([0-9])([a-zA-Zπ])/g, '$1 * $2');
-    expr = expr.replace(/\*/g, ' '); 
-    
-    const regex = /(__TMP_\d+__|[a-zA-Z_0-9π]+)([\²\³\⁴\⁵\⁻]|\^(?:\-?\d*\.?\d+|\(\-?\d+\/\d+\)))?/g;
-    let match;
-    
-    while ((match = regex.exec(expr)) !== null) {
-        let rawVar = match[1];
-        let vLower = rawVar.toLowerCase();
-        let variable = null;
-        
-        // Priority check for exact matches and aliases
-        if(vLower === 'ke') variable = 'KE'; 
-        else if(vLower === 'pe') variable = 'PE'; 
-        else if(vLower === 'pr') variable = 'Pr';
-        else if(window.aliasMap[rawVar]) variable = window.aliasMap[rawVar];
-        else if(window.aliasMap[vLower]) variable = window.aliasMap[vLower];
-        else if(window.dimDict[rawVar]) variable = rawVar;
-        
-        if(variable && (mathFuncNames.includes(variable) || !isNaN(variable))) continue; 
-        if(!variable && !isNaN(rawVar)) continue; // Skip pure numbers
-
-        let powerStr = match[2] || "1";
-        let power = 1;
-        
-        if(powerStr.startsWith('^(')) {
-            let parts = powerStr.replace('^(', '').replace(')', '').split('/');
-            power = parseFloat(parts[0]) / parseFloat(parts[1]);
-        } else {
-            power = parseFloat(powerStr.replace('²', '2').replace('³', '3').replace('⁴', '4').replace('⁵', '5').replace('⁻', '-').replace('^', ''));
-        }
-        
-        if (variable && window.dimDict[variable]) {
-            // Recognized as a full word (e.g., 'Force', 'eps0', 'v')
-            result = window.operateDims(result, window.dimDict[variable], 'add', power);
-        } else if (!variable) {
-            // FALLBACK: Shatter unrecognized strings into single letters (e.g., 'GM' -> 'G', 'M')
-            let chars = rawVar.split('');
-            let tempDims = {M:0, L:0, T:0, I:0, K:0, mol:0};
-            let allRecognized = true;
+            let result = {M:0, L:0, T:0, I:0, K:0, mol:0};
             
-            for (let char of chars) {
-                let charMapped = window.aliasMap[char] || window.aliasMap[char.toLowerCase()] || char;
-                if (window.dimDict[charMapped]) {
-                    tempDims = window.operateDims(tempDims, window.dimDict[charMapped], 'add', 1);
+            expr = expr.replace(/([0-9])([a-zA-Zπ])/g, '$1 * $2');
+            expr = expr.replace(/\*/g, ' '); 
+            
+            const regex = /(__TMP_\d+__|[a-zA-Z_0-9π]+)([\²\³\⁴\⁵\⁻]|\^(?:\-?\d*\.?\d+|\(\-?\d+\/\d+\)))?/g;
+            let match;
+            
+            while ((match = regex.exec(expr)) !== null) {
+                let rawVar = match[1];
+                let vLower = rawVar.toLowerCase();
+                let variable = null;
+                
+                if(vLower === 'ke') variable = 'KE'; 
+                else if(vLower === 'pe') variable = 'PE'; 
+                else if(vLower === 'pr') variable = 'Pr';
+                else if(window.aliasMap[rawVar]) variable = window.aliasMap[rawVar];
+                else if(window.aliasMap[vLower]) variable = window.aliasMap[vLower];
+                else if(window.dimDict[rawVar]) variable = rawVar;
+                
+                if(variable && (window.mathFuncNames.includes(variable) || !isNaN(variable))) continue; 
+                if(!variable && !isNaN(rawVar)) continue; 
+
+                let powerStr = match[2] || "1";
+                let power = 1;
+                
+                if(powerStr.startsWith('^(')) {
+                    let parts = powerStr.replace('^(', '').replace(')', '').split('/');
+                    power = parseFloat(parts[0]) / parseFloat(parts[1]);
                 } else {
-                    allRecognized = false;
-                    break;
+                    power = parseFloat(powerStr.replace('²', '2').replace('³', '3').replace('⁴', '4').replace('⁵', '5').replace('⁻', '-').replace('^', ''));
+                }
+                
+                if (variable && window.dimDict[variable]) {
+                    result = window.operateDims(result, window.dimDict[variable], 'add', power);
+                } else if (!variable) {
+                    let chars = rawVar.split('');
+                    let tempDims = {M:0, L:0, T:0, I:0, K:0, mol:0};
+                    let allRecognized = true;
+                    
+                    for (let char of chars) {
+                        let charMapped = window.aliasMap[char] || window.aliasMap[char.toLowerCase()] || char;
+                        if (window.dimDict[charMapped]) {
+                            tempDims = window.operateDims(tempDims, window.dimDict[charMapped], 'add', 1);
+                        } else {
+                            allRecognized = false;
+                            break;
+                        }
+                    }
+                    if (allRecognized) {
+                        result = window.operateDims(result, tempDims, 'add', power);
+                    }
                 }
             }
-            
-            if (allRecognized) {
-                result = window.operateDims(result, tempDims, 'add', power);
-            }
+            return result;
         }
-    }
-    return result;
-}
-
 
         window.parseDivision = function(expr) {
             let parts = expr.split('/');
@@ -738,7 +729,7 @@
                 if(innerExpr.includes('/') && !isNaN(innerExpr.split('/')[0])) break; 
 
                 let prefix = currentStr.substring(0, lastOpen).trim();
-                let matchedFunc = mathFuncNames.find(func => prefix.endsWith(func));
+                let matchedFunc = window.mathFuncNames.find(func => prefix.endsWith(func));
                 let isSqrt = (!matchedFunc && prefix.endsWith('sqrt'));
                 if(isSqrt) lastOpen = currentStr.lastIndexOf('sqrt');
                 else if(matchedFunc) lastOpen = currentStr.lastIndexOf(matchedFunc);
@@ -790,48 +781,45 @@
             window.activeTempTokens = [];
         }
 
-        // --- MODULE: EQUATION CHECKER (Explanations) ---
+        // --- MODULE: EQUATION CHECKER ---
         window.explainTerm = function(term) {
-    let explanation = "";
-    let processed = new Set();
-    const mathFuncs = ['sin', 'cos', 'tan', 'log', 'ln', 'exp', 'sqrt', 'pi', 'π'];
-    
-    const regex = /[a-zA-Z_]+/g;
-    let match;
-    while((match = regex.exec(term)) !== null) {
-        let rawVar = match[0];
-        let vLower = rawVar.toLowerCase();
-        let lookupVar = null;
+            let explanation = "";
+            let processed = new Set();
+            
+            const regex = /[a-zA-Z_]+/g;
+            let match;
+            while((match = regex.exec(term)) !== null) {
+                let rawVar = match[0];
+                let vLower = rawVar.toLowerCase();
+                let lookupVar = null;
 
-        if(vLower === 'ke') lookupVar = 'KE';
-        else if(vLower === 'pe') lookupVar = 'PE';
-        else if(vLower === 'pr') lookupVar = 'Pr';
-        else if(window.aliasMap[rawVar]) lookupVar = window.aliasMap[rawVar];
-        else if(window.aliasMap[vLower]) lookupVar = window.aliasMap[vLower];
-        else if(window.dimDict[rawVar]) lookupVar = rawVar;
-        
-        if(lookupVar && mathFuncs.includes(lookupVar.toLowerCase())) continue;
+                if(vLower === 'ke') lookupVar = 'KE';
+                else if(vLower === 'pe') lookupVar = 'PE';
+                else if(vLower === 'pr') lookupVar = 'Pr';
+                else if(window.aliasMap[rawVar]) lookupVar = window.aliasMap[rawVar];
+                else if(window.aliasMap[vLower]) lookupVar = window.aliasMap[vLower];
+                else if(window.dimDict[rawVar]) lookupVar = rawVar;
+                
+                if(lookupVar && window.mathFuncNames.includes(lookupVar.toLowerCase())) continue;
 
-        if (lookupVar && window.dimDict[lookupVar]) {
-            if (!processed.has(lookupVar)) {
-                explanation += `<span style="color:var(--text-muted); font-size: 0.95rem;">↳ ${rawVar} = ${window.dimDict[lookupVar].name} = ${window.formatDim(window.dimDict[lookupVar])}</span><br>`;
-                processed.add(lookupVar);
-            }
-        } else if (!lookupVar) {
-            // Shatter unrecognized words for explanation (e.g., 'GM' -> 'G' and 'M')
-            let chars = rawVar.split('');
-            for(let char of chars) {
-                let charMapped = window.aliasMap[char] || window.aliasMap[char.toLowerCase()] || char;
-                if(window.dimDict[charMapped] && !processed.has(charMapped)) {
-                    explanation += `<span style="color:var(--text-muted); font-size: 0.95rem;">↳ ${char} = ${window.dimDict[charMapped].name} = ${window.formatDim(window.dimDict[charMapped])}</span><br>`;
-                    processed.add(charMapped);
+                if (lookupVar && window.dimDict[lookupVar]) {
+                    if (!processed.has(lookupVar)) {
+                        explanation += `<span style="color:var(--text-muted); font-size: 0.95rem;">↳ ${rawVar} = ${window.dimDict[lookupVar].name} = ${window.formatDim(window.dimDict[lookupVar])}</span><br>`;
+                        processed.add(lookupVar);
+                    }
+                } else if (!lookupVar) {
+                    let chars = rawVar.split('');
+                    for(let char of chars) {
+                        let charMapped = window.aliasMap[char] || window.aliasMap[char.toLowerCase()] || char;
+                        if(window.dimDict[charMapped] && !processed.has(charMapped)) {
+                            explanation += `<span style="color:var(--text-muted); font-size: 0.95rem;">↳ ${char} = ${window.dimDict[charMapped].name} = ${window.formatDim(window.dimDict[charMapped])}</span><br>`;
+                            processed.add(charMapped);
+                        }
+                    }
                 }
             }
+            return explanation;
         }
-    }
-    return explanation;
-}
-
 
         window.getDimExplanation = function(lhsObj, rhsObj) {
             let diffs = []; const labels = {M:'Mass', L:'Length', T:'Time', I:'Current', K:'Temperature', mol:'Amount'};
@@ -934,7 +922,6 @@
                     let unitStr = m.units ? ` <span style="font-size:0.9rem; color:var(--text-muted);">(${m.units[0]})</span>` : "";
                     html += `<div style="margin-bottom: 0.5rem;">✓ ${m.name}${unitStr} <button class="secondary-btn" onclick="window.switchTab(null, 'calculator'); document.getElementById('calc-select').value='${m.key}'; window.calculateDimensionTree();">Show Tree</button></div>`;
                 });
-                if(matches.length > 1) html += `<div class="edu-note"><strong>Why multiple answers?</strong><br>Different physical quantities can have identical dimensions. Dimensional analysis alone cannot distinguish between them.</div>`;
             } else {
                 html += `<span class="error-text">No standard quantity found.</span>\n\nPossible constructed quantity:\n<strong style="color:var(--accent);">${window.buildSyntheticDerivation(targetDim.M, targetDim.L, targetDim.T, targetDim.I, targetDim.K, targetDim.mol)}</strong>`;
             }
@@ -1206,16 +1193,48 @@
                     <div class="marshall-text">⚡ Dimension Marshall:</div><div class="message" style="font-style: italic;">"${percent >= 70 ? 'The Chaos Dimensioneer has fled. The realm is secure.' : 'We must train harder before facing him again.'}"</div>
                     <div style="display:flex; gap:1rem; justify-content:center; max-width: 400px; margin: 0 auto;">
                         <button class="primary-btn" onclick="startChallengeLoader()">Battle Again</button>
-                        <button class="secondary-btn" style="margin:0;" onclick="shareScore()">Share</button>
                     </div>
                 </div>`;
         }
 
-        window.shareScore = function() {
-            const percent = window.chalTotal > 0 ? Math.round((window.chalScore / window.chalTotal) * 100) : 0;
-            const text = `🏆 I survived the Dimension Realm!\n\nScore: ${window.chalScore}/${window.chalTotal}\nAccuracy: ${percent}%\nXP Gained: +${window.sessionXP}\n\nCan you beat my score at CinePhysicsHQ?`;
-            if (navigator.share) navigator.share({ title: 'CinePhysicsHQ Challenge', text: text });
-            else { navigator.clipboard.writeText(text); alert("Score copied to clipboard!"); }
+        // --- MODULE: TEACHER WORKSHEET ---
+        window.generateWorksheet = function() {
+            const chapter = document.getElementById('teacher-chapter').value;
+            const count = parseInt(document.getElementById('teacher-count').value) || 10;
+            
+            let validKeys = Object.keys(window.dimDict).filter(k => !k.startsWith('__TMP') && window.dimDict[k].name !== 'Length' && window.dimDict[k].name !== 'Distance'); 
+            if (chapter !== 'all') validKeys = validKeys.filter(k => window.dimDict[k].chapter === chapter);
+
+            let questions = [], answers = [];
+            for(let i=0; i<count; i++) {
+                let randomKey = validKeys[Math.floor(Math.random() * validKeys.length)];
+                questions.push(`Q${i+1}. Derive the dimensional formula for <strong>${window.dimDict[randomKey].name}</strong>.`);
+                answers.push(`Q${i+1}. ${window.dimDict[randomKey].name} = ${window.formatDim(window.dimDict[randomKey])}`);
+            }
+
+            let html = `
+                <html><head><title>Dimensional Analysis Worksheet</title>
+                <style>body { font-family: Arial, sans-serif; padding: 2rem; max-width: 800px; margin: 0 auto; line-height: 1.6; }
+                h1 { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; }
+                .header-info { display: flex; justify-content: space-between; margin-bottom: 2rem; font-weight: bold; }
+                .q-list div { margin-bottom: 3rem; font-size: 1.1rem; }
+                .page-break { page-break-before: always; }
+                .ans-key { color: #555; }
+                @media print { .no-print { display: none; } }
+                </style></head><body>
+                <button class="no-print" style="padding: 10px 20px; font-size:16px; margin-bottom:20px; cursor:pointer;" onclick="window.print()">Print Worksheet</button>
+                <h1>Dimensional Analysis Practice</h1>
+                <div class="header-info"><span>Name: ______________________</span><span>Date: __________</span></div>
+                <p><em>Instructions: Write the dimensional formula for each physical quantity. Show your conceptual derivation steps if required.</em></p>
+                <div class="q-list">${questions.map(q => `<div>${q}</div>`).join('')}</div>
+                <div class="page-break"></div>
+                <h2>Teacher Answer Key</h2>
+                <div class="ans-key">${answers.map(a => `<div style="margin-bottom:0.5rem;">${a}</div>`).join('')}</div>
+                </body></html>
+            `;
+            const newWin = window.open('', '_blank');
+            newWin.document.write(html);
+            newWin.document.close();
         }
 
         // --- BOOTSTRAP INITIALIZATION ---
