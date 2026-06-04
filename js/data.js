@@ -71,11 +71,19 @@ for(let key in window.dimDict) {
     if(!window.dimDict[key].jeeTip) window.dimDict[key].jeeTip = "Ensure you resolve all fractions before finalising exponents.";
 }
 
-window.aliasMap = { 'm1': 'm', 'm2': 'm', 'r': 'd', 'x': 's', 'y': 's', 'P': 'Pr', 'T': 'Temp', 'Rg': 'R_gas', 'Rgas': 'R_gas', 'c': 'v' };
-
-window.knownPiGroups = {
-    "d,mu,rho,v": "Re = ρvd / μ  (Reynolds Number)",
-    "g,l,t": "π = t√(g/l)  (Pendulum Equation)",
-    "a,f,rho,v": "Cd = F / (ρAv²)  (Drag Coefficient)",
-    "g,h,v": "Fr = v / √(gh)  (Froude Number)"
+window.aliasMap = {
+    // Math & Subscripts
+    'm1': 'm', 'm2': 'm', 'r': 'd', 'x': 's', 'y': 's', 'l': 's', 'c': 'v',
+    'p': 'Pr', 't': 'Temp', 'rg': 'R_gas', 'rgas': 'R_gas',
+    
+    // Case-Normalization Safety
+    'ke': 'KE', 'pe': 'PE', 'pr': 'Pr',
+    
+    // Full Physics Words
+    'pressure': 'Pr', 'area': 'A', 'force': 'F', 'velocity': 'v',
+    'acceleration': 'a', 'power': 'P', 'energy': 'E', 'work': 'W',
+    'density': 'rho', 'viscosity': 'mu', 'mass': 'm', 'time': 't',
+    'distance': 'd', 'length': 'l', 'displacement': 's', 'volume': 'Vol',
+    'momentum': 'p', 'torque': 'Tau', 'frequency': 'f', 'temperature': 'Temp',
+    'current': 'I', 'charge': 'q', 'voltage': 'V', 'resistance': 'R'
 };
