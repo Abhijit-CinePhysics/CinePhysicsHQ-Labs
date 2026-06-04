@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a" id="theme-meta">
+    <title>CinePhysicsHQ-Labs: Dimensional Analysis</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+    <!-- Certificate Overlay -->
+    <div id="cert-overlay">
+        <div class="cert-card animate-pop">
+            <div class="close-cert" onclick="document.getElementById('cert-overlay').style.display='none'">✖</div>
+            <h1 class="cert-title">Certificate of Mastery</h1>
+            <div class="cert-subtitle">This certifies that the candidate has demonstrated exceptional proficiency in Dimensional Analysis.</div>
+            <div class="cert-name" id="cert-rank-display">Master of Dimensions</div>
+            <div style="font-size: 1.1rem; margin-top: 1rem;">Authorized by the Dimension Council</div>
+            <div class="cert-footer">
+                <div>CinePhysicsHQ-Labs</div>
+                <div>Dimensional Arena</div>
+            </div>
+        </div>
+    </div>
+
+    <header>
+        <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙 Theme</button>
+        <h1>⚡ CinePhysicsHQ-Labs</h1>
+        <div class="version-tag">VERSION 2.0</div>
+        <p>Interactive Physics Learning • Research • Exploration</p>
+    </header>
+
+    <div class="container">
+        
+        <!-- Mobile Menu Toggle -->
+        <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰ Menu Options</button>
+
+        <!-- Tab Navigation -->
+        <div class="tabs" id="nav-tabs">
+            <button class="tab-btn active" onclick="switchTab(event, 'about')">ℹ️ About</button>
+            <button class="tab-btn" onclick="switchTab(event, 'checker')">1. Equation Checker</button>
+            <button class="tab-btn" onclick="switchTab(event, 'discovery')">2. Quantity Finder</button>
+            <button class="tab-btn" onclick="switchTab(event, 'calculator')">3. Dimension Tree</button>
+            <button class="tab-btn" onclick="switchTab(event, 'cards')">4. Memory Cards</button>
+            <button class="tab-btn" onclick="switchTab(event, 'derivation')">5. Formula Derivator</button>
+            <button class="tab-btn" onclick="switchTab(event, 'buckingham')">6. Buckingham π</button>
+            <button class="tab-btn" onclick="switchTab(event, 'challenge')" style="color: var(--chaos);">⚔️ Boss Battle</button>
+            <button class="tab-btn" onclick="switchTab(event, 'dashboard')" style="color: var(--gold);">🏆 Progress</button>
+            <button class="tab-btn" onclick="switchTab(event, 'teacher')" style="color: var(--success);">📜 Teacher</button>
+        </div>
+
+        <!-- 0. ABOUT SECTION -->
+        <div id="about" class="tab-content active animate-pop">
+            <h2 style="color: var(--accent); margin-bottom: 2rem; font-size: 2rem; text-align: center;">Welcome to the Dimension Realm</h2>
+            <div class="feature-list">
+                <div><span class="feature-icon">⚡</span> Check Equations instantly</div>
+                <div><span class="feature-icon">🔍</span> Discover Quantities in reverse</div>
+                <div><span class="feature-icon">🌳</span> View Visual Dimension Trees</div>
+                <div><span class="feature-icon">🗂️</span> Study Formula Memory Cards</div>
+                <div><span class="feature-icon">⚔️</span> Fight the Chaos Dimensioneer</div>
+                <div><span class="feature-icon">📜</span> Generate Printable Worksheets</div>
+            </div>
+            <button class="primary-btn" style="max-width: 300px; display: block; margin: 0 auto; font-size: 1.2rem; padding: 1rem;" onclick="switchTab(null, 'checker')">Enter the Lab 🚀</button>
+        </div>
+
+        <!-- 1. EQUATION CHECKER -->
+        <div id="checker" class="tab-content">
+            <div class="preset-buttons">
+                <button onclick="loadPreset('v = sqrt(2*KE / m)')">Robust Math: v = sqrt(2*KE / m)</button>
+                <button onclick="loadPreset('F = (m * v) + W')">AI Tutor Fail: F = (m * v) + W</button>
+                <button onclick="loadPreset('x = log(v * t)')">Math Error: x = log(v * t)</button>
+            </div>
+            <div class="input-group">
+                <input type="text" id="equation-input" placeholder="e.g., v = sqrt(2*KE / m) or F = G*m1*m2 / r^2" />
+                <button class="primary-btn" onclick="verifyEquation()">Verify Dimensions</button>
+            </div>
+            <div id="checker-output" class="output-panel">Ready for analysis...</div>
+        </div>
+
+        <!-- 2. QUANTITY FINDER -->
+        <div id="discovery" class="tab-content">
+            <div class="input-group">
+                <label>Direct Dimension Search:</label>
+                <input type="text" id="direct-dim-search" placeholder="e.g., ML2T-2 or [M L^2 T^-2]" oninput="parseDirectDimInput()" />
+            </div>
+            <p style="margin-bottom: 1rem; color: var(--text-muted); text-align: center;">OR adjust exponents manually:</p>
+            <div class="spinner-grid">
+                <div><label>Mass [M]</label><input type="number" id="spin-m" value="1" oninput="discoverQuantity()"></div>
+                <div><label>Length [L]</label><input type="number" id="spin-l" value="2" oninput="discoverQuantity()"></div>
+                <div><label>Time [T]</label><input type="number" id="spin-t" value="-2" oninput="discoverQuantity()"></div>
+                <div><label>Current [I]</label><input type="number" id="spin-i" value="0" oninput="discoverQuantity()"></div>
+                <div><label>Temp [K]</label><input type="number" id="spin-k" value="0" oninput="discoverQuantity()"></div>
+                <div><label>Amount [mol]</label><input type="number" id="spin-mol" value="0" oninput="discoverQuantity()"></div>
+            </div>
+            <div id="discovery-output" class="output-panel">Matches will appear here...</div>
+        </div>
+
+        <!-- 3. VISUAL DIMENSION TREE -->
+        <div id="calculator" class="tab-content">
+            <div class="input-group">
+                <label>Select Physical Quantity:</label>
+                <input type="text" class="search-box" id="search-calc" placeholder="Search quantity..." oninput="filterDropdownList('search-calc', 'calc-select')">
+                <select id="calc-select" onchange="calculateDimensionTree()"><option value="" disabled selected>Select a quantity...</option></select>
+            </div>
+            <div id="calc-output" class="output-panel">Select a quantity to view its visual derivation tree.</div>
+        </div>
+
+        <!-- 4. MEMORY CARDS -->
+        <div id="cards" class="tab-content">
+            <div class="input-group">
+                <label>Select Quantity for Revision:</label>
+                <input type="text" class="search-box" id="search-card" placeholder="Search quantity..." oninput="filterDropdownList('search-card', 'card-select')">
+                <select id="card-select" onchange="generateMemoryCard()"><option value="" disabled selected>Select a quantity...</option></select>
+            </div>
+            <div id="card-output">Select a quantity to generate a memory card.</div>
+        </div>
+        
+        <!-- 5. FORMULA DERIVATOR -->
+        <div id="derivation" class="tab-content">
+            <div class="preset-buttons">
+                <button onclick="loadDerivatorPreset('v', 'g, h')">Velocity (v ∝ √gh)</button>
+                <button onclick="loadDerivatorPreset('F', 'm, v, r')">Centripetal (F ∝ mv²/r)</button>
+                <button onclick="loadDerivatorPreset('P', 'F, v, rho')">Underdetermined Test</button>
+            </div>
+            <div class="input-group">
+                <label>Target Quantity:</label>
+                <input type="text" class="search-box" id="search-deriv" placeholder="Search target..." oninput="filterDropdownList('search-deriv', 'deriv-target')">
+                <select id="deriv-target"></select>
+            </div>
+            <div class="input-group">
+                <label>Available Variables (Comma Separated):</label>
+                <input type="text" id="deriv-vars" placeholder="e.g., g, h" />
+                <button class="primary-btn" onclick="deriveFormula()">Derive Formula</button>
+            </div>
+            <div id="deriv-output" class="output-panel">Awaiting variables...</div>
+        </div>
+
+        <!-- 6. BUCKINGHAM PI -->
+        <div id="buckingham" class="tab-content">
+            <div class="preset-buttons">
+                <button onclick="loadPiPreset('rho, v, d, mu')">Reynolds Number</button>
+                <button onclick="loadPiPreset('t, l, g')">Pendulum Time Period</button>
+                <button onclick="loadPiPreset('F, rho, A, v')">Aerodynamic Drag</button>
+            </div>
+            <div class="input-group">
+                <input type="text" id="pi-input" placeholder="e.g., rho, v, d, mu" />
+                <button class="primary-btn" onclick="solveBuckingham()">Find π Groups</button>
+            </div>
+            <div id="pi-output" class="output-panel">Awaiting variables...</div>
+        </div>
+
+        <!-- 7. BOSS BATTLE ARENA -->
+        <div id="challenge" class="tab-content">
+            <div class="score-board">
+                <div>
+                    <select id="chal-chapter" class="search-box" style="padding: 0.25rem; font-size: 1rem; border-radius: 4px; border: 1px solid var(--border); color: var(--text-main);">
+                        <option value="all">All Chapters</option>
+                        <option value="mechanics">Mechanics & Waves</option>
+                        <option value="thermo">Thermodynamics</option>
+                        <option value="em">Electricity & Magnetism</option>
+                        <option value="modern">Modern Physics & Constants</option>
+                    </select>
+                </div>
+                <div class="level-badge" id="chal-level-display">Level 1 • Cadet</div>
+                <div>Total XP: <span style="color:var(--xp-color);" id="chal-xp">0 XP</span></div>
+            </div>
+
+            <div class="daily-quest" id="daily-quest-ui" style="display:none;"></div>
+
+            <div class="boss-arena" id="challenge-box">
+                <div class="chaos-text" style="font-size: 2rem;">🌌 Chaos Dimensioneer</div>
+                <p style="margin-bottom: 1.5rem; color:var(--text-muted);">"You dare enter my realm? I have twisted the formulas of the universe. Defeat me by fixing them!"</p>
+                <div><button class="primary-btn" style="background:var(--chaos); max-width: 250px;" onclick="startChallengeLoader()">Initiate Battle</button></div>
+            </div>
+        </div>
+
+        <!-- 8. PROGRESS DASHBOARD -->
+        <div id="dashboard" class="tab-content animate-pop">
+            <h2 style="color: var(--gold); text-align: center; margin-bottom: 2rem;">🏆 Your Physics Journey</h2>
+            
+            <div class="score-board" style="justify-content: center; flex-direction: column; gap: 0.5rem; padding: 2rem; margin-bottom: 2rem;">
+                <div style="font-size: 2.2rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent);" id="dash-rank">Dimension Marshal</div>
+                <div class="level-badge" id="dash-level" style="font-size: 1.2rem; margin: 0.5rem 0;">Level 5</div>
+                <div style="color: var(--xp-color); font-size: 1.5rem;" id="dash-xp">2500 XP</div>
+            </div>
+
+            <div class="spinner-grid" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="card-node"><div class="card-title">Questions Solved</div><div class="card-final-dim" id="dash-total-qs">0</div></div>
+                <div class="card-node"><div class="card-title">Bosses Defeated</div><div class="card-final-dim" id="dash-boss">0</div></div>
+                <div class="card-node"><div class="card-title">Highest Streak</div><div class="card-final-dim" id="dash-streak">0</div></div>
+                <div class="card-node"><div class="card-title">Correct Rate</div><div class="card-final-dim" id="dash-rate">0%</div></div>
+            </div>
+
+            <h3 style="color: var(--text-muted); margin-top: 3rem; margin-bottom: 1.5rem; text-align: center; font-weight: normal; letter-spacing: 1px;">CHAPTER MASTERY</h3>
+            <div class="spinner-grid" style="grid-template-columns: repeat(2, 1fr);">
+                <div class="card-node"><div class="card-title">Mechanics</div><div class="card-dim" id="dash-mech" style="color:var(--success);">0%</div></div>
+                <div class="card-node"><div class="card-title">Thermodynamics</div><div class="card-dim" id="dash-therm" style="color:var(--success);">0%</div></div>
+                <div class="card-node"><div class="card-title">Electromagnetism</div><div class="card-dim" id="dash-em" style="color:var(--success);">0%</div></div>
+                <div class="card-node"><div class="card-title">Modern Physics</div><div class="card-dim" id="dash-mod" style="color:var(--success);">0%</div></div>
+            </div>
+
+            <h3 style="color: var(--text-muted); margin-top: 3rem; margin-bottom: 1.5rem; text-align: center; font-weight: normal; letter-spacing: 1px;">YOUR TROPHY CASE</h3>
+            <div class="badges-container" id="badges-ui"></div>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <button id="cert-btn" class="secondary-btn" style="display:none; border-color:var(--gold); color:var(--gold); font-size: 1.1rem; padding: 0.75rem 2rem;" onclick="document.getElementById('cert-overlay').style.display='flex'">View Mastery Certificate</button>
+            </div>
+        </div>
+
+        <!-- 9. TEACHER MODE -->
+        <div id="teacher" class="tab-content">
+            <h2 style="color: var(--success); margin-bottom: 1rem;">Worksheet Generator</h2>
+            <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Generate printable dimensional analysis worksheets for your classroom.</p>
+            <div class="input-group">
+                <label>Select Chapter Focus:</label>
+                <select id="teacher-chapter">
+                    <option value="all">Comprehensive (All Topics)</option>
+                    <option value="mechanics">Mechanics & Kinematics</option>
+                    <option value="thermo">Thermodynamics</option>
+                    <option value="em">Electricity & Magnetism</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <label>Number of Questions:</label>
+                <input type="number" id="teacher-count" value="10" min="5" max="25" />
+            </div>
+            <button class="primary-btn" style="background: var(--success);" onclick="generateWorksheet()">Generate Printable Worksheet</button>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <p>Created by <strong>Abhijit Singh</strong> | Physics Educator</p>
+        <p>CinePhysicsHQ</p>
+    </footer>
+
+    <!-- Core Engine Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/engine.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
