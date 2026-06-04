@@ -477,7 +477,7 @@
         }
 
         window.aliasMap = {
-            'm1': 'm', 'm2': 'm', 'M1': 'm', 'M2': 'm', 
+            'm1': 'm', 'm2': 'm', 'M1': 'm', 'M2': 'm':'M':, 
             'r': 'd', 'R': 'd', 'x': 's', 'y': 's', 'l': 's',
             'P': 'Pr', 'T': 'Temp', 'Rg': 'R_gas', 'Rgas': 'R_gas', 'c': 'v',
             'K': 'k_e', 'k_e': 'k_e',
@@ -657,41 +657,68 @@
         const mathFuncNames = ['sin', 'cos', 'tan', 'log', 'ln', 'exp', 'sqrt', 'pi', 'π'];
 
         window.parseFlatMultiplication = function(expr) {
-            let result = {M:0, L:0, T:0, I:0, K:0, mol:0};
-            expr = expr.replace(/([0-9])([a-zA-Zπ])/g, '$1 * $2');
-            expr = expr.replace(/\*/g, ' '); 
-            const regex = /(__TMP_\d+__|[a-zA-Z_0-9π]+)([\²\³\⁴\⁵\⁻]|\^(?:\-?\d*\.?\d+|\(\-?\d+\/\d+\)))?/g;
-            let match;
-            
-            while ((match = regex.exec(expr)) !== null) {
-                let variable = match[1];
-                let vLower = variable.toLowerCase();
-                
-                if(vLower === 'ke') variable = 'KE'; 
-                else if(vLower === 'pe') variable = 'PE'; 
-                else if(vLower === 'pr') variable = 'Pr';
-                
-                if(window.aliasMap[variable]) variable = window.aliasMap[variable];
-                else if(window.aliasMap[vLower]) variable = window.aliasMap[vLower];
-                
-                if(mathFuncNames.includes(variable) || !isNaN(variable)) continue; 
+    let result = {M:0, L:0, T:0, I:0, K:0, mol:0};
+    
+    // Auto-insert multiplication between numbers and letters
+    expr = expr.replace(/([0-9])([a-zA-Zπ])/g, '$1 * $2');
+    expr = expr.replace(/\*/g, ' '); 
+    
+    const regex = /(__TMP_\d+__|[a-zA-Z_0-9π]+)([\²\³\⁴\⁵\⁻]|\^(?:\-?\d*\.?\d+|\(\-?\d+\/\d+\)))?/g;
+    let match;
+    
+    while ((match = regex.exec(expr)) !== null) {
+        let rawVar = match[1];
+        let vLower = rawVar.toLowerCase();
+        let variable = null;
+        
+        // Priority check for exact matches and aliases
+        if(vLower === 'ke') variable = 'KE'; 
+        else if(vLower === 'pe') variable = 'PE'; 
+        else if(vLower === 'pr') variable = 'Pr';
+        else if(window.aliasMap[rawVar]) variable = window.aliasMap[rawVar];
+        else if(window.aliasMap[vLower]) variable = window.aliasMap[vLower];
+        else if(window.dimDict[rawVar]) variable = rawVar;
+        
+        if(variable && (mathFuncNames.includes(variable) || !isNaN(variable))) continue; 
+        if(!variable && !isNaN(rawVar)) continue; // Skip pure numbers
 
-                let powerStr = match[2] || "1";
-                let power = 1;
-                
-                if(powerStr.startsWith('^(')) {
-                    let parts = powerStr.replace('^(', '').replace(')', '').split('/');
-                    power = parseFloat(parts[0]) / parseFloat(parts[1]);
+        let powerStr = match[2] || "1";
+        let power = 1;
+        
+        if(powerStr.startsWith('^(')) {
+            let parts = powerStr.replace('^(', '').replace(')', '').split('/');
+            power = parseFloat(parts[0]) / parseFloat(parts[1]);
+        } else {
+            power = parseFloat(powerStr.replace('²', '2').replace('³', '3').replace('⁴', '4').replace('⁵', '5').replace('⁻', '-').replace('^', ''));
+        }
+        
+        if (variable && window.dimDict[variable]) {
+            // Recognized as a full word (e.g., 'Force', 'eps0', 'v')
+            result = window.operateDims(result, window.dimDict[variable], 'add', power);
+        } else if (!variable) {
+            // FALLBACK: Shatter unrecognized strings into single letters (e.g., 'GM' -> 'G', 'M')
+            let chars = rawVar.split('');
+            let tempDims = {M:0, L:0, T:0, I:0, K:0, mol:0};
+            let allRecognized = true;
+            
+            for (let char of chars) {
+                let charMapped = window.aliasMap[char] || window.aliasMap[char.toLowerCase()] || char;
+                if (window.dimDict[charMapped]) {
+                    tempDims = window.operateDims(tempDims, window.dimDict[charMapped], 'add', 1);
                 } else {
-                    power = parseFloat(powerStr.replace('²', '2').replace('³', '3').replace('⁴', '4').replace('⁵', '5').replace('⁻', '-').replace('^', ''));
-                }
-                
-                if (window.dimDict[variable]) {
-                    result = window.operateDims(result, window.dimDict[variable], 'add', power);
+                    allRecognized = false;
+                    break;
                 }
             }
-            return result;
+            
+            if (allRecognized) {
+                result = window.operateDims(result, tempDims, 'add', power);
+            }
         }
+    }
+    return result;
+}
+
 
         window.parseDivision = function(expr) {
             let parts = expr.split('/');
@@ -765,32 +792,46 @@
 
         // --- MODULE: EQUATION CHECKER (Explanations) ---
         window.explainTerm = function(term) {
-            let explanation = "";
-            let processed = new Set();
-            const mathFuncs = ['sin', 'cos', 'tan', 'log', 'ln', 'exp', 'sqrt', 'pi', 'π'];
-            
-            const regex = /[a-zA-Z_]+/g;
-            let match;
-            while((match = regex.exec(term)) !== null) {
-                let rawVar = match[0];
-                let lookupVar = rawVar;
-                let vLower = rawVar.toLowerCase();
-                
-                if(vLower === 'ke') lookupVar = 'KE';
-                else if(vLower === 'pe') lookupVar = 'PE';
-                else if(vLower === 'pr') lookupVar = 'Pr';
+    let explanation = "";
+    let processed = new Set();
+    const mathFuncs = ['sin', 'cos', 'tan', 'log', 'ln', 'exp', 'sqrt', 'pi', 'π'];
+    
+    const regex = /[a-zA-Z_]+/g;
+    let match;
+    while((match = regex.exec(term)) !== null) {
+        let rawVar = match[0];
+        let vLower = rawVar.toLowerCase();
+        let lookupVar = null;
 
-                let mappedVar = window.aliasMap[lookupVar] || lookupVar;
-                
-                if(mathFuncs.includes(mappedVar.toLowerCase())) continue;
+        if(vLower === 'ke') lookupVar = 'KE';
+        else if(vLower === 'pe') lookupVar = 'PE';
+        else if(vLower === 'pr') lookupVar = 'Pr';
+        else if(window.aliasMap[rawVar]) lookupVar = window.aliasMap[rawVar];
+        else if(window.aliasMap[vLower]) lookupVar = window.aliasMap[vLower];
+        else if(window.dimDict[rawVar]) lookupVar = rawVar;
+        
+        if(lookupVar && mathFuncs.includes(lookupVar.toLowerCase())) continue;
 
-                if(window.dimDict[mappedVar] && !processed.has(mappedVar)) {
-                    explanation += `<span style="color:var(--text-muted); font-size: 0.95rem;">↳ ${rawVar} = ${window.dimDict[mappedVar].name} = ${window.formatDim(window.dimDict[mappedVar])}</span><br>`;
-                    processed.add(mappedVar);
+        if (lookupVar && window.dimDict[lookupVar]) {
+            if (!processed.has(lookupVar)) {
+                explanation += `<span style="color:var(--text-muted); font-size: 0.95rem;">↳ ${rawVar} = ${window.dimDict[lookupVar].name} = ${window.formatDim(window.dimDict[lookupVar])}</span><br>`;
+                processed.add(lookupVar);
+            }
+        } else if (!lookupVar) {
+            // Shatter unrecognized words for explanation (e.g., 'GM' -> 'G' and 'M')
+            let chars = rawVar.split('');
+            for(let char of chars) {
+                let charMapped = window.aliasMap[char] || window.aliasMap[char.toLowerCase()] || char;
+                if(window.dimDict[charMapped] && !processed.has(charMapped)) {
+                    explanation += `<span style="color:var(--text-muted); font-size: 0.95rem;">↳ ${char} = ${window.dimDict[charMapped].name} = ${window.formatDim(window.dimDict[charMapped])}</span><br>`;
+                    processed.add(charMapped);
                 }
             }
-            return explanation;
         }
+    }
+    return explanation;
+}
+
 
         window.getDimExplanation = function(lhsObj, rhsObj) {
             let diffs = []; const labels = {M:'Mass', L:'Length', T:'Time', I:'Current', K:'Temperature', mol:'Amount'};
