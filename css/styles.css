@@ -146,3 +146,38 @@ button.primary-btn:hover { opacity: 0.9; }
     .theme-toggle { position: static; margin-bottom: 1rem; display: inline-block; }
     .mc-header { flex-direction: column; text-align: center; gap: 0.5rem; }
 }
+/* --- Quick Symbol Insert UI --- */
+.quick-symbols { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 0.5rem; 
+    margin-bottom: 1rem; 
+}
+.quick-symbols button { 
+    flex: 1; 
+    min-width: 40px; 
+    background: rgba(59, 130, 246, 0.1); 
+    color: var(--accent); 
+    border: 1px solid var(--accent); 
+    padding: 0.5rem; 
+    border-radius: 4px; 
+    cursor: pointer; 
+    font-size: 1.1rem; 
+    font-weight: bold; 
+    transition: 0.2s; 
+}
+.quick-symbols button:hover { 
+    background: var(--accent); 
+    color: white; 
+}
+.insert-picker-group { 
+    display: flex; 
+    gap: 0.5rem; 
+    margin-bottom: 1.5rem; 
+}
+.insert-picker-group select { 
+    margin-bottom: 0; 
+    border-color: var(--accent) !important; 
+    background-color: rgba(59, 130, 246, 0.05) !important; 
+}
+
