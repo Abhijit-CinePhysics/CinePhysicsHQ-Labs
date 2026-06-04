@@ -20,25 +20,47 @@ window.operateDims = function(d1, d2, op, scalar = 1) {
 const mathFuncNames = ['sin', 'cos', 'tan', 'log', 'ln', 'exp', 'sqrt'];
 
 window.parseFlatMultiplication = function(expr) {
-    let result = {M:0,L:0,T:0,I:0,K:0,mol:0};
-    expr = expr.replace(/\*/g, ' '); 
+    let result = createDim(0,0,0,0,0,0);
+    
+    // Preprocess spaces into explicit multiplication
+    expr = expr.trim().replace(/\s+/g, '*'); 
+    
     const regex = /(__TMP_\d+__|[a-zA-Z_0-9]+)([\²\³\⁴\⁵\⁻]|\^(?:\-?\d*\.?\d+|\(\-?\d+\/\d+\)))?/g;
     let match;
+    
     while ((match = regex.exec(expr)) !== null) {
-        let variable = match[1], vLower = variable.toLowerCase();
-        if(vLower === 'ke') variable = 'KE'; else if(vLower === 'pe') variable = 'PE'; else if(vLower === 'pr') variable = 'Pr';
-        if(window.aliasMap[variable]) variable = window.aliasMap[variable];
-        if(mathFuncNames.includes(variable) || !isNaN(variable)) continue; 
+        let variable = match[1];
+        let vLower = variable.toLowerCase();
+        
+        // Catch aliases and case-variations dynamically
+        if (window.aliasMap[vLower]) {
+            variable = window.aliasMap[vLower];
+        }
 
-        let powerStr = match[2] || "1", power = 1;
-        if(powerStr.startsWith('^(')) {
+        // Ignore pure math functions or raw numbers
+        if (mathFuncNames.includes(variable) || !isNaN(variable)) continue; 
+
+        // Extract and process exponents safely
+        let powerStr = match[2] || "1";
+        let power = 1;
+        
+        if (powerStr.startsWith('^(')) {
             let parts = powerStr.replace('^(', '').replace(')', '').split('/');
             power = parseFloat(parts[0]) / parseFloat(parts[1]);
-        } else power = parseFloat(powerStr.replace('²', '2').replace('³', '3').replace('⁴', '4').replace('⁵', '5').replace('⁻', '-').replace('^', ''));
-        if (window.dimDict[variable]) result = window.operateDims(result, window.dimDict[variable], 'add', power);
+        } else {
+            powerStr = powerStr.replace('²', '2').replace('³', '3').replace('⁴', '4').replace('⁵', '5').replace('⁻', '-').replace('^', '');
+            power = parseFloat(powerStr);
+        }
+        
+        // Add dimension exponents mathematically
+        if (window.dimDict[variable]) {
+            result = window.operateDims(result, window.dimDict[variable], 'add', power);
+        }
     }
+    
     return result;
 }
+
 
 window.parseDivision = function(expr) {
     let parts = expr.split('/');
