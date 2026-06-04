@@ -64,12 +64,27 @@
             <button class="primary-btn" style="max-width: 300px; display: block; margin: 0 auto; font-size: 1.2rem; padding: 1rem;" onclick="switchTab(null, 'checker')">Enter the Lab 🚀</button>
         </div>
 
-        <!-- 1. EQUATION CHECKER -->
         <div id="checker" class="tab-content">
             <div class="preset-buttons">
                 <button onclick="loadPreset('v = sqrt(2*KE / m)')">Robust Math: v = sqrt(2*KE / m)</button>
                 <button onclick="loadPreset('F = (m * v) + W')">AI Tutor Fail: F = (m * v) + W</button>
                 <button onclick="loadPreset('x = log(v * t)')">Math Error: x = log(v * t)</button>
+            </div>
+
+            <label>Constants & Quantities:</label>
+            <div class="quick-symbols">
+                <button onclick="insertSymbol('eps0')" title="Permittivity">ε₀</button>
+                <button onclick="insertSymbol('mu0')" title="Permeability">μ₀</button>
+                <button onclick="insertSymbol('N_A')" title="Avogadro's Number">Nₐ</button>
+                <button onclick="insertSymbol('R_gas')" title="Gas Constant">R</button>
+                <button onclick="insertSymbol('h')" title="Planck's Constant">h</button>
+                <button onclick="insertSymbol('G')" title="Gravitational Constant">G</button>
+                <button onclick="insertSymbol('k')" title="Boltzmann Constant">k</button>
+            </div>
+            <div class="insert-picker-group">
+                <select id="equation-symbol-picker" onchange="if(this.value){ insertSymbol(this.value); this.selectedIndex = 0; }">
+                    <option value="" disabled selected>Insert Any Quantity...</option>
+                </select>
             </div>
             <div class="input-group">
                 <input type="text" id="equation-input" placeholder="e.g., v = sqrt(2*KE / m) or F = G*m1*m2 / r^2" />
@@ -77,6 +92,7 @@
             </div>
             <div id="checker-output" class="output-panel">Ready for analysis...</div>
         </div>
+
 
         <!-- 2. QUANTITY FINDER -->
         <div id="discovery" class="tab-content">
