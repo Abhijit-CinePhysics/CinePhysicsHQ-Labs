@@ -49,7 +49,6 @@ window.initStats = function() {
     let saved = localStorage.getItem('cinePhysicsHQ_Save');
     if (saved) { let parsed = JSON.parse(saved); if (parsed.version === 1) window.userStats = parsed.data; else window.userStats = parsed.data; }
     
-    // Fallbacks for older saves
     if(!window.userStats.chapterCorrect) window.userStats.chapterCorrect = { mechanics: 0, thermo: 0, em: 0, modern: 0 };
     if(!window.userStats.chapterTotal) window.userStats.chapterTotal = { mechanics: 0, thermo: 0, em: 0, modern: 0 };
     if(!window.userStats.totalQsSolved) window.userStats.totalQsSolved = 0; 
@@ -112,6 +111,36 @@ window.populateDashboard = function() {
 }
 
 // --- MODULE: EQUATION CHECKER ---
+
+// Extracts and maps variables to their dimensions for educational breakdown
+window.explainTerm = function(term) {
+    let explanation = "";
+    let processed = new Set();
+    const mathFuncs = ['sin', 'cos', 'tan', 'log', 'ln', 'exp', 'sqrt'];
+    
+    const regex = /[a-zA-Z_]+/g;
+    let match;
+    while((match = regex.exec(term)) !== null) {
+        let rawVar = match[0];
+        let lookupVar = rawVar;
+        let vLower = rawVar.toLowerCase();
+        
+        if(vLower === 'ke') lookupVar = 'KE';
+        else if(vLower === 'pe') lookupVar = 'PE';
+        else if(vLower === 'pr') lookupVar = 'Pr';
+
+        let mappedVar = window.aliasMap[lookupVar] || lookupVar;
+        
+        if(mathFuncs.includes(mappedVar.toLowerCase())) continue;
+
+        if(window.dimDict[mappedVar] && !processed.has(mappedVar)) {
+            explanation += `<span style="color:var(--text-muted); font-size: 0.95rem;">↳ ${rawVar} = ${window.dimDict[mappedVar].name} = ${window.formatDim(window.dimDict[mappedVar])}</span>\n`;
+            processed.add(mappedVar);
+        }
+    }
+    return explanation;
+}
+
 window.getDimExplanation = function(lhsObj, rhsObj) {
     let diffs = []; const labels = {M:'Mass', L:'Length', T:'Time', I:'Current', K:'Temperature', mol:'Amount'};
     for(let key in lhsObj) if(lhsObj[key] !== rhsObj[key]) diffs.push(`${labels[key]} exponent differs (LHS: ${lhsObj[key]}, RHS: ${rhsObj[key]})`);
@@ -128,17 +157,25 @@ window.verifyEquation = function() {
     const [lhsRaw, rhsRaw] = input.split('=');
     const lhsTerms = lhsRaw.split(/[\+\-](?![^\(]*\))/).map(t => t.trim()).filter(t => t);
     const rhsTerms = rhsRaw.split(/[\+\-](?![^\(]*\))/).map(t => t.trim()).filter(t => t);
-    let outputHTML = `<div class="animate-pop">Equation: <strong>${input}</strong>\n\n`;
+    
+    let outputHTML = `<div class="animate-pop">Equation: <strong style="font-size: 1.2rem;">${input}</strong>\n\n`;
     let globalError = null;
 
     function evaluateSide(sideName, terms) {
-        let html = `${sideName} Breakdown:\n`;
+        let html = `<div style="margin-bottom:0.5rem;"><strong style="color:var(--accent); font-size:1.1rem;">${sideName} Breakdown:</strong></div>`;
         let firstDimObj = null, firstDimStr = null, isInternallyConsistent = true;
+        
         for (let i = 0; i < terms.length; i++) {
             let evalResult = window.evaluateTermRecursively(terms[i]);
             if(evalResult.error) { globalError = evalResult.error; return { error: true }; }
             let dimStr = window.formatDim(evalResult.dim);
-            html += `Term: [${terms[i]}]\n➜ Result: ${dimStr}\n\n`;
+            let explanation = window.explainTerm(terms[i]);
+
+            html += `<div style="background:rgba(255,255,255,0.02); padding:1rem; border-radius:6px; margin-bottom:1rem; border:1px solid var(--border);">`;
+            html += `<strong>Term:</strong> [${terms[i]}]\n`;
+            if(explanation) html += `${explanation}`;
+            html += `\n<strong>➜ Result: <span style="color:var(--gold);">${dimStr}</span></strong></div>`;
+
             if (i === 0) { firstDimObj = evalResult.dim; firstDimStr = dimStr; }
             else if (dimStr !== firstDimStr) isInternallyConsistent = false;
         }
@@ -147,10 +184,11 @@ window.verifyEquation = function() {
 
     const lhsData = evaluateSide('LHS', lhsTerms);
     if(globalError) { outputPanel.innerHTML = outputHTML + `<div class="edu-note"><span class="marshall-text">⚡ Dimension Marshall:</span><br><span class="dialogue-quote">"Math error detected. ${globalError}"</span></div></div>`; window.cleanupTempTokens(); return; }
+    
     const rhsData = evaluateSide('RHS', rhsTerms);
     if(globalError) { outputPanel.innerHTML = outputHTML + `<div class="edu-note"><span class="marshall-text">⚡ Dimension Marshall:</span><br><span class="dialogue-quote">"Math error detected. ${globalError}"</span></div></div>`; window.cleanupTempTokens(); return; }
 
-    outputHTML += lhsData.html + rhsData.html + `Verification:\n`;
+    outputHTML += lhsData.html + rhsData.html + `<strong>Final Verification:</strong>\n`;
     let marshallTutor = "";
 
     if (!lhsData.isInternallyConsistent) {
@@ -431,7 +469,7 @@ window.checkChallenge = function(type, answer) {
 
     window.chalTotal++; window.userStats.totalQsSolved++;
     let chapterKey = document.getElementById('chal-chapter').value;
-    if(chapterKey === 'all') chapterKey = 'mechanics'; // Simple fallback for total metrics
+    if(chapterKey === 'all') chapterKey = 'mechanics'; 
     window.userStats.chapterTotal[chapterKey]++;
     
     let earnedXP = 0, mResponse = "";
@@ -460,6 +498,7 @@ window.checkChallenge = function(type, answer) {
 
 window.showResults = function() {
     const percent = window.chalTotal > 0 ? Math.round((window.chalScore / window.chalTotal) * 100) : 0;
+    if(percent === 100 && !window.userStats.badges.includes('first_perfect')) window.userStats.badges.push('first_perfect'); window.saveStats();
     let title = percent === 100 ? '👑 FLAWLESS VICTORY' : percent >= 70 ? '🏆 BOSS DEFEATED' : '💀 RETREAT';
     document.getElementById('challenge-box').innerHTML = `
         <div class="challenge-result animate-pop">
@@ -471,46 +510,6 @@ window.showResults = function() {
                 <button class="primary-btn" onclick="startChallengeLoader()">Battle Again</button>
             </div>
         </div>`;
-}
-
-// --- MODULE: TEACHER WORKSHEET ---
-window.generateWorksheet = function() {
-    const chapter = document.getElementById('teacher-chapter').value;
-    const count = parseInt(document.getElementById('teacher-count').value) || 10;
-    
-    let validKeys = Object.keys(window.dimDict).filter(k => !k.startsWith('__TMP') && window.dimDict[k].name !== 'Length' && window.dimDict[k].name !== 'Distance'); 
-    if (chapter !== 'all') validKeys = validKeys.filter(k => window.dimDict[k].chapter === chapter);
-
-    let questions = [], answers = [];
-    for(let i=0; i<count; i++) {
-        let randomKey = validKeys[Math.floor(Math.random() * validKeys.length)];
-        questions.push(`Q${i+1}. Derive the dimensional formula for <strong>${window.dimDict[randomKey].name}</strong>.`);
-        answers.push(`Q${i+1}. ${window.dimDict[randomKey].name} = ${window.formatDim(window.dimDict[randomKey])}`);
-    }
-
-    let html = `
-        <html><head><title>Dimensional Analysis Worksheet</title>
-        <style>body { font-family: Arial, sans-serif; padding: 2rem; max-width: 800px; margin: 0 auto; line-height: 1.6; }
-        h1 { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; }
-        .header-info { display: flex; justify-content: space-between; margin-bottom: 2rem; font-weight: bold; }
-        .q-list div { margin-bottom: 3rem; font-size: 1.1rem; }
-        .page-break { page-break-before: always; }
-        .ans-key { color: #555; }
-        @media print { .no-print { display: none; } }
-        </style></head><body>
-        <button class="no-print" style="padding: 10px 20px; font-size:16px; margin-bottom:20px; cursor:pointer;" onclick="window.print()">Print Worksheet</button>
-        <h1>Dimensional Analysis Practice</h1>
-        <div class="header-info"><span>Name: ______________________</span><span>Date: __________</span></div>
-        <p><em>Instructions: Write the dimensional formula for each physical quantity. Show your conceptual derivation steps if required.</em></p>
-        <div class="q-list">${questions.map(q => `<div>${q}</div>`).join('')}</div>
-        <div class="page-break"></div>
-        <h2>Teacher Answer Key</h2>
-        <div class="ans-key">${answers.map(a => `<div style="margin-bottom:0.5rem;">${a}</div>`).join('')}</div>
-        </body></html>
-    `;
-    const newWin = window.open('', '_blank');
-    newWin.document.write(html);
-    newWin.document.close();
 }
 
 // --- BOOTSTRAP INITIALIZATION ---
