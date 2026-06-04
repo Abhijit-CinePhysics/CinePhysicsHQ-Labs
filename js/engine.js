@@ -20,10 +20,13 @@ window.operateDims = function(d1, d2, op, scalar = 1) {
 const mathFuncNames = ['sin', 'cos', 'tan', 'log', 'ln', 'exp', 'sqrt'];
 
 window.parseFlatMultiplication = function(expr) {
-    let result = createDim(0,0,0,0,0,0);
+    let result = {M:0, L:0, T:0, I:0, K:0, mol:0};
     
-    // Preprocess spaces into explicit multiplication
-    expr = expr.trim().replace(/\s+/g, '*'); 
+    // 1. Auto-insert multiplication between numbers and letters (Fixes Q1Q2 -> Q1 * Q2)
+    expr = expr.replace(/([0-9])([a-zA-Z])/g, '$1 * $2');
+    
+    // 2. Replace explicit multiplication with spaces for regex parsing
+    expr = expr.replace(/\*/g, ' '); 
     
     const regex = /(__TMP_\d+__|[a-zA-Z_0-9]+)([\²\³\⁴\⁵\⁻]|\^(?:\-?\d*\.?\d+|\(\-?\d+\/\d+\)))?/g;
     let match;
@@ -32,32 +35,31 @@ window.parseFlatMultiplication = function(expr) {
         let variable = match[1];
         let vLower = variable.toLowerCase();
         
-        // Catch aliases and case-variations dynamically
-        if (window.aliasMap[vLower]) {
-            variable = window.aliasMap[vLower];
-        }
+        // Manual case-safety overrides
+        if(vLower === 'ke') variable = 'KE'; 
+        else if(vLower === 'pe') variable = 'PE'; 
+        else if(vLower === 'pr') variable = 'Pr';
+        
+        // Priority: Check exact case first ('K' vs 'k'), then lowercase fallback
+        if(window.aliasMap[variable]) variable = window.aliasMap[variable];
+        else if(window.aliasMap[vLower]) variable = window.aliasMap[vLower];
+        
+        if(mathFuncNames.includes(variable) || !isNaN(variable)) continue; 
 
-        // Ignore pure math functions or raw numbers
-        if (mathFuncNames.includes(variable) || !isNaN(variable)) continue; 
-
-        // Extract and process exponents safely
         let powerStr = match[2] || "1";
         let power = 1;
         
-        if (powerStr.startsWith('^(')) {
+        if(powerStr.startsWith('^(')) {
             let parts = powerStr.replace('^(', '').replace(')', '').split('/');
             power = parseFloat(parts[0]) / parseFloat(parts[1]);
         } else {
-            powerStr = powerStr.replace('²', '2').replace('³', '3').replace('⁴', '4').replace('⁵', '5').replace('⁻', '-').replace('^', '');
-            power = parseFloat(powerStr);
+            power = parseFloat(powerStr.replace('²', '2').replace('³', '3').replace('⁴', '4').replace('⁵', '5').replace('⁻', '-').replace('^', ''));
         }
         
-        // Add dimension exponents mathematically
         if (window.dimDict[variable]) {
             result = window.operateDims(result, window.dimDict[variable], 'add', power);
         }
     }
-    
     return result;
 }
 
