@@ -64,6 +64,8 @@ window.dimDict = {
     'mu0': { name: 'Permeability (μ₀)', concept: ['Magnetic Field × Dist', 'Current'], op: '/', breakdown: ['[MT⁻²I⁻¹] × [L]', '[I]'], units: ['H/m'], app: 'Electromagnetism', chapter: 'modern', diff: 'jee-advanced', mistake: 'Mixing up with permittivity.', jeeTip: 'Used in c = 1/√(μ₀ε₀).', ...createDim(1, 1, -2, -2) },
     'sigma': { name: 'Stefan-Boltzmann Constant', concept: ['Intensity', 'Temperature⁴'], op: '/', breakdown: ['[MT⁻³]', '[K⁴]'], units: ['W/(m²·K⁴)'], app: 'Blackbody radiation', chapter: 'modern', diff: 'jee-advanced', mistake: 'Forgetting Temperature is to the 4th power.', jeeTip: 'Power per unit Area per K⁴.', ...createDim(1, 0, -3, 0, -4) },
     'b_wien': { name: 'Wien Constant', concept: ['Length', 'Temperature'], op: '×', breakdown: ['[L]', '[K]'], units: ['m·K'], app: 'Astrophysics', chapter: 'modern', diff: 'hard', mistake: 'Using division instead of multiplication.', jeeTip: 'λ_max × T = b.', ...createDim(0, 1, 0, 0, 1) }
+    'k_e': { name: 'Coulomb Constant', concept: ['Force × Dist²', 'Charge²'], op: '/', breakdown: ['[ML³T⁻²]', '[I²T²]'], units: ['N·m²/C²'], app: 'Electrostatics', chapter: 'em', diff: 'jee-advanced', mistake: 'Using 1/4πε₀ directly without squaring charge.', jeeTip: 'k_e has exactly the inverse dimensions of ε₀.', ...createDim(1, 3, -4, -2) },
+
 };
 
 for(let key in window.dimDict) {
@@ -72,18 +74,38 @@ for(let key in window.dimDict) {
 }
 
 window.aliasMap = {
-    // Math & Subscripts
-    'm1': 'm', 'm2': 'm', 'r': 'd', 'x': 's', 'y': 's', 'l': 's', 'c': 'v',
-    'p': 'Pr', 't': 'Temp', 'rg': 'R_gas', 'rgas': 'R_gas',
-    
-    // Case-Normalization Safety
-    'ke': 'KE', 'pe': 'PE', 'pr': 'Pr',
-    
-    // Full Physics Words
-    'pressure': 'Pr', 'area': 'A', 'force': 'F', 'velocity': 'v',
-    'acceleration': 'a', 'power': 'P', 'energy': 'E', 'work': 'W',
-    'density': 'rho', 'viscosity': 'mu', 'mass': 'm', 'time': 't',
-    'distance': 'd', 'length': 'l', 'displacement': 's', 'volume': 'Vol',
-    'momentum': 'p', 'torque': 'Tau', 'frequency': 'f', 'temperature': 'Temp',
-    'current': 'I', 'charge': 'q', 'voltage': 'V', 'resistance': 'R'
+    // --- Mathematical & Subscript Aliases ---
+    'm1': 'm', 'm2': 'm', 'M1': 'm', 'M2': 'm', 
+    'r': 'd', 'R': 'd', 'x': 's', 'y': 's', 'l': 's',
+    'P': 'Pr', 'T': 'Temp', 'Rg': 'R_gas', 'Rgas': 'R_gas', 'c': 'v',
+
+    // --- Electrostatics Aliases ---
+    'K': 'k_e', 'k_e': 'k_e',
+    'Q': 'q', 'Q1': 'q', 'Q2': 'q', 'q1': 'q', 'q2': 'q',
+
+    // --- Full-Word Aliases ---
+    'pressure': 'Pr', 'Pressure': 'Pr',
+    'area': 'A', 'Area': 'A',
+    'force': 'F', 'Force': 'F',
+    'velocity': 'v', 'Velocity': 'v',
+    'acceleration': 'a', 'Acceleration': 'a',
+    'power': 'P', 'Power': 'P',
+    'energy': 'E', 'Energy': 'E',
+    'work': 'W', 'Work': 'W',
+    'density': 'rho', 'Density': 'rho',
+    'viscosity': 'mu', 'Viscosity': 'mu',
+    'mass': 'm', 'Mass': 'm',
+    'time': 't', 'Time': 't',
+    'distance': 'd', 'Distance': 'd',
+    'length': 'l', 'Length': 'l',
+    'displacement': 's', 'Displacement': 's',
+    'volume': 'Vol', 'Volume': 'Vol',
+    'momentum': 'p', 'Momentum': 'p',
+    'torque': 'Tau', 'Torque': 'Tau',
+    'frequency': 'f', 'Frequency': 'f',
+    'temperature': 'Temp', 'Temperature': 'Temp',
+    'current': 'I', 'Current': 'I',
+    'charge': 'q', 'Charge': 'q',
+    'voltage': 'V', 'Voltage': 'V',
+    'resistance': 'R', 'Resistance': 'R'
 };
