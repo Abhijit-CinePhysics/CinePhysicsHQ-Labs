@@ -30,18 +30,35 @@ window.switchTab = function(evt, tabName) {
     if(tabName === 'dashboard') window.populateDashboard();
 }
 
-window.filterDropdownList = function(inputId, selectId) {
-    let filterText = document.getElementById(inputId).value, sel = document.getElementById(selectId);
-    let currentVal = sel.value, sortedKeys = Object.keys(window.dimDict).sort((a, b) => window.dimDict[a].name.localeCompare(window.dimDict[b].name));
-    sel.innerHTML = '<option value="" disabled selected>Select a quantity...</option>';
-    sortedKeys.forEach(key => {
-        if (key.startsWith('__TMP')) return;
-        let name = window.dimDict[key].name;
-        if (name.toLowerCase().includes(filterText.toLowerCase()) || key.toLowerCase().includes(filterText.toLowerCase())) {
-            sel.add(new Option(`${name} (${key})`, key));
+window.populateDropdowns = function(filterText = '') {
+    // Array of all dropdown IDs that need to be populated
+    const selects = ['calc-select', 'deriv-target', 'card-select', 'equation-symbol-picker'];
+    
+    let sortedKeys = Object.keys(window.dimDict).sort((a, b) => window.dimDict[a].name.localeCompare(window.dimDict[b].name));
+    
+    selects.forEach(selId => {
+        let sel = document.getElementById(selId);
+        if(!sel) return;
+        
+        let currentVal = sel.value;
+        
+        // Use special placeholder text for the symbol picker
+        let defaultText = selId === 'equation-symbol-picker' ? 'Insert Any Quantity...' : 'Select a quantity...';
+        sel.innerHTML = `<option value="" disabled selected>${defaultText}</option>`;
+        
+        sortedKeys.forEach(key => {
+            if (key.startsWith('__TMP')) return;
+            let name = window.dimDict[key].name;
+            if (name.toLowerCase().includes(filterText.toLowerCase()) || key.toLowerCase().includes(filterText.toLowerCase())) {
+                sel.add(new Option(`${name} (${key})`, key));
+            }
+        });
+        
+        // Restore previous selection if it still exists in the filtered list
+        if(currentVal && Array.from(sel.options).some(opt => opt.value === currentVal)) {
+            sel.value = currentVal;
         }
     });
-    if(currentVal && Array.from(sel.options).some(opt => opt.value === currentVal)) sel.value = currentVal;
 }
 
 // --- MODULE: SAVES & PROGRESS ---
