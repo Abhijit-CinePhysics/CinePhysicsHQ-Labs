@@ -72,7 +72,11 @@
         .success-text { color: var(--success); font-weight: bold;}
         .error-text { color: var(--error); font-weight: bold;}
 
-        /* Visual Card Tree */
+        /* Features & Visual Card Tree */
+        .feature-list { display: flex; flex-direction: column; gap: 1.2rem; max-width: 450px; margin: 0 auto 3rem auto; font-size: 1.3rem; font-weight: bold; color: var(--text-main); }
+        .feature-list div { display: flex; align-items: center; gap: 1rem; }
+        .feature-icon { font-size: 1.8rem; }
+
         .tree-container { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; margin-top: 1.5rem; font-family: 'Segoe UI', sans-serif; }
         .tree-row { display: flex; gap: 1.5rem; align-items: center; justify-content: center; flex-wrap: wrap; position: relative;}
         .card-node { background: var(--card-bg); border: 2px solid var(--border); border-radius: 8px; padding: 1rem 1.5rem; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.2); min-width: 150px;}
@@ -147,7 +151,6 @@
         .site-footer a { color: var(--text-main); text-decoration: none; font-weight: bold; transition: color 0.2s;}
         .site-footer a:hover { color: var(--accent); }
 
-        /* Mobile Optimization */
         @media (max-width: 768px) {
             .mobile-menu-btn { display: block; }
             .tabs { display: none; flex-direction: column; }
@@ -181,7 +184,7 @@
     <header>
         <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙 Theme</button>
         <h1>⚡ CinePhysicsHQ-Labs</h1>
-        <div class="version-tag">VERSION 2.1</div>
+        <div class="version-tag">VERSION 3.0 (MASTER BUILD)</div>
         <p>Interactive Physics Learning • Research • Exploration</p>
     </header>
 
@@ -204,13 +207,13 @@
 
         <div id="about" class="tab-content active animate-pop">
             <h2 style="color: var(--accent); margin-bottom: 2rem; font-size: 2rem; text-align: center;">Welcome to the Dimension Realm</h2>
-            <div style="display: flex; flex-direction: column; gap: 1.2rem; max-width: 450px; margin: 0 auto 3rem auto; font-size: 1.3rem; font-weight: bold; color: var(--text-main);">
-                <div style="display: flex; align-items: center; gap: 1rem;"><span style="font-size: 1.8rem;">⚡</span> Check Equations instantly</div>
-                <div style="display: flex; align-items: center; gap: 1rem;"><span style="font-size: 1.8rem;">🔍</span> Discover Quantities in reverse</div>
-                <div style="display: flex; align-items: center; gap: 1rem;"><span style="font-size: 1.8rem;">🌳</span> View Visual Dimension Trees</div>
-                <div style="display: flex; align-items: center; gap: 1rem;"><span style="font-size: 1.8rem;">🗂️</span> Study Formula Memory Cards</div>
-                <div style="display: flex; align-items: center; gap: 1rem;"><span style="font-size: 1.8rem;">⚔️</span> Fight the Chaos Dimensioneer</div>
-                <div style="display: flex; align-items: center; gap: 1rem;"><span style="font-size: 1.8rem;">📜</span> Generate Printable Worksheets</div>
+            <div class="feature-list">
+                <div><span class="feature-icon">⚡</span> Check Equations instantly</div>
+                <div><span class="feature-icon">🔍</span> Discover Quantities in reverse</div>
+                <div><span class="feature-icon">🌳</span> View Visual Dimension Trees</div>
+                <div><span class="feature-icon">🗂️</span> Study Formula Memory Cards</div>
+                <div><span class="feature-icon">⚔️</span> Fight the Chaos Dimensioneer</div>
+                <div><span class="feature-icon">📜</span> Generate Printable Worksheets</div>
             </div>
             <button class="primary-btn" style="max-width: 300px; display: block; margin: 0 auto; font-size: 1.2rem; padding: 1rem;" onclick="switchTab(null, 'checker')">Enter the Lab 🚀</button>
         </div>
@@ -391,14 +394,18 @@
     <footer class="site-footer">
         <p>Created by <strong>Abhijit Singh</strong> | Physics Educator</p>
         <p>CinePhysicsHQ</p>
+        <p style="margin-top: 0.5rem;">
+            Instagram: <a href="https://instagram.com/abhijitsingh.io" target="_blank">@abhijitsingh.io</a> | 
+            YouTube: <a href="https://youtube.com/@CinePhysicsHQ" target="_blank">@CinePhysicsHQ</a>
+        </p>
     </footer>
 
     <script>
-        // --- 1. CORE DICTIONARY (Data) ---
+        // --- DATA & DICTIONARY ---
         window.createDim = (M, L, T, I=0, K=0, mol=0) => ({ M, L, T, I, K, mol });
 
         window.dimDict = {
-            'm': { name: 'Mass', concept: ['Fundamental'], breakdown: ['[M]'], units: ['kg', 'g'], app: 'Inertia modeling', chapter: 'mechanics', diff: 'easy', mistake: 'Confusing mass with weight.', jeeTip: 'Always standardise to kg in SI calculations.', ...window.createDim(1, 0, 0) },
+            'm': { name: 'Mass', concept: ['Fundamental'], breakdown: ['[M]'], units: ['kg', 'g'], app: 'Inertia modeling', chapter: 'mechanics', diff: 'easy', mistake: 'Confusing mass with weight (a force).', jeeTip: 'Always standardise to kg in SI calculations.', ...window.createDim(1, 0, 0) },
             's': { name: 'Displacement', concept: ['Fundamental'], breakdown: ['[L]'], units: ['m', 'cm'], app: 'Trajectory planning', chapter: 'mechanics', diff: 'easy', mistake: 'Using path length instead of shortest distance.', jeeTip: 'Displacement can be negative; distance cannot.', ...window.createDim(0, 1, 0) },
             'l': { name: 'Length', concept: ['Fundamental'], breakdown: ['[L]'], units: ['m', 'cm'], app: 'Structural engineering', chapter: 'mechanics', diff: 'easy', mistake: 'Forgetting to convert cm to m.', jeeTip: 'Dimensional analysis treats all lengths (radius, height, breadth) as [L].', ...window.createDim(0, 1, 0) },
             'd': { name: 'Distance', concept: ['Fundamental'], breakdown: ['[L]'], units: ['m', 'cm'], app: 'Kinematics', chapter: 'mechanics', diff: 'easy', mistake: 'Using path length instead of shortest distance.', jeeTip: 'Same dimensional treatment as displacement.', ...window.createDim(0, 1, 0) },
@@ -756,7 +763,7 @@
             window.activeTempTokens = [];
         }
 
-        // --- MODULE: EQUATION CHECKER ---
+        // --- MODULE: EQUATION CHECKER (Explanations) ---
         window.explainTerm = function(term) {
             let explanation = "";
             let processed = new Set();
@@ -1028,6 +1035,7 @@
         // --- MODULE: BOSS BATTLE ARENA ---
         window.chalScore = 0; window.chalTotal = 0; window.sessionXP = 0; window.chalCurrentAnswer = null; window.chalCurrentContext = null; window.currentQuestionDiff = 'easy';
         window.bossHP = 100; window.chalMaxQuestions = 10;
+        window.shareTitle = "";
 
         window.getUniqueQuestion = function(poolArray, categoryKey) {
             let available = poolArray.filter(q => !window.userStats.askedQIds[categoryKey].includes(q.id || q));
@@ -1059,6 +1067,10 @@
             const chapterFilter = document.getElementById('chal-chapter').value;
             let activeChapter = chapterFilter === 'all' ? ['mechanics', 'thermo', 'em', 'modern'][Math.floor(Math.random()*4)] : chapterFilter;
             validKeys = validKeys.filter(k => window.dimDict[k].chapter === activeChapter);
+
+            if(validKeys.length < 4) {
+                document.getElementById('challenge-box').innerHTML = `<span class="error-text">Not enough quantities. Select 'All Chapters'.</span>`; return;
+            }
 
             if(type === 1 || type === 2) {
                 const randomKey = window.getUniqueQuestion(validKeys, activeChapter), item = window.dimDict[randomKey];
@@ -1144,6 +1156,7 @@
             const percent = window.chalTotal > 0 ? Math.round((window.chalScore / window.chalTotal) * 100) : 0;
             if(percent === 100 && !window.userStats.badges.includes('first_perfect')) window.userStats.badges.push('first_perfect'); window.saveStats();
             let title = percent === 100 ? '👑 FLAWLESS VICTORY' : percent >= 70 ? '🏆 BOSS DEFEATED' : '💀 RETREAT';
+            window.shareTitle = title;
             document.getElementById('challenge-box').innerHTML = `
                 <div class="challenge-result animate-pop">
                     <h4 style="color:var(--text-muted); letter-spacing:2px; margin-bottom:0.5rem;">⚡ BATTLE REPORT</h4>
@@ -1152,48 +1165,16 @@
                     <div class="marshall-text">⚡ Dimension Marshall:</div><div class="message" style="font-style: italic;">"${percent >= 70 ? 'The Chaos Dimensioneer has fled. The realm is secure.' : 'We must train harder before facing him again.'}"</div>
                     <div style="display:flex; gap:1rem; justify-content:center; max-width: 400px; margin: 0 auto;">
                         <button class="primary-btn" onclick="startChallengeLoader()">Battle Again</button>
+                        <button class="secondary-btn" style="margin:0;" onclick="shareScore()">Share</button>
                     </div>
                 </div>`;
         }
 
-        // --- MODULE: TEACHER WORKSHEET ---
-        window.generateWorksheet = function() {
-            const chapter = document.getElementById('teacher-chapter').value;
-            const count = parseInt(document.getElementById('teacher-count').value) || 10;
-            
-            let validKeys = Object.keys(window.dimDict).filter(k => !k.startsWith('__TMP') && window.dimDict[k].name !== 'Length' && window.dimDict[k].name !== 'Distance'); 
-            if (chapter !== 'all') validKeys = validKeys.filter(k => window.dimDict[k].chapter === chapter);
-
-            let questions = [], answers = [];
-            for(let i=0; i<count; i++) {
-                let randomKey = validKeys[Math.floor(Math.random() * validKeys.length)];
-                questions.push(`Q${i+1}. Derive the dimensional formula for <strong>${window.dimDict[randomKey].name}</strong>.`);
-                answers.push(`Q${i+1}. ${window.dimDict[randomKey].name} = ${window.formatDim(window.dimDict[randomKey])}`);
-            }
-
-            let html = `
-                <html><head><title>Dimensional Analysis Worksheet</title>
-                <style>body { font-family: Arial, sans-serif; padding: 2rem; max-width: 800px; margin: 0 auto; line-height: 1.6; }
-                h1 { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; }
-                .header-info { display: flex; justify-content: space-between; margin-bottom: 2rem; font-weight: bold; }
-                .q-list div { margin-bottom: 3rem; font-size: 1.1rem; }
-                .page-break { page-break-before: always; }
-                .ans-key { color: #555; }
-                @media print { .no-print { display: none; } }
-                </style></head><body>
-                <button class="no-print" style="padding: 10px 20px; font-size:16px; margin-bottom:20px; cursor:pointer;" onclick="window.print()">Print Worksheet</button>
-                <h1>Dimensional Analysis Practice</h1>
-                <div class="header-info"><span>Name: ______________________</span><span>Date: __________</span></div>
-                <p><em>Instructions: Write the dimensional formula for each physical quantity. Show your conceptual derivation steps if required.</em></p>
-                <div class="q-list">${questions.map(q => `<div>${q}</div>`).join('')}</div>
-                <div class="page-break"></div>
-                <h2>Teacher Answer Key</h2>
-                <div class="ans-key">${answers.map(a => `<div style="margin-bottom:0.5rem;">${a}</div>`).join('')}</div>
-                </body></html>
-            `;
-            const newWin = window.open('', '_blank');
-            newWin.document.write(html);
-            newWin.document.close();
+        window.shareScore = function() {
+            const percent = window.chalTotal > 0 ? Math.round((window.chalScore / window.chalTotal) * 100) : 0;
+            const text = `🏆 I survived the Dimension Realm!\n\nScore: ${window.chalScore}/${window.chalTotal}\nAccuracy: ${percent}%\nXP Gained: +${window.sessionXP}\n\nCan you beat my score at CinePhysicsHQ?`;
+            if (navigator.share) navigator.share({ title: 'CinePhysicsHQ Challenge', text: text });
+            else { navigator.clipboard.writeText(text); alert("Score copied to clipboard!"); }
         }
 
         // --- BOOTSTRAP INITIALIZATION ---
