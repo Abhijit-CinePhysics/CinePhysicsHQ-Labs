@@ -10,6 +10,16 @@ window.toggleTheme = function() {
 
 window.toggleMobileMenu = function() { document.getElementById('nav-tabs').classList.toggle('open'); }
 
+window.insertSymbol = function(symbol) {
+    const input = document.getElementById('equation-input');
+    if (input.value.trim() !== '' && !input.value.endsWith(' ') && !input.value.endsWith('(')) {
+        input.value += ' ' + symbol;
+    } else {
+        input.value += symbol;
+    }
+    input.focus();
+}
+
 window.switchTab = function(evt, tabName) {
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
