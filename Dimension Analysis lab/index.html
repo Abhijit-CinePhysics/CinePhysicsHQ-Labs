@@ -673,7 +673,22 @@
                 document.getElementById('chal-level-display').innerText = window.userStats.xp > 10000 ? '🌌 DIMENSION MARSHALL' : `Level ${lvl.level} • ${lvl.title}`;
             }
         }
-
+        window.shareResults = function(percent, title) {
+            const shareText = `I just scored ${percent}% and achieved [${title}] in the CinePhysics Dimension Boss Battle! ⚔️⚡\n\nTest your physics skills here: https://your-website-url.com`;
+            
+            if (navigator.share) {
+                // Triggers native mobile sharing menu
+                navigator.share({
+                    title: 'CinePhysics Boss Battle',
+                    text: shareText,
+                }).catch(console.error);
+            } else {
+                // Fallback for desktops
+                const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+                window.open(whatsappUrl, '_blank');
+            }
+        }
+      
         // --- MODULE: ENGINE (PARSING) ---
         window.toSuperscript = function(numStr) { return numStr.toString().split('').map(char => ({ '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '.': '⋅' }[char] || char)).join(''); }
         window.formatDim = function(dim) {
