@@ -527,7 +527,7 @@
             'density': 'rho', 'viscosity': 'mu', 'mass': 'm', 'time': 't',
             'distance': 'd', 'length': 'l', 'displacement': 's', 'volume': 'Vol',
             'momentum': 'p', 'torque': 'Tau', 'frequency': 'f', 'temperature': 'Temp', 
-            'Temperature: 'Temp', 'T': ''Temp', 'temp': 'Temp',
+            'Temperature': 'Temp', 'T': 'Temp', 'temp': 'Temp',
             'current': 'I', 'charge': 'q', 'voltage': 'V', 'resistance': 'R'
         };
 
@@ -1394,7 +1394,7 @@
         }
 
         // --- BOOTSTRAP INITIALIZATION ---
-        window.onload = () => {
+        document.addEventListener('DOMContentLoaded', () => {
             if(localStorage.getItem('cinePhysicsTheme') === 'light') { 
                 document.body.classList.add('light-mode'); 
                 document.getElementById('theme-meta').content = '#f8fafc'; 
@@ -1407,7 +1407,7 @@
             if (!localStorage.getItem('cinePhysicsOnboarded')) {
                 document.getElementById('onboarding-overlay').style.display = 'flex';
             }
-        };
+        });
 
     </script>
 </body>
