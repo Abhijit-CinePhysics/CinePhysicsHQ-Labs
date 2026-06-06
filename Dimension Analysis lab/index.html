@@ -219,7 +219,7 @@
     <header>
         <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙 Theme</button>
         <h1>⚡ CinePhysicsHQ-Labs</h1>
-        <div class="version-tag">VERSION 3.3 (MASTER BUILD)</div>
+        <div class="version-tag">VERSION 3.4 (MASTER BUILD)</div>
         <p>Interactive Physics Learning • Research • Exploration</p>
     </header>
 
@@ -764,8 +764,13 @@
             }
         }
       
-        // --- MODULE: ENGINE (PARSING) ---
-        window.toSuperscript = function(numStr) { return numStr.toString().split('').map(char => ({ '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '.': '⋅' }[char] || char)).join(''); }
+        // --- MODULE: ENGINE (PARSING & TEXT FORMATTING) ---
+        // Enhanced mapping to support negative signs, parentheses and fractions cleanly
+        window.toSuperscript = function(numStr) { 
+            const map = { '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '.': '⋅', '/': 'ᐟ', '(': '⁽', ')': '⁾' };
+            return numStr.toString().split('').map(char => map[char] || char).join(''); 
+        }
+        
         window.formatDim = function(dim) {
             let str = '';
             if (dim.M) str += 'M' + (dim.M !== 1 ? window.toSuperscript(dim.M) : '');
@@ -820,18 +825,39 @@
                 if (variable && window.dimDict[variable]) {
                     result = window.operateDims(result, window.dimDict[variable], 'add', power);
                 } else if (!variable) {
+                    // This block fixes Bug 1: Splitting implicit equations like "mc2"
                     let chars = rawVar.split('');
                     let tempDims = {M:0, L:0, T:0, I:0, K:0, mol:0};
                     let allRecognized = true;
                     
-                    for (let char of chars) {
+                    let i = 0;
+                    while (i < chars.length) {
+                        let char = chars[i];
                         let charMapped = window.aliasMap[char] || window.aliasMap[char.toLowerCase()] || char;
+                        
                         if (window.dimDict[charMapped]) {
-                            tempDims = window.operateDims(tempDims, window.dimDict[charMapped], 'add', 1);
+                            let charPower = 1;
+                            let nextIdx = i + 1;
+                            let powStr = "";
+                            
+                            // Check if the directly following characters are numbers (e.g. the "2" in "mc2")
+                            while(nextIdx < chars.length && /[0-9\.\-]/.test(chars[nextIdx])) {
+                                powStr += chars[nextIdx];
+                                nextIdx++;
+                            }
+                            if(powStr !== "" && powStr !== "-" && powStr !== ".") {
+                                charPower = parseFloat(powStr);
+                                i = nextIdx - 1; // skip past the numbers
+                            }
+                            // Add to tempDims for this character
+                            tempDims = window.operateDims(tempDims, window.dimDict[charMapped], 'add', charPower);
+                        } else if (/[0-9\.\-]/.test(char)) {
+                            // Safely ignore stray mathematical coefficients
                         } else {
                             allRecognized = false;
                             break;
                         }
+                        i++;
                     }
                     if (allRecognized) {
                         result = window.operateDims(result, tempDims, 'add', power);
@@ -1064,7 +1090,10 @@
         window.buildSyntheticDerivation = function(M, L, T, I, K, mol) {
             if(M===0 && L===0 && T===0 && I===0 && K===0 && mol===0) return 'Pure Number (Dimensionless)';
             let num = [], den = [];
-            const addPart = (exp, name) => { if(exp > 0) num.push(`${name}${exp>1?'^'+exp:''}`); else if(exp < 0) den.push(`${name}${exp<-1?'^'+(-exp):''}`); };
+            const addPart = (exp, name) => { 
+                if(exp > 0) num.push(`${name}${exp>1 ? window.toSuperscript(exp) : ''}`); 
+                else if(exp < 0) den.push(`${name}${exp<-1 ? window.toSuperscript(-exp) : ''}`); 
+            };
             addPart(M, 'Mass'); addPart(L, 'Length'); addPart(T, 'Time'); addPart(I, 'Current'); addPart(K, 'Temperature'); addPart(mol, 'Amount');
             let nStr = num.length > 0 ? num.join(' × ') : '1', dStr = den.length > 0 ? den.join(' × ') : '';
             return dStr ? `(${nStr}) / (${dStr})` : nStr;
@@ -1137,11 +1166,24 @@
             }
             if (pivots < cols) { out.innerHTML = `<span class="error-text">❌ Underdetermined system (Rank ${pivots} < Variables ${cols}).</span>`; return; }
             let numStr="", denStr="";
+            
             for(let c=0; c<cols; c++) {
                 let power = 0;
                 for(let r=0; r<rows; r++) { if(Math.abs(matrix[r][c] - 1) < 1e-7) { let isP = true; for(let x=0; x<rows; x++) if(x!==r && Math.abs(matrix[x][c]) > 1e-7) isP = false; if(isP) { power = matrix[r][cols]; break; } } }
+                
+                // This block fixes Bug 2: Generating properly formatted superscripts 
                 if(Math.abs(power) > 1e-7) {
-                    let pStr = Math.abs(power-0.5)<1e-7?"^(1/2)":Math.abs(power-0.3333333)<1e-7?"^(1/3)":Math.abs(power-1.5)<1e-7?"^(3/2)":Math.abs(power)!==1?"^"+parseFloat(Math.abs(power).toFixed(2)):"";
+                    let absPower = Math.abs(power);
+                    let pStr = "";
+                    if (Math.abs(absPower - 1) > 1e-7) {
+                        let fracStr = "";
+                        if (Math.abs(absPower - 0.5) < 1e-7) fracStr = "1/2";
+                        else if (Math.abs(absPower - 0.3333333) < 1e-7) fracStr = "1/3";
+                        else if (Math.abs(absPower - 1.5) < 1e-7) fracStr = "3/2";
+                        else fracStr = parseFloat(absPower.toFixed(2)).toString();
+                        
+                        pStr = window.toSuperscript(fracStr);
+                    }
                     if(power > 0) numStr += `${validVars[c].orig}${pStr} `; else denStr += `${validVars[c].orig}${pStr} `;
                 }
             }
@@ -1183,10 +1225,22 @@
                 let free = freeCols[i], vec = new Array(cols).fill(0); vec[free] = 1;
                 for(let r = 0; r < pivotCols.length; r++) vec[pivotCols[r]] = -matrix[r][free];
                 let numStr = "", denStr = "";
+                
+                // Formatted for Buckingham Pi as well
                 for(let j=0; j<cols; j++) {
                     let exp = vec[j];
                     if(Math.abs(exp) > 1e-7) {
-                        let varName = validVars[j].orig, powerStr = Math.abs(exp) !== 1 ? window.toSuperscript(Math.abs(exp)) : "";
+                        let varName = validVars[j].orig;
+                        let absExp = Math.abs(exp);
+                        let powerStr = "";
+                        if(Math.abs(absExp - 1) > 1e-7) {
+                            let fracStr = "";
+                            if (Math.abs(absExp - 0.5) < 1e-7) fracStr = "1/2";
+                            else if (Math.abs(absExp - 0.3333333) < 1e-7) fracStr = "1/3";
+                            else if (Math.abs(absExp - 1.5) < 1e-7) fracStr = "3/2";
+                            else fracStr = parseFloat(absExp.toFixed(2)).toString();
+                            powerStr = window.toSuperscript(fracStr);
+                        }
                         if(exp > 0) numStr += `${varName}${powerStr} `; else denStr += `${varName}${powerStr} `;
                     }
                 }
