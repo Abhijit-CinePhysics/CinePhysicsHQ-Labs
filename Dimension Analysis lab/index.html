@@ -1145,6 +1145,28 @@
         }
 
         window.startChallenge = function() {
+          console.log("startChallenge called");
+
+    try {
+
+        const types = [1,2,3];
+        const type = types[Math.floor(Math.random()*types.length)];
+
+        console.log("Question type:", type);
+
+        // existing code here
+
+    } catch(err) {
+        console.error(err);
+
+        document.getElementById('challenge-box').innerHTML = `
+            <div style="color:red;padding:20px">
+                Boss Battle Error:<br>
+                ${err.message}
+            </div>
+        `;
+    }
+        }
             const types = [1, 2, 3]; const type = types[Math.floor(Math.random() * types.length)];
             let validKeys = Object.keys(window.dimDict).filter(k => !k.startsWith('__TMP') && window.dimDict[k].name !== 'Length' && window.dimDict[k].name !== 'Distance'); 
             const chapterFilter = document.getElementById('chal-chapter').value;
