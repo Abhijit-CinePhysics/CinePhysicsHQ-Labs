@@ -22,7 +22,7 @@
     <meta property="og:title" content="CinePhysicsHQ-Labs: Dimensional Analysis">
     <meta property="og:description" content="Defeat the Chaos Dimensioneer, check physics equations, and master dimensions for JEE/NEET.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://your-github-pages-url.com"> 
+    <meta property="og:url" content="https://abhijit-cinephysics.github.io/CinePhysicsHQ-Labs/Dimension%20Analysis%20lab/"> 
     <meta property="og:image" content="https://via.placeholder.com/1200x630.png?text=CinePhysicsHQ+Labs">
 
     <meta name="twitter:card" content="summary_large_image">
@@ -674,7 +674,7 @@
             }
         }
         window.shareResults = function(percent, title) {
-            const shareText = `I just scored ${percent}% and achieved [${title}] in the CinePhysics Dimension Boss Battle! ⚔️⚡\n\nTest your physics skills here: https://your-website-url.com`;
+            const shareText = `I just scored ${percent}% and achieved [${title}] in the CinePhysics Dimension Boss Battle! ⚔️⚡\n\nTest your physics skills here: https://abhijit-cinephysics.github.io/CinePhysicsHQ-Labs/Dimension%20Analysis%20lab/`;
             
             if (navigator.share) {
                 // Triggers native mobile sharing menu
@@ -1236,21 +1236,23 @@
         }
 
         window.showResults = function() {
-            const percent = window.chalTotal > 0 ? Math.round((window.chalScore / window.chalTotal) * 100) : 0;
-            if(percent === 100 && !window.userStats.badges.includes('first_perfect')) window.userStats.badges.push('first_perfect'); window.saveStats();
-            let title = percent === 100 ? '👑 FLAWLESS VICTORY' : percent >= 70 ? '🏆 BOSS DEFEATED' : '💀 RETREAT';
-            window.shareTitle = title;
-            document.getElementById('challenge-box').innerHTML = `
-                <div class="challenge-result animate-pop">
-                    <h4 style="color:var(--text-muted); letter-spacing:2px; margin-bottom:0.5rem;">⚡ BATTLE REPORT</h4>
-                    <h2>${title}</h2>
-                    <div class="stats"><strong>Boss Damage:</strong> ${window.chalScore * 10}% <br><strong>Accuracy:</strong> ${percent}% <br><strong style="color:var(--xp-color);">XP Gained:</strong> +${window.sessionXP}</div>
-                    <div class="marshall-text">⚡ Dimension Marshall:</div><div class="message" style="font-style: italic;">"${percent >= 70 ? 'The Chaos Dimensioneer has fled. The realm is secure.' : 'We must train harder before facing him again.'}"</div>
-                    <div style="display:flex; gap:1rem; justify-content:center; max-width: 400px; margin: 0 auto;">
-                        <button class="primary-btn" onclick="startChallengeLoader()">Battle Again</button>
-                    </div>
-                </div>`;
-        }
+    const percent = window.chalTotal > 0 ? Math.round((window.chalScore / window.chalTotal) * 100) : 0;
+    if(percent === 100 && !window.userStats.badges.includes('first_perfect')) window.userStats.badges.push('first_perfect'); window.saveStats();
+    let title = percent === 100 ? '👑 FLAWLESS VICTORY' : percent >= 70 ? '🏆 BOSS DEFEATED' : '💀 RETREAT';
+    window.shareTitle = title;
+    document.getElementById('challenge-box').innerHTML = `
+        <div class="challenge-result animate-pop">
+            <h4 style="color:var(--text-muted); letter-spacing:2px; margin-bottom:0.5rem;">⚡ BATTLE REPORT</h4>
+            <h2>${title}</h2>
+            <div class="stats"><strong>Boss Damage:</strong> ${window.chalScore * 10}% <br><strong>Accuracy:</strong> ${percent}% <br><strong style="color:var(--xp-color);">XP Gained:</strong> +${window.sessionXP}</div>
+            <div class="marshall-text">⚡ Dimension Marshall:</div><div class="message" style="font-style: italic;">"${percent >= 70 ? 'The Chaos Dimensioneer has fled. The realm is secure.' : 'We must train harder before facing him again.'}"</div>
+            <div style="display:flex; gap:1rem; justify-content:center; max-width: 500px; margin: 0 auto; flex-wrap: wrap;">
+                <button class="primary-btn" style="flex: 1; min-width: 150px;" onclick="startChallengeLoader()">Battle Again</button>
+                <button class="secondary-btn" style="flex: 1; min-width: 150px; border-color: var(--gold); color: var(--gold); margin-left: 0;" onclick="shareResults(${percent}, '${title}')">Share Result 📱</button>
+            </div>
+        </div>`;
+}
+
 
         // --- MODULE: TEACHER WORKSHEET ---
         window.generateWorksheet = function() {
