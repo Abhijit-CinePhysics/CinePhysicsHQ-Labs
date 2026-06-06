@@ -15,6 +15,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#0f172a" id="theme-meta">
     <title>CinePhysicsHQ-Labs: Dimensional Analysis</title>
+      <meta name="description" content="Master Dimensional Analysis for JEE/NEET with CinePhysicsHQ-Labs. Interactive equation checker, visual dimension trees, and gamified boss battles.">
+    <meta name="keywords" content="dimensional analysis tool, physics JEE, NEET physics, dimension checker, buckingham pi calculator, physics formulas">
+    <meta name="author" content="Abhijit Singh">
+
+    <meta property="og:title" content="CinePhysicsHQ-Labs: Dimensional Analysis">
+    <meta property="og:description" content="Defeat the Chaos Dimensioneer, check physics equations, and master dimensions for JEE/NEET.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://your-github-pages-url.com"> 
+    <meta property="og:image" content="https://via.placeholder.com/1200x630.png?text=CinePhysicsHQ+Labs">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="CinePhysicsHQ-Labs: Dimensional Analysis">
+    <meta name="twitter:description" content="Interactive dimensional analysis calculator and boss battles for Physics students.">
+  
     <style>
         :root {
             --bg-color: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc; --text-muted: #94a3b8;
@@ -177,7 +191,14 @@
     </style>
 </head>
 <body>
-
+    <div id="onboarding-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.9); z-index: 1000; justify-content: center; align-items: center; padding: 1rem;">
+        <div class="memory-card animate-pop" style="max-width: 500px; text-align: center;">
+            <h2 style="color: var(--gold); margin-bottom: 1rem; font-size: 2rem;">Welcome to the Dimension Realm! ⚡</h2>
+            <p style="margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-main);">To get started, let's test a famous physics formula. Click below to watch the engine analyze an equation in real-time.</p>
+            <button class="primary-btn" style="font-size: 1.2rem; padding: 1rem;" onclick="closeOnboarding()">Try the Equation Checker 🚀</button>
+        </div>
+    </div>
+  
     <div id="cert-overlay">
         <div class="cert-card animate-pop">
             <div class="close-cert" onclick="document.getElementById('cert-overlay').style.display='none'">✖</div>
@@ -519,6 +540,15 @@
 
         window.toggleMobileMenu = function() { document.getElementById('nav-tabs').classList.toggle('open'); }
 
+               window.closeOnboarding = function() {
+            document.getElementById('onboarding-overlay').style.display = 'none';
+            localStorage.setItem('cinePhysicsOnboarded', 'true');
+            // Guide them to the checker and load a preset automatically
+            window.switchTab(null, 'checker');
+            setTimeout(() => window.loadPreset('v = sqrt(2*KE / m)'), 300);
+               }
+      
+      
         window.insertSymbol = function(symbol) {
             const input = document.getElementById('equation-input');
             if (input.value.trim() !== '' && !input.value.endsWith(' ') && !input.value.endsWith('(')) {
@@ -1248,7 +1278,7 @@
         }
 
         // --- BOOTSTRAP INITIALIZATION ---
-        window.onload = () => {
+                window.onload = () => {
             if(localStorage.getItem('cinePhysicsTheme') === 'light') { 
                 document.body.classList.add('light-mode'); 
                 document.getElementById('theme-meta').content = '#f8fafc'; 
@@ -1256,7 +1286,13 @@
             window.populateDropdowns('');
             window.discoverQuantity(); 
             window.initStats(); 
+            
+            // Trigger onboarding if it's their first time
+            if (!localStorage.getItem('cinePhysicsOnboarded')) {
+                document.getElementById('onboarding-overlay').style.display = 'flex';
+            }
         };
+
     </script>
 </body>
 </html>
