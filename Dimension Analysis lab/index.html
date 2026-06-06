@@ -1184,17 +1184,109 @@
                         
                         pStr = window.toSuperscript(fracStr);
                     }
-                    if(power > 0) numStr += `${validVars[c].orig}${pStr} `; else denStr += `${validVars[c].orig}${pStr} `;
+        window.loadDerivatorPreset = function(target, vars) { document.getElementById('deriv-target').value = target; document.getElementById('deriv-vars').value = vars; window.deriveFormula(); }
+
+        window.deriveFormula = function() {
+            const targetSym = document.getElementById('deriv-target').value;
+            const input = document.getElementById('deriv-vars').value;
+            const out = document.getElementById('deriv-output');
+            
+            if(!targetSym) return;
+            let targetDim = window.dimDict[targetSym];
+            
+            let vars = input.split(',').map(v => v.trim()).filter(v => v);
+            let validVars = [];
+            
+            for(let v of vars) {
+                let m = window.aliasMap[v] || window.aliasMap[v.toLowerCase()] || v;
+                if(!window.dimDict[m]) {
+                    let foundKey = Object.keys(window.dimDict).find(key => window.dimDict[key].name.toLowerCase() === v.toLowerCase());
+                    m = foundKey || m;
+                }
+                if(!window.dimDict[m]) { 
+                    out.innerHTML = `<span class="error-text">❌ Unknown variable: "${v}".</span>`; 
+                    return; 
+                }
+                validVars.push({orig:v, dims:window.dimDict[m]});
+            }
+            if(validVars.length === 0) return;
+
+            const baseDims = ['M', 'L', 'T', 'I', 'K', 'mol'];
+            let matrix=[], activeDims=[];
+            for(let d of baseDims) {
+                let row=[], hasNonZero=false; 
+                for(let v of validVars) { row.push(v.dims[d]); if(v.dims[d]!==0) hasNonZero=true; }
+                row.push(targetDim[d]); 
+                if(hasNonZero || targetDim[d]!==0) { matrix.push(row); activeDims.push(d); }
+            }
+            
+            let rows = matrix.length, cols = validVars.length, lead = 0;
+            for (let r = 0; r < rows; r++) {
+                if (lead >= cols) break; 
+                let i = r; 
+                while (matrix[i][lead] === 0) { i++; if (i === rows) { i = r; lead++; if (lead === cols) break; } }
+                if (lead < cols) {
+                    let temp = matrix[i]; matrix[i] = matrix[r]; matrix[r] = temp; 
+                    let lv = matrix[r][lead]; for (let j = 0; j <= cols; j++) matrix[r][j] /= lv; 
+                    for (let x = 0; x < rows; x++) { if (x !== r) { let mult = matrix[x][lead]; for (let j = 0; j <= cols; j++) matrix[x][j] -= mult * matrix[r][j]; } }
+                    lead++;
                 }
             }
-            out.innerHTML = `<div class="animate-pop"><span class="success-text" style="font-size:1.4rem;">${targetSym} ∝ ${numStr.trim()||'1'} ${denStr?'/ ('+denStr.trim()+')':''}</span></div>`;
+            
+            for(let r = 0; r < rows; r++) {
+                let allZero = true; for(let c = 0; c < cols; c++) if(Math.abs(matrix[r][c]) > 1e-7) allZero = false;
+                if(allZero && Math.abs(matrix[r][cols]) > 1e-7) { out.innerHTML = `<span class="error-text">❌ Impossible to derive ${window.dimDict[targetSym].name} from (${validVars.map(v=>v.orig).join(', ')}).</span>`; return; }
+            }
+            
+            let pivots = 0;
+            for (let r = 0; r < rows; r++) {
+                let hasPivot = false; 
+                for (let c = 0; c < cols; c++) { 
+                    if (Math.abs(matrix[r][c] - 1) < 1e-7) { 
+                        let isP = true; for (let x = 0; x < rows; x++) if (x !== r && Math.abs(matrix[x][c]) > 1e-7) isP = false; 
+                        if (isP) { hasPivot = true; break; } 
+                    } 
+                }
+                if (hasPivot) pivots++;
+            }
+            
+            if (pivots < cols) { out.innerHTML = `<span class="error-text">❌ Underdetermined system (Rank ${pivots} < Variables ${cols}).</span>`; return; }
+            
+            let resHtml = "";
+            for(let c=0; c<cols; c++) {
+                let power = 0;
+                for(let r=0; r<rows; r++) { if(Math.abs(matrix[r][c] - 1) < 1e-7) { let isP = true; for(let x=0; x<rows; x++) if(x!==r && Math.abs(matrix[x][c]) > 1e-7) isP = false; if(isP) { power = matrix[r][cols]; break; } } }
+                
+                if(Math.abs(power) > 1e-7) {
+                    let absPower = Math.abs(power);
+                    let pStr = "";
+                    if (Math.abs(absPower - 1) > 1e-7) {
+                        let fracStr = "";
+                        if (Math.abs(absPower - 0.5) < 1e-7) fracStr = "1/2";
+                        else if (Math.abs(absPower - 0.3333333) < 1e-7) fracStr = "1/3";
+                        else if (Math.abs(absPower - 1.5) < 1e-7) fracStr = "3/2";
+                        else fracStr = parseFloat(absPower.toFixed(2)).toString();
+                        pStr = window.toSuperscript(fracStr);
+                    }
+                    resHtml += `${validVars[c].orig}${pStr} `;
+                }
+            }
+            out.innerHTML = `<div class="animate-pop"><span class="success-text" style="font-size:1.4rem;">${targetSym} ∝ ${resHtml.trim()||'1'}</span></div>`;
         }
 
         window.loadPiPreset = function(v) { document.getElementById('pi-input').value = v; window.solveBuckingham(); }
         window.solveBuckingham = function() {
             const out = document.getElementById('pi-output'), input = document.getElementById('pi-input').value;
             let vars = input.split(',').map(v => v.trim()).filter(v => v), validVars = [];
-            for(let v of vars) { let m = window.aliasMap[v] || v; if(!window.dimDict[m]){ out.innerHTML=`<span class="error-text">❌ Unknown variable: ${v}</span>`; return; } validVars.push({orig:v, mapped:m, dims:window.dimDict[m]}); }
+            for(let v of vars) { 
+                let m = window.aliasMap[v] || window.aliasMap[v.toLowerCase()] || v;
+                if(!window.dimDict[m]){ 
+                    let foundKey = Object.keys(window.dimDict).find(key => window.dimDict[key].name.toLowerCase() === v.toLowerCase());
+                    m = foundKey || m;
+                }
+                if(!window.dimDict[m]){ out.innerHTML=`<span class="error-text">❌ Unknown variable: ${v}</span>`; return; } 
+                validVars.push({orig:v, mapped:m, dims:window.dimDict[m]}); 
+            }
             if(validVars.length === 0) return;
             let matrix=[], activeDims=[];
             for(let d of ['M','L','T','I','K','mol']) {
@@ -1225,8 +1317,6 @@
                 let free = freeCols[i], vec = new Array(cols).fill(0); vec[free] = 1;
                 for(let r = 0; r < pivotCols.length; r++) vec[pivotCols[r]] = -matrix[r][free];
                 let numStr = "", denStr = "";
-                
-                // Formatted for Buckingham Pi as well
                 for(let j=0; j<cols; j++) {
                     let exp = vec[j];
                     if(Math.abs(exp) > 1e-7) {
@@ -1248,6 +1338,7 @@
             }
             out.innerHTML = html + `</div>`;
         }
+
 
         // --- MODULE: BOSS BATTLE ARENA ---
         window.chalScore = 0; window.chalTotal = 0; window.sessionXP = 0; window.chalCurrentAnswer = null; window.chalCurrentContext = null; window.currentQuestionDiff = 'easy'; window.currentQuestionChapter = 'mechanics';
