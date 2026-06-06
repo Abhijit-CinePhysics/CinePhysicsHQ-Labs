@@ -219,7 +219,7 @@
     <header>
         <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙 Theme</button>
         <h1>⚡ CinePhysicsHQ-Labs</h1>
-        <div class="version-tag">VERSION 3.1 (MASTER BUILD)</div>
+        <div class="version-tag">VERSION 3.2 (MASTER BUILD)</div>
         <p>Interactive Physics Learning • Research • Exploration</p>
     </header>
 
@@ -469,6 +469,7 @@
             'rho': { name: 'Density', concept: ['Mass', 'Volume'], op: '/', breakdown: ['[M]', '[L³]'], units: ['kg/m³'], app: 'Buoyancy', chapter: 'mechanics', diff: 'medium', mistake: 'Mixing up density [ML⁻³] with specific gravity (dimensionless).', jeeTip: 'Crucial for fluid mechanics derivations like Bernoulli\'s principle.', ...window.createDim(1, -3, 0) },
             'mu': { name: 'Viscosity', concept: ['Shear Stress', 'Vel Gradient'], op: '/', breakdown: ['[ML⁻¹T⁻²]', '[T⁻¹]'], units: ['Pa·s'], app: 'Motor oil rating', chapter: 'mechanics', diff: 'hard', mistake: 'Forgetting that velocity gradient is [T⁻¹].', jeeTip: 'Memorize [ML⁻¹T⁻¹]. It appears frequently in Stokes\' Law and Reynolds Number.', ...window.createDim(1, -1, -1) },
             'ST': { name: 'Surface Tension', concept: ['Force', 'Length'], op: '/', breakdown: ['[MLT⁻²]', '[L]'], units: ['N/m'], app: 'Capillary action', chapter: 'mechanics', diff: 'medium', mistake: 'Confusing it with surface energy. (Actually, Energy/Area gives the same [MT⁻²]).', jeeTip: 'Notice L cancels out entirely. Surface Tension is purely [MT⁻²].', ...window.createDim(1, 0, -2) },
+            'SpringConst': { name: 'Spring Constant', concept: ['Force', 'Length'], op: '/', breakdown: ['[MLT⁻²]', '[L]'], units: ['N/m'], app: 'Hooke\'s Law', chapter: 'mechanics', diff: 'medium', mistake: 'Confusing it with dimensionless constants.', jeeTip: 'Dimensionally identical to Surface Tension.', ...window.createDim(1, 0, -2) },
             'f': { name: 'Frequency', concept: ['Cycles', 'Time'], op: '/', breakdown: ['[1]', '[T]'], units: ['Hertz (Hz)'], app: 'Acoustics', chapter: 'mechanics', diff: 'easy', mistake: 'Adding dimensions to the "cycle" count.', jeeTip: 'Angular frequency (ω) and standard frequency (f) share [T⁻¹].', ...window.createDim(0, 0, -1) },
             'omega': { name: 'Angular Frequency', concept: ['Angle', 'Time'], op: '/', breakdown: ['[1]', '[T]'], units: ['rad/s'], app: 'Wave mechanics', chapter: 'mechanics', diff: 'medium', mistake: 'Treating radians as [L]. Radian is dimensionless.', jeeTip: 'Dimensionally identical to normal frequency.', ...window.createDim(0, 0, -1) },
             'alpha': { name: 'Angular Acceleration', concept: ['Angular Velocity', 'Time'], op: '/', breakdown: ['[T⁻¹]', '[T]'], units: ['rad/s²'], app: 'Rotational dynamics', chapter: 'mechanics', diff: 'medium', mistake: 'Including [L] in the formula.', jeeTip: 'Purely [T⁻²].', ...window.createDim(0, 0, -2) },
@@ -478,7 +479,9 @@
             'n': { name: 'Amount of Substance', concept: ['Fundamental'], breakdown: ['[mol]'], units: ['Mole'], app: 'Chemical reactions', chapter: 'thermo', diff: 'easy', mistake: 'Forgetting mol in gas equations.', jeeTip: 'A fundamental dimension. Don\'t ignore it in PV=nRT.', ...window.createDim(0, 0, 0, 0, 0, 1) },
             'HC': { name: 'Heat Capacity', concept: ['Energy', 'Temperature'], op: '/', breakdown: ['[ML²T⁻²]', '[K]'], units: ['J/K'], app: 'HVAC systems', chapter: 'thermo', diff: 'medium', mistake: 'Confusing it with Specific Heat (which divides by Mass).', jeeTip: 'Heat is just Energy. Substitute [ML²T⁻²] directly.', ...window.createDim(1, 2, -2, 0, -1) },
             'SHC': { name: 'Specific Heat', concept: ['Heat Capacity', 'Mass'], op: '/', breakdown: ['[ML²T⁻²K⁻¹]', '[M]'], units: ['J/(kg·K)'], app: 'Thermodynamics', chapter: 'thermo', diff: 'medium', mistake: 'Forgetting to divide by mass.', jeeTip: 'Note the missing [M] compared to Heat Capacity.', ...window.createDim(0, 2, -2, 0, -1) },
+            'LatentHeat': { name: 'Latent Heat', concept: ['Energy', 'Mass'], op: '/', breakdown: ['[ML²T⁻²]', '[M]'], units: ['J/kg'], app: 'Phase changes', chapter: 'thermo', diff: 'medium', mistake: 'Forgetting to divide by Mass.', jeeTip: 'It has the same dimensions as Gravitational Potential [L²T⁻²].', ...window.createDim(0, 2, -2) },
             'ThermalCond': { name: 'Thermal Conductivity', concept: ['Power', '(Area × TempGrad)'], op: '/', breakdown: ['[ML²T⁻³]', '[L²]×[KL⁻¹]'], units: ['W/(m·K)'], app: 'Insulation', chapter: 'thermo', diff: 'hard', mistake: 'Mishandling the Temperature Gradient ([K]/[L]).', jeeTip: 'Break it down slowly: Power / (Length × Temperature).', ...window.createDim(1, 1, -3, 0, -1) },
+            'Entropy': { name: 'Entropy', concept: ['Energy', 'Temperature'], op: '/', breakdown: ['[ML²T⁻²]', '[K]'], units: ['J/K'], app: 'Thermodynamics', chapter: 'thermo', diff: 'medium', mistake: 'Treating it as pure energy.', jeeTip: 'Identical to Heat Capacity and Boltzmann Constant.', ...window.createDim(1, 2, -2, 0, -1) },
             
             'I': { name: 'Current', concept: ['Fundamental'], breakdown: ['[I]'], units: ['Ampere (A)'], app: 'Circuit design', chapter: 'em', diff: 'easy', mistake: 'Deriving Current from Charge. In the SI system, Current [I] is fundamental.', jeeTip: 'Charge is [IT], not the other way around.', ...window.createDim(0, 0, 0, 1) },
             'q': { name: 'Charge', concept: ['Current', 'Time'], op: '×', breakdown: ['[I]', '[T]'], units: ['Coulomb (C)'], app: 'Battery limits', chapter: 'em', diff: 'easy', mistake: 'Treating Charge as a fundamental dimension.', jeeTip: 'Always substitute [IT] for charge in electrostatic derivations.', ...window.createDim(0, 0, 1, 1) },
@@ -491,7 +494,12 @@
             'E_field': { name: 'Electric Field', concept: ['Force', 'Charge'], op: '/', breakdown: ['[MLT⁻²]', '[IT]'], units: ['V/m'], app: 'Electrostatics', chapter: 'em', diff: 'medium', mistake: 'Confusing with Electric Potential.', jeeTip: 'Easily derived as Voltage / Length.', ...window.createDim(1, 1, -3, -1) },
             'B': { name: 'Magnetic Field', concept: ['Force', '(Charge × Velocity)'], op: '/', breakdown: ['[MLT⁻²]', '([IT] × [LT⁻¹])'], units: ['Tesla (T)'], app: 'Motors', chapter: 'em', diff: 'hard', mistake: 'Deriving from Biot-Savart instead of F = qvB.', jeeTip: 'Notice Length cancels out. B is purely [MT⁻²I⁻¹].', ...window.createDim(1, 0, -2, -1) },
             'Flux': { name: 'Magnetic Flux', concept: ['Magnetic Field', 'Area'], op: '×', breakdown: ['[MT⁻²I⁻¹]', '[L²]'], units: ['Weber (Wb)'], app: 'Generators', chapter: 'em', diff: 'hard', mistake: 'Confusing with Magnetic Field.', jeeTip: 'Multiply B by Area [L²].', ...window.createDim(1, 2, -2, -1) },
+            'ElecFlux': { name: 'Electric Flux', concept: ['Electric Field', 'Area'], op: '×', breakdown: ['[MLT⁻³I⁻¹]', '[L²]'], units: ['V·m'], app: 'Gauss Law', chapter: 'em', diff: 'hard', mistake: 'Confusing with Magnetic Flux.', jeeTip: '[ML³T⁻³I⁻¹].', ...window.createDim(1, 3, -3, -1) },
             'Ind': { name: 'Inductance', concept: ['Magnetic Flux', 'Current'], op: '/', breakdown: ['[ML²T⁻²I⁻¹]', '[I]'], units: ['Henry (H)'], app: 'Transformers', chapter: 'em', diff: 'jee-advanced', mistake: 'Messing up the I exponents.', jeeTip: 'Inductance is purely [ML²T⁻²I⁻²].', ...window.createDim(1, 2, -2, -2) },
+            'ElecDipole': { name: 'Electric Dipole Moment', concept: ['Charge', 'Length'], op: '×', breakdown: ['[IT]', '[L]'], units: ['C·m'], app: 'Electromagnetism', chapter: 'em', diff: 'medium', mistake: 'Squaring the distance.', jeeTip: 'Simple [LTI].', ...window.createDim(0, 1, 0, 1) },
+            'MagDipole': { name: 'Magnetic Dipole Moment', concept: ['Current', 'Area'], op: '×', breakdown: ['[I]', '[L²]'], units: ['A·m²'], app: 'Magnetism', chapter: 'em', diff: 'medium', mistake: 'Multiplying by magnetic field.', jeeTip: 'It is just [L²I].', ...window.createDim(0, 2, 0, 1) },
+            'Poynting': { name: 'Poynting Vector', concept: ['Power', 'Area'], op: '/', breakdown: ['[ML²T⁻³]', '[L²]'], units: ['W/m²'], app: 'EM Waves', chapter: 'em', diff: 'hard', mistake: 'Treating as pure Power.', jeeTip: 'Energy flux density. [MT⁻³].', ...window.createDim(1, 0, -3) },
+            'Mobility': { name: 'Electron Mobility', concept: ['Velocity', 'Electric Field'], op: '/', breakdown: ['[LT⁻¹]', '[MLT⁻³I⁻¹]'], units: ['m²/(V·s)'], app: 'Semiconductors', chapter: 'em', diff: 'hard', mistake: 'Inverting the division.', jeeTip: 'Mass exponent is negative: [M⁻¹T²I].', ...window.createDim(-1, 0, 2, 1) },
             
             'h': { name: 'Planck Constant', concept: ['Energy', 'Frequency'], op: '/', breakdown: ['[ML²T⁻²]', '[T⁻¹]'], units: ['J·s'], app: 'Quantum mechanics', chapter: 'modern', diff: 'jee-advanced', mistake: 'Confusing h with ħ.', jeeTip: 'Planck\'s Constant shares identical dimensions with Angular Momentum.', ...window.createDim(1, 2, -1) },
             'G': { name: 'Gravitational Constant', concept: ['(Force × Dist²)', 'Mass²'], op: '/', breakdown: ['[ML³T⁻²]', '[M²]'], units: ['N·m²/kg²'], app: 'Astrophysics', chapter: 'modern', diff: 'jee-advanced', mistake: 'Forgetting to square the distance or mass.', jeeTip: 'G has a negative mass exponent: [M⁻¹L³T⁻²].', ...window.createDim(-1, 3, -2) },
@@ -505,7 +513,10 @@
             'k_e': { name: 'Coulomb Constant', concept: ['Force × Dist²', 'Charge²'], op: '/', breakdown: ['[ML³T⁻²]', '[I²T²]'], units: ['N·m²/C²'], app: 'Electrostatics', chapter: 'em', diff: 'jee-advanced', mistake: 'Using 1/4πε₀ directly without squaring charge.', jeeTip: 'k_e has exactly the inverse dimensions of ε₀.', ...window.createDim(1, 3, -4, -2) },
             'c_light': { name: 'Speed of Light', concept: ['Distance', 'Time'], op: '/', breakdown: ['[L]', '[T]'], units: ['m/s'], app: 'Relativity', chapter: 'modern', diff: 'easy', mistake: 'Treating it as dimensionless.', jeeTip: 'Always [LT⁻¹].', ...window.createDim(0, 1, -1) },
             'e': { name: 'Elementary Charge', concept: ['Current', 'Time'], op: '×', breakdown: ['[I]', '[T]'], units: ['Coulomb (C)'], app: 'Electrostatics', chapter: 'modern', diff: 'easy', mistake: 'Forgetting it is charge.', jeeTip: 'Same dimensions as q.', ...window.createDim(0, 0, 1, 1) },
-            'epsilon': { name: 'Emissivity', concept: ['Ratio', 'Ratio'], op: '/', breakdown: ['[1]', '[1]'], units: ['Dimensionless'], app: 'Thermodynamics', chapter: 'thermo', diff: 'medium', mistake: 'Confusing with permittivity (epsilon_0).', jeeTip: 'Purely dimensionless.', ...window.createDim(0, 0, 0) }
+            'epsilon': { name: 'Emissivity', concept: ['Ratio', 'Ratio'], op: '/', breakdown: ['[1]', '[1]'], units: ['Dimensionless'], app: 'Thermodynamics', chapter: 'thermo', diff: 'medium', mistake: 'Confusing with permittivity (epsilon_0).', jeeTip: 'Purely dimensionless.', ...window.createDim(0, 0, 0) },
+            'Faraday': { name: 'Faraday Constant', concept: ['Charge', 'Amount'], op: '/', breakdown: ['[IT]', '[mol]'], units: ['C/mol'], app: 'Electrochemistry', chapter: 'modern', diff: 'medium', mistake: 'Ignoring the mol dimension.', jeeTip: 'Used in electrolysis. [TI mol⁻¹].', ...window.createDim(0, 0, 1, 1, 0, -1) },
+            'Rydberg': { name: 'Rydberg Constant', concept: ['1', 'Length'], op: '/', breakdown: ['[1]', '[L]'], units: ['m⁻¹'], app: 'Atomic Spectra', chapter: 'modern', diff: 'medium', mistake: 'Treating as Energy (Rhc is energy, R is not).', jeeTip: 'Purely spatial frequency: [L⁻¹].', ...window.createDim(0, -1, 0) },
+            'Hubble': { name: 'Hubble Constant', concept: ['Velocity', 'Distance'], op: '/', breakdown: ['[LT⁻¹]', '[L]'], units: ['s⁻¹'], app: 'Cosmology', chapter: 'modern', diff: 'medium', mistake: 'Assuming it has length.', jeeTip: 'Dimensionally identical to frequency: [T⁻¹].', ...window.createDim(0, 0, -1) }
         };
 
         for(let key in window.dimDict) {
@@ -528,7 +539,10 @@
             'distance': 'd', 'length': 'l', 'displacement': 's', 'volume': 'Vol',
             'momentum': 'p', 'torque': 'Tau', 'frequency': 'f', 'temperature': 'Temp', 
             'Temperature': 'Temp', 'T': 'Temp', 'temp': 'Temp',
-            'current': 'I', 'charge': 'q', 'voltage': 'V', 'resistance': 'R'
+            'current': 'I', 'charge': 'q', 'voltage': 'V', 'resistance': 'R',
+            'entropy': 'Entropy', 'latentheat': 'LatentHeat', 'springconstant': 'SpringConst',
+            'electricflux': 'ElecFlux', 'poynting': 'Poynting', 'mobility': 'Mobility',
+            'faraday': 'Faraday', 'rydberg': 'Rydberg', 'hubble': 'Hubble'
         };
 
         window.knownPiGroups = {
@@ -553,7 +567,6 @@
         window.closeOnboarding = function() {
             document.getElementById('onboarding-overlay').style.display = 'none';
             localStorage.setItem('cinePhysicsOnboarded', 'true');
-            // Guide them to the checker and load a preset automatically
             window.switchTab(null, 'checker');
             setTimeout(() => window.loadPreset('v = sqrt(2*KE / m)'), 300);
         }
@@ -587,16 +600,24 @@
                 if(!sel) return;
                 let currentVal = sel.value;
                 let defaultText = selId === 'equation-symbol-picker' ? 'Insert Any Quantity...' : 'Select a quantity...';
-                sel.innerHTML = `<option value="" disabled selected>${defaultText}</option>`;
                 
+                // Keep the placeholder dynamically unselected if the user is typing
+                sel.innerHTML = `<option value="" disabled ${!filterText ? 'selected' : ''}>${defaultText}</option>`;
+                
+                let matchAdded = false;
                 sortedKeys.forEach(key => {
                     if (key.startsWith('__TMP')) return;
                     let name = window.dimDict[key].name;
                     if (name.toLowerCase().includes(filterText.toLowerCase()) || key.toLowerCase().includes(filterText.toLowerCase())) {
                         sel.add(new Option(`${name} (${key})`, key));
+                        matchAdded = true;
                     }
                 });
-                if(currentVal && Array.from(sel.options).some(opt => opt.value === currentVal)) {
+                
+                // UX Fix: Auto-select the top valid option so typing actually works without needing to click
+                if(filterText && sel.options.length > 1) {
+                    sel.selectedIndex = 1; 
+                } else if(currentVal && Array.from(sel.options).some(opt => opt.value === currentVal)) {
                     sel.value = currentVal;
                 }
             });
@@ -665,16 +686,12 @@
         window.populateDashboard = function() {
             let lvl = window.getLevelInfo(window.userStats.xp); 
             
-            // Populate New Player Name Elements
             let pName = window.userStats.playerName || "";
-            
-            // Adjust dashboard title
             let journeyEl = document.getElementById('dash-journey-title');
             if(journeyEl) {
                 journeyEl.innerText = pName ? `🏆 ${pName}'s Physics Journey` : `🏆 Your Physics Journey`;
             }
             
-            // Set the explicitly named rank area
             let dashNameEl = document.getElementById('dash-player-name');
             if(dashNameEl) {
                 dashNameEl.innerText = pName ? pName : "Physics Cadet";
@@ -704,8 +721,6 @@
                 const certBtn = document.getElementById('cert-btn');
                 if(certBtn && (window.userStats.xp >= 1000 || window.userStats.bossesDefeated >= 5)) {
                     certBtn.style.display = "inline-block"; 
-                    
-                    // Display name and rank correctly inside the certificate
                     document.getElementById('cert-name-display').innerText = pName || "Master of Dimensions";
                     document.getElementById('cert-rank-display').innerText = "Rank: " + (window.userStats.xp >= 10000 ? 'Dimension Marshall' : lvl.title);
                 }
@@ -733,13 +748,11 @@
             const shareText = `I just scored ${percent}% and achieved [${title}] in the CinePhysics Dimension Boss Battle! ⚔️⚡\n\nTest your physics skills here: https://abhijit-cinephysics.github.io/CinePhysicsHQ-Labs/Dimension%20Analysis%20lab/`;
             
             if (navigator.share) {
-                // Triggers native mobile sharing menu
                 navigator.share({
                     title: 'CinePhysics Boss Battle',
                     text: shareText,
                 }).catch(console.error);
             } else {
-                // Fallback for desktops
                 const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
                 window.open(whatsappUrl, '_blank');
             }
@@ -945,7 +958,6 @@
             const outputPanel = document.getElementById('checker-output');
             if (!input.includes('=')) { outputPanel.innerHTML = '<span class="error-text">❌ Error: Equation must contain an "=" sign.</span>'; return; }
             
-            // Safe Fraction Parser: Converts isolated fractions like "1/2 *" to "0.5 *" to prevent division splitting errors
             let safeInput = input.replace(/(^|\s)(\d+)\/(\d+)(\s|\*)/g, (match, pre, n, d, post) => pre + (n/d).toString() + post);
 
             const [lhsRaw, rhsRaw] = safeInput.split('=');
