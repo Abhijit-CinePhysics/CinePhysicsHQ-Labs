@@ -165,7 +165,7 @@
         #cert-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; justify-content: center; align-items: center; }
         .cert-card { background: #f8fafc; color: #0f172a; padding: 3rem; border-radius: 8px; border: 8px solid var(--gold); text-align: center; max-width: 800px; width: 90%; font-family: 'Times New Roman', serif; position: relative;}
         .cert-title { font-size: 2.5rem; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 2px;}
-        .cert-name { font-size: 2.2rem; color: var(--accent); margin-bottom: 1rem; font-family: 'Segoe UI', sans-serif; font-weight: bold; border-bottom: 2px solid var(--border); display: inline-block; padding: 0 2rem;}
+        .cert-name { font-size: 2.2rem; color: var(--accent); margin-bottom: 0.5rem; font-family: 'Segoe UI', sans-serif; font-weight: bold; border-bottom: 2px solid var(--border); display: inline-block; padding: 0 2rem;}
         .cert-footer { margin-top: 3rem; display: flex; justify-content: space-between; font-weight: bold; color: #334155; }
         .close-cert { position: absolute; top: 10px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #94a3b8; }
 
@@ -203,7 +203,10 @@
             <div class="close-cert" onclick="document.getElementById('cert-overlay').style.display='none'">✖</div>
             <h1 class="cert-title">Certificate of Mastery</h1>
             <div class="cert-subtitle">This certifies that the candidate has demonstrated exceptional proficiency in Dimensional Analysis.</div>
-            <div class="cert-name" id="cert-rank-display">Master of Dimensions</div>
+            
+            <div class="cert-name" id="cert-name-display">Physics Cadet</div>
+            <div id="cert-rank-display" style="font-size: 1.3rem; font-weight: bold; color: #334155; margin-bottom: 1rem;"></div>
+            
             <div style="font-size: 1.1rem; margin-top: 1rem; color: #333;">Authorized by the Dimension Council</div>
             <div class="cert-footer">
                 <div>CinePhysicsHQ-Labs</div>
@@ -253,7 +256,7 @@
             <div class="preset-buttons">
                 <button onclick="loadPreset('v = sqrt(2*KE / m)')">Robust Math: v = sqrt(2*KE / m)</button>
                 <button onclick="loadPreset('F = k_e * Q1*Q2 / r^2')">Coulomb's Law</button>
-                <button onclick="loadPreset('g = G*M / R^2')">Gravity: g = GM/R²</button>
+                <button onclick="loadPreset('g = G*M / r^2')">Gravity: g = GM/r²</button>
             </div>
             
             <label>Constants & Quantities:</label>
@@ -366,14 +369,16 @@
             <div class="boss-arena" id="challenge-box">
                 <div class="chaos-text" style="font-size: 2rem;">🌌 Chaos Dimensioneer</div>
                 <p style="margin-bottom: 1.5rem; color:var(--text-muted);">"You dare enter my realm? I have twisted the formulas of the universe. Defeat me by fixing them!"</p>
-                <div><button class="primary-btn" style="background:var(--chaos); max-width: 250px;" onclick="startChallengeLoader()">Initiate Battle</button></div>
+                <div><button class="primary-btn" style="background:var(--chaos); max-width: 250px;" onclick="startChallengeLoader()">Begin Battle</button></div>
             </div>
         </div>
 
         <div id="dashboard" class="tab-content animate-pop">
-            <h2 style="color: var(--gold); text-align: center; margin-bottom: 2rem;">🏆 Your Physics Journey</h2>
+            <h2 id="dash-journey-title" style="color: var(--gold); text-align: center; margin-bottom: 2rem;">🏆 Your Physics Journey</h2>
             
             <div class="score-board" style="justify-content: center; flex-direction: column; gap: 0.5rem; padding: 2rem; margin-bottom: 2rem;">
+                <div style="font-size: 1.5rem; color: var(--text-muted); font-weight: normal; margin-bottom: 0.5rem;" id="dash-player-name"></div>
+                
                 <div style="font-size: 2.2rem; text-transform: uppercase; letter-spacing: 2px; color: var(--accent);" id="dash-rank">Dimension Marshal</div>
                 <div class="level-badge" id="dash-level" style="font-size: 1.2rem; margin: 0.5rem 0;">Level 5</div>
                 <div style="color: var(--xp-color); font-size: 1.5rem;" id="dash-xp">2500 XP</div>
@@ -509,8 +514,8 @@
 
         window.aliasMap = {
             'm1': 'm', 'm2': 'm', 'M1': 'm', 'M2': 'm', 'M': 'm',
-            'r': 'd', 'R': 'd', 'x': 's', 'y': 's',
-            'P': 'Pr', 'T': 'Temp', 'Rg': 'R_gas', 'Rgas': 'R_gas', 'c': 'v',
+            'r': 'd', 'x': 's', 'y': 's',
+            'Rg': 'R_gas', 'Rgas': 'R_gas', 'c': 'c_light',
             'K': 'k_e', 'k_e': 'k_e',
             'Q': 'q', 'Q1': 'q', 'Q2': 'q', 'q1': 'q', 'q2': 'q',
             'permittivity': 'eps0', 'permeability': 'mu0', 'planck': 'h',
@@ -603,6 +608,7 @@
         // --- MODULE: SAVES & PROGRESS ---
         window.SAVE_VERSION = 1;
         window.userStats = { 
+            playerName: "",
             askedQIds: { mechanics: [], thermo: [], em: [], modern: [], eqs: [] }, 
             chapterCorrect: { mechanics: 0, thermo: 0, em: 0, modern: 0 }, 
             chapterTotal: { mechanics: 0, thermo: 0, em: 0, modern: 0 }, 
@@ -623,6 +629,7 @@
                 }
             }
             
+            if(!window.userStats.playerName) window.userStats.playerName = "";
             if(!window.userStats.chapterCorrect) window.userStats.chapterCorrect = { mechanics: 0, thermo: 0, em: 0, modern: 0 };
             if(!window.userStats.chapterTotal) window.userStats.chapterTotal = { mechanics: 0, thermo: 0, em: 0, modern: 0 };
             if(!window.userStats.totalQsSolved) window.userStats.totalQsSolved = 0; 
@@ -655,6 +662,22 @@
 
         window.populateDashboard = function() {
             let lvl = window.getLevelInfo(window.userStats.xp); 
+            
+            // Populate New Player Name Elements
+            let pName = window.userStats.playerName || "";
+            
+            // Adjust dashboard title
+            let journeyEl = document.getElementById('dash-journey-title');
+            if(journeyEl) {
+                journeyEl.innerText = pName ? `🏆 ${pName}'s Physics Journey` : `🏆 Your Physics Journey`;
+            }
+            
+            // Set the explicitly named rank area
+            let dashNameEl = document.getElementById('dash-player-name');
+            if(dashNameEl) {
+                dashNameEl.innerText = pName ? pName : "Physics Cadet";
+            }
+
             let dashRank = document.getElementById('dash-rank');
             if(dashRank) {
                 dashRank.innerText = window.userStats.xp >= 10000 ? '🌌 DIMENSION MARSHALL' : lvl.title;
@@ -678,9 +701,14 @@
 
                 const certBtn = document.getElementById('cert-btn');
                 if(certBtn && (window.userStats.xp >= 1000 || window.userStats.bossesDefeated >= 5)) {
-                    certBtn.style.display = "inline-block"; document.getElementById('cert-rank-display').innerText = window.userStats.xp >= 10000 ? 'Dimension Marshall' : lvl.title;
+                    certBtn.style.display = "inline-block"; 
+                    
+                    // Display name and rank correctly inside the certificate
+                    document.getElementById('cert-name-display').innerText = pName || "Master of Dimensions";
+                    document.getElementById('cert-rank-display').innerText = "Rank: " + (window.userStats.xp >= 10000 ? 'Dimension Marshall' : lvl.title);
                 }
             }
+            
             let elXp = document.getElementById('chal-xp');
             if(elXp) {
                 elXp.innerText = window.userStats.xp + " XP";
@@ -698,6 +726,7 @@
                 document.getElementById('chal-level-display').innerText = window.userStats.xp > 10000 ? '🌌 DIMENSION MARSHALL' : `Level ${lvl.level} • ${lvl.title}`;
             }
         }
+        
         window.shareResults = function(percent, title) {
             const shareText = `I just scored ${percent}% and achieved [${title}] in the CinePhysics Dimension Boss Battle! ⚔️⚡\n\nTest your physics skills here: https://abhijit-cinephysics.github.io/CinePhysicsHQ-Labs/Dimension%20Analysis%20lab/`;
             
@@ -914,7 +943,10 @@
             const outputPanel = document.getElementById('checker-output');
             if (!input.includes('=')) { outputPanel.innerHTML = '<span class="error-text">❌ Error: Equation must contain an "=" sign.</span>'; return; }
             
-            const [lhsRaw, rhsRaw] = input.split('=');
+            // Safe Fraction Parser: Converts isolated fractions like "1/2 *" to "0.5 *" to prevent division splitting errors
+            let safeInput = input.replace(/(^|\s)(\d+)\/(\d+)(\s|\*)/g, (match, pre, n, d, post) => pre + (n/d).toString() + post);
+
+            const [lhsRaw, rhsRaw] = safeInput.split('=');
             const lhsTerms = lhsRaw.split(/[\+\-](?![^\(]*\))/).map(t => t.trim()).filter(t => t);
             const rhsTerms = rhsRaw.split(/[\+\-](?![^\(]*\))/).map(t => t.trim()).filter(t => t);
             
@@ -950,10 +982,11 @@
 
             outputHTML += lhsData.html + rhsData.html + `<strong>Final Verification:</strong>\n`;
             let marshallTutor = "";
+            let pName = window.userStats.playerName || "Cadet";
 
             if (!lhsData.isInternallyConsistent) {
                 outputHTML += `<span class="error-text">✖ LHS terms are not dimensionally identical.</span>`;
-                marshallTutor = `"Cadet, you cannot add apples to oranges. The terms on the left side of the equation have different dimensions."`;
+                marshallTutor = `"${pName}, you cannot add apples to oranges. The terms on the left side of the equation have different dimensions."`;
             } else if (!rhsData.isInternallyConsistent) {
                 outputHTML += `<span class="error-text">✖ RHS terms are not dimensionally identical.</span>`;
                 marshallTutor = `"The terms on the right side are mathematically incompatible. Check your addition/subtraction."`;
@@ -962,7 +995,7 @@
                 marshallTutor = `"The dimensions disagree. Here is exactly why:<br>• ` + window.getDimExplanation(lhsData.dimObj, rhsData.dimObj) + `"`;
             } else {
                 outputHTML += `[LHS] = ${lhsData.dimStr}\n[RHS] = ${rhsData.dimStr}\n<span class="success-text">✔ [LHS] = [RHS] -> Homogeneous</span>`;
-                marshallTutor = `"Well done. The equation is perfectly balanced."`;
+                marshallTutor = `"Well done, ${pName}. The equation is perfectly balanced."`;
             }
             
             outputHTML += `\n\n<div class="edu-note"><span class="marshall-text">⚡ Dimension Marshall:</span><br><span class="dialogue-quote">${marshallTutor}</span></div></div>`;
@@ -1106,8 +1139,7 @@
                 let row=[], hasNonZero=false; for(let v of validVars) { row.push(v.dims[d]); if(v.dims[d]!==0) hasNonZero=true; }
                 if(hasNonZero) { matrix.push(row); activeDims.push(d); }
             }
-            let rows = matrix.length, cols = validVars.length, numGroups = cols - rows;
-            if(numGroups <= 0) { out.innerHTML = `<span class="error-text">Not enough variables. Require more variables than fundamental dimensions.</span>`; return; }
+            let rows = matrix.length, cols = validVars.length;
             let lead=0;
             for (let r = 0; r < rows; r++) {
                 if (lead >= cols) break; let i = r; while (matrix[i][lead] === 0) { i++; if (i === rows) { i = r; lead++; if (lead === cols) break; } }
@@ -1119,6 +1151,9 @@
             let pivotCols = [], freeCols = [];
             for (let r = 0; r < rows; r++) { for (let c = 0; c < cols; c++) { if (Math.abs(matrix[r][c] - 1) < 1e-7) { let isP = true; for (let x = 0; x < rows; x++) if (x !== r && Math.abs(matrix[x][c]) > 1e-7) isP = false; if (isP) { pivotCols.push(c); break; } } } }
             for(let c = 0; c < cols; c++) if(!pivotCols.includes(c)) freeCols.push(c);
+
+            let numGroups = cols - pivotCols.length;
+            if(numGroups <= 0) { out.innerHTML = `<span class="error-text">Not enough variables. Require more variables than fundamental dimensions.</span>`; return; }
 
             let html = `<div class="animate-pop">Analyzing: ${validVars.map(v=>v.orig).join(', ')}\nExpected Groups: ${numGroups}\n\n`;
             let sortedInput = vars.map(v => (window.aliasMap[v.toLowerCase()] || v.toLowerCase())).slice().sort().join(',');
@@ -1153,6 +1188,36 @@
         }
 
         window.startChallengeLoader = function() {
+            if (!window.userStats.playerName) {
+                const box = document.getElementById('challenge-box');
+                box.innerHTML = `
+                    <div class="animate-pop">
+                        <div class="marshall-text" style="font-size: 1.5rem; margin-bottom: 1rem;">⚡ Identify Yourself</div>
+                        <p style="color:var(--text-muted); margin-bottom: 1.5rem;">The Dimension Council requires your name before entering the arena.</p>
+                        <input type="text" id="player-name-input" placeholder="Enter your name..." style="max-width: 300px; margin: 0 auto; text-align: center; display: block;" />
+                        <button class="primary-btn" style="max-width: 250px; margin-top: 1rem;" onclick="confirmPlayerName()">Enter Realm</button>
+                    </div>
+                `;
+            } else {
+                window.beginSync();
+            }
+        }
+
+        window.confirmPlayerName = function() {
+            const nameInput = document.getElementById('player-name-input');
+            if (nameInput && nameInput.value.trim() !== '') {
+                window.userStats.playerName = nameInput.value.trim();
+                window.saveStats();
+                window.beginSync();
+            } else {
+                if(nameInput) {
+                    nameInput.style.borderColor = 'var(--error)';
+                    nameInput.placeholder = "Name is required!";
+                }
+            }
+        }
+
+        window.beginSync = function() {
             window.bossHP = 100; window.chalScore = 0; window.chalTotal = 0; window.sessionXP = 0;
             const box = document.getElementById('challenge-box');
             if(!box) return;
@@ -1177,6 +1242,7 @@
             window.currentQuestionChapter = activeChapter;
             
             validKeys = validKeys.filter(k => window.dimDict[k].chapter === activeChapter);
+            let pName = window.userStats.playerName || 'Cadet';
 
             if(validKeys.length < 4) {
                 document.getElementById('challenge-box').innerHTML = `<span class="error-text">Not enough quantities. Select 'All Chapters'.</span>`; return;
@@ -1189,7 +1255,7 @@
 
                 if(type === 1) {
                     window.chalCurrentAnswer = window.formatDim(item).replace(/\[|\]/g, ''); 
-                    window.updateBossUI(`${diffTag}<div class="marshall-text">⚡ Dimension Marshall:</div><div class="dialogue-quote">"Strike him by revealing the true dimensions of <strong style="color:var(--accent);">${item.name}</strong>."</div>
+                    window.updateBossUI(`${diffTag}<div class="marshall-text">⚡ Dimension Marshall:</div><div class="dialogue-quote">"Strike him by revealing the true dimensions of <strong style="color:var(--accent);">${item.name}</strong>, ${pName}."</div>
                     <input type="text" id="chal-ans-input" placeholder="e.g., ML2T-2" style="max-width: 300px; margin: 0 auto; text-align: center;">
                     <div class="challenge-btn-group"><button onclick="checkChallenge(1)">Attack</button></div>`, false);
                 } else {
@@ -1198,7 +1264,7 @@
                     while(options.length < 4) { let fake = allKeys[Math.floor(Math.random() * allKeys.length)]; if(!options.includes(fake) && window.formatDim(window.dimDict[fake]) !== window.formatDim(item)) options.push(fake); }
                     options.sort(() => Math.random() - 0.5);
                     let btnHtml = options.map(opt => `<button onclick="checkChallenge(2, '${opt}')">${window.dimDict[opt].name}</button>`).join('');
-                    window.updateBossUI(`${diffTag}<div class="chaos-text" style="font-size:1rem;">🌌 Chaos Dimensioneer:</div><div class="dialogue-quote">"You will never guess what quantity hides behind <strong style="color:var(--accent);">${window.formatDim(item)}</strong>!"</div>
+                    window.updateBossUI(`${diffTag}<div class="chaos-text" style="font-size:1rem;">🌌 Chaos Dimensioneer:</div><div class="dialogue-quote">"You will never guess what quantity hides behind <strong style="color:var(--accent);">${window.formatDim(item)}</strong>, ${pName}!"</div>
                     <div class="challenge-btn-group" style="flex-direction: column; max-width: 400px; margin: 0 auto;">${btnHtml}</div>`, false);
                 }
             } else {
@@ -1218,7 +1284,7 @@
                 window.chalCurrentAnswer = cEq.valid; window.chalCurrentContext = { lhs: cEq.lhs, rhs: cEq.rhs };
                 window.updateBossUI(`<div class="diff-tag" style="position:relative; float:right;">Difficulty: ${window.currentQuestionDiff.toUpperCase()} | +${xp} XP</div>
                     <div class="chaos-text" style="font-size:1rem;">🌌 Chaos Dimensioneer:</div><div class="dialogue-quote">"Behold my perfect physics: <strong>${cEq.eq}</strong>. Flawless!"</div>
-                    <div class="marshall-text" style="font-size:1rem; margin-top:-10px;">⚡ Dimension Marshall:</div><div class="dialogue-quote" style="font-size:0.9rem;">"Cadet, is this equation dimensionally correct, or is it a trap?"</div>
+                    <div class="marshall-text" style="font-size:1rem; margin-top:-10px;">⚡ Dimension Marshall:</div><div class="dialogue-quote" style="font-size:0.9rem;">"${pName}, is this equation dimensionally correct, or is it a trap?"</div>
                     <div class="challenge-btn-group"><button onclick="checkChallenge(3, true)">Valid</button><button onclick="checkChallenge(3, false)">Trap (Invalid)</button></div>`, false);
             }
         }
