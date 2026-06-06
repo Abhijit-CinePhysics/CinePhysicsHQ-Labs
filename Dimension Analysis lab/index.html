@@ -219,7 +219,7 @@
     <header>
         <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙 Theme</button>
         <h1>⚡ CinePhysicsHQ-Labs</h1>
-        <div class="version-tag">VERSION 3.2 (MASTER BUILD)</div>
+        <div class="version-tag">VERSION 3.3 (MASTER BUILD)</div>
         <p>Interactive Physics Learning • Research • Exploration</p>
     </header>
 
@@ -304,7 +304,10 @@
             <div class="input-group">
                 <label>Select Physical Quantity:</label>
                 <input type="text" class="search-box" id="search-calc" placeholder="Search quantity..." oninput="filterDropdownList('search-calc', 'calc-select')">
-                <select id="calc-select" onchange="calculateDimensionTree()"><option value="" disabled selected>Select a quantity...</option></select>
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                    <select id="calc-select" onchange="calculateDimensionTree()" style="margin-bottom: 0;"><option value="" disabled selected>Select a quantity...</option></select>
+                    <button class="primary-btn" style="width: auto; white-space: nowrap;" onclick="calculateDimensionTree()">Show Tree</button>
+                </div>
             </div>
             <div id="calc-output" class="output-panel">Select a quantity to view its visual derivation tree.</div>
         </div>
@@ -313,7 +316,10 @@
             <div class="input-group">
                 <label>Select Quantity for Revision:</label>
                 <input type="text" class="search-box" id="search-card" placeholder="Search quantity..." oninput="filterDropdownList('search-card', 'card-select')">
-                <select id="card-select" onchange="generateMemoryCard()"><option value="" disabled selected>Select a quantity...</option></select>
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
+                    <select id="card-select" onchange="generateMemoryCard()" style="margin-bottom: 0;"><option value="" disabled selected>Select a quantity...</option></select>
+                    <button class="primary-btn" style="width: auto; white-space: nowrap;" onclick="generateMemoryCard()">Show Card</button>
+                </div>
             </div>
             <div id="card-output">Select a quantity to generate a memory card.</div>
         </div>
