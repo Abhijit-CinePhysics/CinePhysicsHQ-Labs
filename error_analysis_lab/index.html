@@ -70,8 +70,7 @@
         .mcq-option input { margin-right: 10px; }
 
         /* Section Grid */
-        .explorer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
-        @media (max-width: 900px) { .explorer-grid { grid-template-columns: 1fr; } }
+        .explorer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 20px; }
         .custom-builder { background: #ecf0f1; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #9b59b6; }
         .algebra-box { background: #e8f4f8; padding: 15px; border-radius: 8px; margin-top: 15px; font-size: 1.1rem; text-align: center; border: 1px dashed #3498db; overflow-x: auto; }
         .comparison-box { background: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
@@ -110,7 +109,7 @@
         <h1>Uncertainty & Error Analysis</h1>
         
         <div class="info-note" style="background: #e8f4f8; padding: 15px; border-radius: 8px; border-left: 4px solid #3498db; margin-bottom: 30px; font-size: 1.1rem;">
-            <strong>🧪 Teaching Note:</strong> Sections 1–5 utilize <em>Maximum Possible Error</em> propagation. Sections 6, 9 & 16 utilize <em>Statistical Uncertainty</em> methods. Understanding the difference between absolute bounds and statistical likelihood is a fundamental skill in experimental physics!
+            <strong>🧪 Teaching Note:</strong> Sections 1–5 utilize <em>Maximum Possible Error</em> propagation (Standard CBSE/JEE convention). Sections 6, 9 & 16 utilize <em>Statistical Uncertainty</em> methods. Understanding the difference between absolute bounds and statistical likelihood is a fundamental skill in experimental physics!
         </div>
 
         <div class="lab-section" id="section-1">
@@ -152,12 +151,13 @@
         <div class="lab-section" id="section-4">
             <h2>Section 4: Instrument Selection Challenge</h2>
             <p>Mission: Measure a <strong>side length ≈ 7 cm</strong> with maximum precision.</p>
+            <span class="info-note"><strong>Convention Note:</strong> Different institutions adopt different conventions. School practicals often evaluate Vernier uncertainty as exactly the Least Count (LC), whereas many Universities standardize all analog/digital readings as LC/2.</span><br><br>
             
-            <label for="s4-convention"><strong>Convention:</strong> </label>
+            <label for="s4-convention"><strong>Evaluation Convention:</strong> </label>
             <select id="s4-convention" style="margin-bottom: 15px; width: 300px;">
-                <option value="school">School (Scale = LC/2, Vernier = LC)</option>
-                <option value="uni">University (All Instruments = LC/2)</option>
-                <option value="mfg">Manufacturer (All = LC)</option>
+                <option value="school">School Convention (Scale = LC/2, Vernier = LC)</option>
+                <option value="uni">University Convention (All Instruments = LC/2)</option>
+                <option value="mfg">Manufacturer Specs (All Instruments = LC)</option>
             </select><br>
 
             <label><input type="radio" name="s4-inst" value="1" data-type="analog"> Scale A (LC: 1 cm)</label><br>
@@ -169,6 +169,7 @@
 
         <div class="lab-section" id="section-5">
             <h2>Section 5: Real Physics Experiment (Density)</h2>
+            <p>Practical derivation measuring the diameter ($D$) of a sphere using a Vernier Caliper.</p>
             <p>Formula: $\rho = \frac{m}{\frac{1}{6} \pi D^3} = \frac{6m}{\pi D^3}$</p>
             <label for="s5-m">Mass (m) = </label><input type="number" id="s5-m" value="50" style="width:80px"> ± <input type="number" id="s5-em" value="0.5" style="width:80px"> g<br><br>
             <label for="s5-D">Diameter (D) = </label><input type="number" id="s5-D" value="4" style="width:80px"> ± <input type="number" id="s5-eD" value="0.01" style="width:80px"> cm<br>
@@ -178,9 +179,13 @@
 
         <div class="lab-section" id="section-6">
             <h2>Section 6: Monte Carlo Visualization (Advanced)</h2>
-            <p>Simulating measurements using Gaussian Distribution. Bins centered using Sturges' Rule.</p>
+            <p>Simulating measurements using Gaussian Distribution. Bins are dynamically centered using Sturges' Rule.</p>
             <div class="warning-note" style="margin-bottom: 15px;">
-                <strong>⚠️ Important:</strong> In this section, uncertainties are treated as <strong>1σ standard deviations</strong>. Non-physical negative samples (e.g. negative lengths) are removed via rejection sampling.
+                <strong>⚠️ Important:</strong> In this section, entered uncertainties are treated as <strong>1σ standard deviations</strong>, not maximum possible errors.
+            </div>
+            <div class="info-note" style="margin-bottom: 15px;">
+                <em>Physics Note:</em> Gaussian distributions mathematically extend to negative infinity. To maintain physically meaningful dimensions, we employ <strong>rejection sampling</strong> to discard non-physical negative values without skewing the distribution.<br>
+                <em>Advanced Note:</em> The area is a product ($A = L \times B$). The resulting distribution becomes approximately Gaussian only for small relative uncertainties.
             </div>
             
             <label for="s6-N">Simulation Size (N): </label>
@@ -208,20 +213,23 @@
 
         <div class="lab-section" id="section-7">
             <h2>Section 7: Uncertainty Challenge Arena 2.0</h2>
+            
             <div class="arena-stats">
                 <div class="arena-stat-box">Score<br><span class="arena-stat-val" id="arena-score">0</span></div>
                 <div class="arena-stat-box">Streak<br><span class="arena-stat-val" id="arena-streak">0</span></div>
                 <div class="arena-stat-box">Best<br><span class="arena-stat-val" id="arena-best">0</span></div>
                 <div class="arena-stat-box">Accuracy<br><span class="arena-stat-val" id="arena-accuracy">0%</span></div>
             </div>
+
             <label for="arena-diff">Difficulty: </label>
             <select id="arena-diff">
-                <option value="easy">Easy</option>
-                <option value="medium" selected>Medium</option>
-                <option value="hard">Hard</option>
-                <option value="expert">Expert</option>
+                <option value="easy">Easy (Addition/Subtraction)</option>
+                <option value="medium" selected>Medium (Multiplication/Division)</option>
+                <option value="hard">Hard (Power Rule)</option>
+                <option value="expert">Expert (Complex Combinations)</option>
             </select>
             <button class="btn-secondary" id="btn-s7-skip" style="margin-left: 10px;">Skip / Reroll</button>
+            
             <div id="s7-question-container" style="margin-top: 20px; font-size: 1.1rem;"></div>
             <div id="s7-options-container" style="margin-top: 20px;"></div>
             <button class="btn-success" id="s7-submit-btn" style="margin-top: 20px;">Submit Answer</button>
@@ -229,28 +237,32 @@
         </div>
 
         <div class="lab-section" id="section-8">
-            <h2>Section 8: Instrument Simulator</h2>
+            <h2>Section 8: Instrument Simulator (Zero Error)</h2>
+            <p>Compute corrected instrument readings based on observed data and systematic zero error.</p>
+            
             <label for="s8-convention"><strong>Convention:</strong> </label>
             <select id="s8-convention" style="margin-bottom: 15px; width: 300px;">
-                <option value="school">School (Scale = LC/2, Vernier = LC)</option>
+                <option value="school">School Convention (Scale = LC/2, Vernier/Screw = LC)</option>
                 <option value="uni">University (All Instruments = LC/2)</option>
-                <option value="mfg">Manufacturer (All = LC)</option>
+                <option value="mfg">Manufacturer (All Instruments = LC)</option>
             </select><br>
 
+            <label for="s8-inst"><strong>Instrument:</strong> </label>
             <select id="s8-inst">
                 <option value="0.1" data-type="analog">Meter Scale (LC: 0.1 cm)</option>
                 <option value="0.01" data-type="vernier">Vernier Caliper (LC: 0.01 cm)</option>
                 <option value="0.001" data-type="vernier">Screw Gauge (LC: 0.001 cm)</option>
             </select><br><br>
+            
             <label for="s8-val">Observed Reading: </label><input type="number" id="s8-val" value="5.25" style="width:100px;"> cm<br><br>
-            <label for="s8-zero">Zero Error (±): </label><input type="number" id="s8-zero" value="+0.02" step="0.01" style="width:100px;"> cm<br>
+            <label for="s8-zero">Zero Error (with sign): </label><input type="number" id="s8-zero" value="+0.02" step="0.01" style="width:100px;"> cm<br>
             <button id="btn-s8">Compute Correction</button>
             <div id="out-s8" class="output-box"></div>
         </div>
 
         <div class="lab-section" id="section-9">
-            <h2>Section 9: Statistical Data Analysis</h2>
-            <p>Paste repeated measurements (one per line) to compare scientific methodologies.</p>
+            <h2>Section 9: Real Experimental Data Mode</h2>
+            <p>Paste repeated practical measurements to generate standard statistical uncertainties and error bands. Compare across three standard methodologies.</p>
             <textarea id="s9-data" rows="5" style="width:100%; max-width:300px;">2.51&#10;2.48&#10;2.52&#10;2.50&#10;2.49</textarea><br>
             <button id="btn-s9">Analyze Data</button>
             <div id="out-s9" class="output-box"></div>
@@ -258,71 +270,108 @@
         </div>
 
         <div class="lab-section" id="section-10">
-            <h2>Section 10: Error Propagation Visualizer</h2>
+            <h2>Section 10: Percentage Propagation Explorer</h2>
+            <p>Explore percentage error propagation algebraically. Enter variables to see the relative contribution pie chart.</p>
+            
             <label for="s10-preset">Formula: </label>
             <select id="s10-preset">
                 <option value="density">Density ($\rho = \frac{m}{V}$)</option>
                 <option value="kinetic">Kinetic Energy ($E = \frac{1}{2}mv^2$)</option>
                 <option value="pendulum">Gravity ($g = \frac{4\pi^2L}{T^2}$)</option>
                 <option value="resistance">Resistance ($R = \frac{V}{I}$)</option>
-                <option value="custom">⚙️ Custom Formula</option>
+                <option value="custom">⚙️ Custom Formula ($Z = A^x B^y C^z$)</option>
             </select>
+
             <div id="s10-custom-builder" class="custom-builder" style="display: none;">
-                <strong>Define Powers ($A^a B^b C^c$)</strong><br>
-                a: <input type="number" id="s10-pow-a" value="1" style="width:60px"> | b: <input type="number" id="s10-pow-b" value="2" style="width:60px"> | c: <input type="number" id="s10-pow-c" value="-1" style="width:60px">
-                <br><button class="btn-secondary" id="btn-s10-update">Update</button>
+                <strong>Define Custom Variables & Powers</strong><br>
+                <span class="info-note">Note: Propagation uses the absolute value of powers ($|n|$). Negative exponents still add to total uncertainty!</span><br>
+                A: Power <input type="number" id="s10-pow-a" value="1" style="width:60px"> | 
+                B: Power <input type="number" id="s10-pow-b" value="2" style="width:60px"> | 
+                C: Power <input type="number" id="s10-pow-c" value="-1" style="width:60px">
+                <br><button class="btn-secondary" id="btn-s10-update">Update Equation</button>
             </div>
+
             <div class="explorer-grid" style="grid-template-columns: 1fr;">
-                <div id="s10-inputs-container" style="background:#f8f9fa; padding:15px; border-radius:8px; border:1px solid #ddd;"></div>
+                <div id="s10-inputs-container" style="background:#f8f9fa; padding:15px; border-radius:8px; border:1px solid #ddd;">
+                </div>
+
                 <div id="s10-analysis" style="display: flex; flex-direction: column; align-items: center;">
                     <div id="s10-formula-display" style="font-size: 1.2rem; margin-bottom: 10px; font-weight: bold;"></div>
-                    <div id="s10-algebra-box" class="algebra-box" style="width: 100%;"></div>
-                    <div id="s10-dominant" class="warning-note" style="width: 100%; text-align:center;"></div>
-                    <div class="pie-container"><canvas id="s10-chart"></canvas></div>
+                    <div id="s10-dominant" class="warning-note" style="width: 100%; text-align:center; margin-top:15px; background:#fff3cd; border-left-color:#ffc107; color:#856404;"></div>
+                    <div class="pie-container" style="margin-top: 10px;"><canvas id="s10-chart"></canvas></div>
                 </div>
             </div>
         </div>
 
         <div class="lab-section" id="section-11">
-            <h2>Section 11: Significant Figures Challenge</h2>
+            <h2>Section 11: Significant Figures Challenge (JEE/NEET)</h2>
+            <p>Master the rules of significant figures and decimal places in scientific calculations. Hand-engineered to parse complex Olympiad notation.</p>
+            <span class="info-note"><strong>Ambiguity Warning:</strong> Numbers with trailing zeros but no decimal (e.g., <code>1000</code>) are mathematically ambiguous. This engine rigorously evaluates them as ambiguous. Use scientific notation or explicit decimals (<code>1000.</code>) for precision.</span>
+            
             <div class="arena-stats">
                 <div class="arena-stat-box">Score<br><span class="arena-stat-val" id="sig-score">0</span></div>
+                <div class="arena-stat-box">Streak<br><span class="arena-stat-val" id="sig-streak">0</span></div>
+                <div class="arena-stat-box">Best<br><span class="arena-stat-val" id="sig-best">0</span></div>
+                <div class="arena-stat-box">Accuracy<br><span class="arena-stat-val" id="sig-accuracy">0%</span></div>
             </div>
-            <button class="btn-secondary" id="btn-s11-new">New Problem</button>
+
+            <button class="btn-secondary" id="btn-s11-new">Generate New Problem</button>
             <div id="s11-question-container" style="margin-top: 20px; font-size: 1.2rem; font-weight: bold;"></div>
             <div id="s11-options-container" style="margin-top: 20px;"></div>
-            <button class="btn-success" id="s11-submit-btn" style="margin-top: 20px;">Submit</button>
+            <button class="btn-success" id="s11-submit-btn" style="margin-top: 20px;">Submit Answer</button>
             <div id="out-s11" class="output-box"></div>
         </div>
 
         <div class="lab-section" id="section-12">
-            <h2>Section 12: Viva Preparation</h2>
-            <button class="btn-secondary" id="btn-s12-new">New Question</button>
-            <div id="s12-question-container" style="margin-top: 20px; font-weight: bold;"></div>
+            <h2>Section 12: Viva Preparation Arena</h2>
+            <p>Test your conceptual knowledge for practical examinations.</p>
+            
+            <div class="arena-stats">
+                <div class="arena-stat-box">Score<br><span class="arena-stat-val" id="viva-score">0</span></div>
+                <div class="arena-stat-box">Streak<br><span class="arena-stat-val" id="viva-streak">0</span></div>
+                <div class="arena-stat-box">Best<br><span class="arena-stat-val" id="viva-best">0</span></div>
+                <div class="arena-stat-box">Accuracy<br><span class="arena-stat-val" id="viva-accuracy">0%</span></div>
+            </div>
+
+            <button class="btn-secondary" id="btn-s12-new">Generate New Question</button>
+            <div id="s12-question-container" style="margin-top: 20px; font-size: 1.1rem; font-weight: bold;"></div>
             <div id="s12-options-container" style="margin-top: 20px;"></div>
-            <button class="btn-success" id="s12-submit-btn" style="margin-top: 20px;">Submit</button>
+            <button class="btn-success" id="s12-submit-btn" style="margin-top: 20px;">Submit Answer</button>
             <div id="out-s12" class="output-box"></div>
         </div>
 
         <div class="lab-section" id="section-13">
             <h2>Section 13: Error Source Detective</h2>
+            <p>Identify the dominant source of uncertainty to improve experimental design.</p>
+            
+            <div class="arena-stats">
+                <div class="arena-stat-box">Score<br><span class="arena-stat-val" id="det-score">0</span></div>
+                <div class="arena-stat-box">Streak<br><span class="arena-stat-val" id="det-streak">0</span></div>
+                <div class="arena-stat-box">Best<br><span class="arena-stat-val" id="det-best">0</span></div>
+                <div class="arena-stat-box">Accuracy<br><span class="arena-stat-val" id="det-accuracy">0%</span></div>
+            </div>
+
             <button class="btn-secondary" id="btn-s13-new">New Case</button>
-            <div id="s13-question-container" style="margin-top: 20px;"></div>
+            <div id="s13-question-container" style="margin-top: 20px; font-size: 1.1rem;"></div>
             <div id="s13-options-container" style="margin-top: 20px;"></div>
-            <button class="btn-success" id="s13-submit-btn" style="margin-top: 20px;">Analyze</button>
+            <button class="btn-success" id="s13-submit-btn" style="margin-top: 20px;">Submit Analysis</button>
             <div id="out-s13" class="output-box"></div>
         </div>
 
         <div class="lab-section" id="section-14">
             <h2>Section 14: Olympiad Sandbox (Weighted Mean)</h2>
+            <p>Combine multiple independent measurements of the same quantity with varying uncertainties.</p>
             <textarea id="s14-data" rows="4" style="width:100%; max-width:400px;" placeholder="Format: value, error (one per line)">10.2, 0.1&#10;10.4, 0.2&#10;10.1, 0.05</textarea><br>
-            <button id="btn-s14">Calculate</button>
+            <button id="btn-s14">Calculate Weighted Mean</button>
             <div id="out-s14" class="output-box"></div>
         </div>
 
         <div class="lab-section" id="section-15">
             <h2>Section 15: Accuracy vs Precision Target Board</h2>
-            <div class="dartboard-wrapper"><canvas id="dartboard-canvas" width="300" height="300"></canvas></div>
+            <p>Visualize statistical properties common in practical Viva questions using authentic 2D Gaussian scatter.</p>
+            <div class="dartboard-wrapper">
+                <canvas id="dartboard-canvas" width="300" height="300"></canvas>
+            </div>
             <div style="text-align: center; margin-top: 15px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center;">
                 <button id="btn-s15-ap" class="btn-secondary">Accurate & Precise</button>
                 <button id="btn-s15-anp" class="btn-secondary">Accurate, Not Precise</button>
@@ -332,9 +381,11 @@
         </div>
 
         <div class="lab-section" id="section-16">
-            <h2>Section 16: Linear Regression Laboratory</h2>
-            <textarea id="s16-data" rows="6" style="width:100%; max-width:300px;">1.0, 2.1, 0, 0.4&#10;2.0, 3.9, 0, 0.5&#10;3.0, 6.2, 0, 0.6&#10;4.0, 8.1, 0, 0.5&#10;5.0, 9.8, 0, 0.7</textarea><br>
-            <button id="btn-s16">Analyze Regression</button>
+            <h2>Section 16: Linear Regression Laboratory (Undergraduate)</h2>
+            <p>Input experimental coordinates to perform Least Squares Fitting. If strictly positive $\Delta y$ uncertainties are provided for all points, the system automatically shifts to <strong>Weighted Least Squares (WLS)</strong> fitting.</p>
+            <div class="info-note">Format: <code>x, y, dx, dy</code> <br><strong>Note:</strong> $\Delta x$ error bars are for visual purposes only and are not included in the regression mathematics.</div>
+            <textarea id="s16-data" rows="6" style="width:100%; max-width:300px; margin-top: 10px;">1.0, 2.1, 0, 0.4&#10;2.0, 3.9, 0, 0.5&#10;3.0, 6.2, 0, 0.6&#10;4.0, 8.1, 0, 0.5&#10;5.0, 9.8, 0, 0.7</textarea><br>
+            <button id="btn-s16">Compute Best Fit Line & Residuals</button>
             <div id="out-s16" class="output-box"></div>
             <div class="chart-container"><canvas id="s16-chart"></canvas></div>
             <div class="chart-container" style="margin-top: 30px;"><canvas id="s16-res-chart"></canvas></div>
@@ -342,42 +393,1507 @@
 
         <div class="lab-section" id="section-17">
             <h2>Section 17: Error Propagation Showdown</h2>
-            <div class="info-note"><strong>Disclaimer:</strong> Statistical quadrature assumes independent, uncorrelated random errors.</div>
+            <p>Compare how uncertainties combine using the CBSE (Maximum Error) method versus the Statistical method.</p>
+            
+            <div class="info-note" style="margin-bottom: 20px;">
+                <strong>Educational Note:</strong> <em>Maximum Error</em> gives the absolute worst-case bound. <em>Statistical (Quadrature) Error</em> assumes <strong>uncorrelated, independent random measurements</strong>. It is not valid for correlated measurements!
+            </div>
+
             <label for="s17-A">A = </label><input type="number" id="s17-A" value="100" style="width:80px"> ± <input type="number" id="s17-eA" value="2" style="width:80px"><br><br>
             <label for="s17-B">B = </label><input type="number" id="s17-B" value="50" style="width:80px"> ± <input type="number" id="s17-eB" value="1.5" style="width:80px"><br><br>
-            <select id="s17-op"><option value="add">Add</option><option value="sub">Sub</option><option value="mul">Mul</option><option value="div">Div</option></select>
-            <button id="btn-s17">Calculate</button>
+            
+            <label for="s17-op">Operation: </label>
+            <select id="s17-op" style="width: 180px; margin-bottom: 15px;">
+                <option value="add">Addition (A + B)</option>
+                <option value="sub">Subtraction (A - B)</option>
+                <option value="mul">Multiplication (A × B)</option>
+                <option value="div">Division (A / B)</option>
+            </select><br>
+
+            <button id="btn-s17">Calculate Propagation</button>
+            
             <div class="explorer-grid" id="s17-grid" style="display: none; margin-top: 20px;">
-                <div class="comparison-box"><h3 style="margin-top: 0; color: #e74c3c;">CBSE (Max Error)</h3><div id="out-s17-cbse"></div></div>
-                <div class="comparison-box"><h3 style="margin-top: 0; color: #2980b9;">Statistical (Independent)</h3><div id="out-s17-stat"></div></div>
+                <div class="comparison-box">
+                    <h3 style="margin-top: 0; color: #e74c3c;">CBSE (Max Error)</h3>
+                    <div id="out-s17-cbse"></div>
+                </div>
+                <div class="comparison-box">
+                    <h3 style="margin-top: 0; color: #2980b9;">Statistical (Independent Random Errors)</h3>
+                    <div id="out-s17-stat"></div>
+                </div>
             </div>
         </div>
 
         <div class="lab-section" id="section-18">
-            <h2>Section 18: Least Count Calculator</h2>
-            <select id="s18-type"><option value="vernier">Vernier Caliper</option><option value="screw">Screw Gauge</option></select><br>
+            <h2>Section 18: Least Count Calculator (CBSE Practical)</h2>
+            <p>Calculate the fundamental precision limit of standard laboratory instruments. General enough to handle non-standard vernier scales.</p>
+            
+            <label for="s18-type">Instrument: </label>
+            <select id="s18-type" style="margin-bottom: 15px; width: 200px;">
+                <option value="vernier">Vernier Caliper</option>
+                <option value="screw">Screw Gauge / Spherometer</option>
+            </select><br>
+
             <div id="s18-vernier-inputs">
-                <input type="number" id="s18-v-msd" value="1" step="0.1"> MSD (mm)<br>
-                <input type="number" id="s18-v-vsd" value="10"> Total VSD<br>
-                <input type="number" id="s18-v-match" value="9"> Matches MSD<br>
+                <label for="s18-v-msd">1 MSD Value = </label><input type="number" id="s18-v-msd" value="1" step="0.1"> mm<br><br>
+                <label for="s18-v-vsd">Total VSD (N) = </label><input type="number" id="s18-v-vsd" value="10"> divisions<br><br>
+                <label for="s18-v-match">Matches with MSD count = </label><input type="number" id="s18-v-match" value="9"> divisions<br>
             </div>
+
             <div id="s18-screw-inputs" style="display: none;">
-                <input type="number" id="s18-s-pitch" value="1" step="0.1"> Pitch (mm)<br>
-                <input type="number" id="s18-s-div" value="100"> Divisions<br>
+                <label for="s18-s-pitch">Pitch = </label><input type="number" id="s18-s-pitch" value="1" step="0.1"> mm<br><br>
+                <label for="s18-s-div">Circular Divisions = </label><input type="number" id="s18-s-div" value="100"> divisions<br>
             </div>
-            <button id="btn-s18">Calculate</button>
+
+            <button id="btn-s18" style="margin-top: 15px;">Calculate Least Count</button>
             <div id="out-s18" class="output-box"></div>
         </div>
 
+        <div class="lab-section" id="section-19">
+            <h2>Section 19: Full Experimental Error Calculator</h2>
+            <p>Evaluate complex experimental formulas algebraically. Generates a complete mathematical derivation and an interactive Error Budget table for experimental design.</p>
+            
+            <div class="info-note">Calculate propagation for a general power-law equation: $Z = \frac{A^a B^b}{C^c}$</div>
+
+            <div style="background:#f8f9fa; padding:15px; border-radius:8px; border:1px solid #ddd; margin-top: 15px;">
+                <label style="display:inline-block; width:40px;"><b>A = </b></label> <input type="number" id="s19-A" value="5" style="width:80px"> ± <input type="number" id="s19-eA" value="0.1" style="width:80px"> | Power ($a$) <input type="number" id="s19-pA" value="2" style="width:60px"><br><br>
+                <label style="display:inline-block; width:40px;"><b>B = </b></label> <input type="number" id="s19-B" value="2" style="width:80px"> ± <input type="number" id="s19-eB" value="0.2" style="width:80px"> | Power ($b$) <input type="number" id="s19-pB" value="1" style="width:60px"><br><br>
+                <label style="display:inline-block; width:40px;"><b>C = </b></label> <input type="number" id="s19-C" value="8" style="width:80px"> ± <input type="number" id="s19-eC" value="0.1" style="width:80px"> | Power ($c$) <input type="number" id="s19-pC" value="-3" style="width:60px"><br>
+            </div>
+
+            <button id="btn-s19" style="margin-top: 15px;">Compute Propagation Record</button>
+            <div id="out-s19" class="output-box"></div>
+        </div>
+
         <div class="notebook" id="notebook">
-            <h2>Practical Report</h2>
-            <button id="btn-print">Export PDF</button>
+            <h2>CinePhysicsHQ Practical Report</h2>
+            <div class="report-header">
+                <div><label>Name:</label> <input type="text" placeholder="Student Name"></div>
+                <div><label>Class:</label> <input type="text" placeholder="Class/Section"></div>
+                <div><label>Date:</label> <input type="date"></div>
+            </div>
+            <h3>Observation Logbook</h3>
+            <div id="log-entries"></div>
+            <button id="btn-print">Export Report (PDF)</button>
         </div>
     </div>
 
+    <div class="sidebar">
+        <h2>Formula Cheat Sheet</h2>
+        <div class="formula-box"><strong>Addition/Subtraction (Max)</strong><br>$\Delta Z = \Delta A + \Delta B$</div>
+        <div class="formula-box"><strong>Addition/Subtraction (Stat)</strong><br>$\Delta Z = \sqrt{(\Delta A)^2 + (\Delta B)^2}$</div>
+        <div class="formula-box"><strong>Multiplication/Division</strong><br>$\frac{\Delta Z}{Z} = \frac{\Delta A}{A} + \frac{\Delta B}{B}$</div>
+        <div class="formula-box"><strong>Power Rule</strong><br>If $Z = A^n$ <br>$\frac{\Delta Z}{Z} = |n|\left(\frac{\Delta A}{A}\right)$</div>
+        <div class="formula-box"><strong>Weighted Mean</strong><br>$w_i = \frac{1}{(\Delta x_i)^2}$<br>$x_{best} = \frac{\sum w_i x_i}{\sum w_i}$</div>
+        <div class="formula-box"><strong>Chi-Square</strong><br>$\chi^2 = \sum \frac{(y_i-y_{fit})^2}{\sigma_i^2}$</div>
+    </div>
+
     <script>
-        // JS logic omitted for brevity, but all physics fixes incorporated...
-        // [Integration logic identical to previous turn with updated parser/WLS/residual logic]
+        let logCounter = 1;
+
+        // Custom plugin to draw error bars on Chart.js
+        const errorBarPlugin = {
+            id: 'errorBars',
+            afterDatasetsDraw: (chart) => {
+                const ctx = chart.ctx;
+                const dataset = chart.data.datasets.find(d => d.customErrorBars);
+                if (!dataset) return;
+                const meta = chart.getDatasetMeta(chart.data.datasets.indexOf(dataset));
+                ctx.save();
+                ctx.strokeStyle = dataset.backgroundColor;
+                ctx.lineWidth = 1.5;
+                dataset.data.forEach((dp, i) => {
+                    if(!dp.dx && !dp.dy) return;
+                    const x = meta.data[i].x, y = meta.data[i].y;
+                    const xAxis = chart.scales.x, yAxis = chart.scales.y;
+                    if(dp.dx > 0) {
+                        const l = xAxis.getPixelForValue(dp.rawX - dp.dx);
+                        const r = xAxis.getPixelForValue(dp.rawX + dp.dx);
+                        ctx.beginPath(); ctx.moveTo(l, y); ctx.lineTo(r, y); ctx.stroke();
+                        ctx.beginPath(); ctx.moveTo(l, y-4); ctx.lineTo(l, y+4); ctx.stroke();
+                        ctx.beginPath(); ctx.moveTo(r, y-4); ctx.lineTo(r, y+4); ctx.stroke();
+                    }
+                    if(dp.dy > 0) {
+                        const t = yAxis.getPixelForValue(dp.rawY + dp.dy);
+                        const b = yAxis.getPixelForValue(dp.rawY - dp.dy);
+                        ctx.beginPath(); ctx.moveTo(x, t); ctx.lineTo(x, b); ctx.stroke();
+                        ctx.beginPath(); ctx.moveTo(x-4, t); ctx.lineTo(x+4, t); ctx.stroke();
+                        ctx.beginPath(); ctx.moveTo(x-4, b); ctx.lineTo(x+4, b); ctx.stroke();
+                    }
+                });
+                ctx.restore();
+            }
+        };
+
+        function typeset(elId) { if(window.MathJax) MathJax.typesetPromise([document.getElementById(elId)]); }
+
+        function showOut(id, html) {
+            const el = document.getElementById(id);
+            el.innerHTML = html; el.style.display = 'block'; typeset(id);
+        }
+
+        function logToNotebook(title, details) {
+            const logDiv = document.getElementById('log-entries');
+            const time = new Date().toLocaleTimeString();
+            logDiv.innerHTML = `<div class="log-entry"><strong>#${logCounter} - ${title}</strong><span class="log-time">[${time}]</span><br>${details}</div>` + logDiv.innerHTML;
+            logCounter++; typeset('log-entries');
+        }
+
+        function validateInputs(valIds, errIds = [], enforcePositive = false) {
+            for(let id of valIds) { 
+                let val = +document.getElementById(id).value; 
+                if(isNaN(val)) { alert("Measurements must be valid numbers."); return false; }
+                if(enforcePositive && val <= 0) { alert("Measurements must be positive numbers > 0 for this specific experiment."); return false; }
+            }
+            for(let id of errIds) { 
+                let err = +document.getElementById(id).value; 
+                if(isNaN(err) || err < 0) { alert("Uncertainties cannot be negative."); return false; } 
+            }
+            return true;
+        }
+
+        /* --- Robust Scientific Result Formatting --- */
+        function formatMeasurement(value, error) {
+            if (error === 0) return `${value} ± 0`;
+            const firstDigit = parseInt(Math.abs(error).toExponential().charAt(0));
+            const sigFigs = (firstDigit === 1 || firstDigit === 2) ? 2 : 1;
+            let errVal = parseFloat(error.toPrecision(sigFigs));
+            let decimalsVal = Math.max(0, -(Math.floor(Math.log10(errVal))) + (sigFigs - 1));
+            return `${value.toFixed(decimalsVal)} ± ${errVal.toFixed(decimalsVal)}`;
+        }
+
+        /* --- SECTIONS 1 to 5, 8 Logic --- */
+        function calcS1() {
+            if(!validateInputs(['s1-L','s1-B','s1-H'],['s1-eL','s1-eB','s1-eH'], true)) return;
+            const L = +document.getElementById('s1-L').value, eL = +document.getElementById('s1-eL').value;
+            const B = +document.getElementById('s1-B').value, eB = +document.getElementById('s1-eB').value;
+            const H = +document.getElementById('s1-H').value, eH = +document.getElementById('s1-eH').value;
+            const V = L*B*H, rel = (eL/L)+(eB/B)+(eH/H), eV = V*rel;
+            const formatted = formatMeasurement(V, eV);
+            const h = `V = ${V.toFixed(2)} m³<br>$\\frac{\\Delta V}{V} = ${rel.toFixed(4)}$<br>Percentage Error = ${(rel*100).toFixed(2)}%<br><b>Final: V = (${formatted}) m³</b>`;
+            showOut('out-s1', h); logToNotebook("Volume Calculation", h);
+        }
+
+        function calcS2() {
+            if(!validateInputs(['s2-A','s2-B'],['s2-eA','s2-eB'], false)) return; 
+            const A = +document.getElementById('s2-A').value, eA = +document.getElementById('s2-eA').value;
+            const B = +document.getElementById('s2-B').value, eB = +document.getElementById('s2-eB').value;
+            const op = document.getElementById('s2-op').value;
+            
+            if((op === 'mul' || op === 'div') && (A === 0 || B === 0)) {
+                alert("Base values cannot be zero in multiplication or division error propagation.");
+                return;
+            }
+
+            let res=0, err=0, step="";
+            if(op==='add'){ res=A+B; err=eA+eB; step="$\\Delta Z = \\Delta A + \\Delta B$"; }
+            if(op==='sub'){ res=A-B; err=eA+eB; step="$\\Delta Z = \\Delta A + \\Delta B$"; }
+            if(op==='mul'){ res=A*B; err=Math.abs(res)*((eA/Math.abs(A))+(eB/Math.abs(B))); step="$\\frac{\\Delta Z}{Z} = \\frac{\\Delta A}{A} + \\frac{\\Delta B}{B}$"; }
+            if(op==='div'){ res=A/B; err=Math.abs(res)*((eA/Math.abs(A))+(eB/Math.abs(B))); step="$\\frac{\\Delta Z}{Z} = \\frac{\\Delta A}{A} + \\frac{\\Delta B}{B}$"; }
+            const formatted = formatMeasurement(res, err);
+            const h = `Result = ${res.toFixed(2)}<br>${step}<br>Absolute Error = ${err.toPrecision(3)}<br><b>Final: ${formatted}</b>`;
+            showOut('out-s2', h); logToNotebook("Formula Playground", h);
+        }
+
+        let s3Chart;
+        function initS3() {
+            const ctx = document.getElementById('s3-chart').getContext('2d');
+            s3Chart = new Chart(ctx, { type: 'line', data: { labels: ['Start', 'Measurement', 'End'], datasets: [
+                { label: 'Upper', data: [105,105,105], borderColor: 'rgba(231,76,60,0.8)', backgroundColor: 'rgba(231,76,60,0.2)', fill: 2 },
+                { label: 'True', data: [100,100,100], borderColor: '#3498db', fill: false, borderWidth: 3 },
+                { label: 'Lower', data: [95,95,95], borderColor: 'rgba(231,76,60,0.8)', fill: false }
+            ]}, options: { scales: { y: { min: 80, max: 120 } }, plugins: { legend: { display: false } } } });
+        }
+        function updateS3() {
+            const perc = +document.getElementById('s3-slider').value;
+            document.getElementById('s3-val').innerText = perc;
+            if(s3Chart){ s3Chart.data.datasets[0].data = [100+perc, 100+perc, 100+perc]; s3Chart.data.datasets[2].data = [100-perc, 100-perc, 100-perc]; s3Chart.update(); }
+        }
+
+        function calcS4() {
+            const convention = document.getElementById('s4-convention').value;
+            const sel = document.querySelector('input[name="s4-inst"]:checked');
+            const lc = +sel.value;
+            const isAnalog = sel.dataset.type === 'analog';
+            
+            let uncertainty;
+            if (convention === 'school') {
+                uncertainty = isAnalog ? lc / 2.0 : lc; 
+            } else if (convention === 'uni') {
+                uncertainty = lc / 2.0;
+            } else {
+                uncertainty = lc;
+            }
+            
+            const pErr = (uncertainty / 7.0) * 100;
+            const score = Math.max(0, 100 - (pErr * 10));
+            const h = `Least Count: ${lc} cm<br>Instrument Uncertainty applied: ±${uncertainty} cm<br>Target Length: ≈ 7 cm<br>% Error: ${pErr.toFixed(2)}%<br><b>Score: ${score.toFixed(1)}/100</b>`;
+            showOut('out-s4', h); logToNotebook("Instrument Selection", h);
+        }
+
+        function calcS5() {
+            if(!validateInputs(['s5-m','s5-D'],['s5-em','s5-eD'], true)) return;
+            const m = +document.getElementById('s5-m').value, em = +document.getElementById('s5-em').value;
+            const D = +document.getElementById('s5-D').value, eD = +document.getElementById('s5-eD').value;
+            
+            const den = m / ((1/6)*Math.PI*Math.pow(D,3));
+            const relErr = (em/m) + 3*(eD/D);
+            const absErr = den * relErr;
+            const formatted = formatMeasurement(den, absErr);
+            
+            const h = `
+                <strong>Derivation:</strong><br>
+                $\\rho = \\frac{6m}{\\pi D^3}$<br>
+                $\\frac{\\Delta \\rho}{\\rho} = \\frac{\\Delta m}{m} + 3\\frac{\\Delta D}{D}$<br>
+                $\\frac{\\Delta \\rho}{\\rho} = \\frac{${em}}{${m}} + 3\\left(\\frac{${eD}}{${D}}\\right)$<br>
+                $\\frac{\\Delta \\rho}{\\rho} = ${(em/m).toFixed(4)} + ${(3*eD/D).toFixed(4)} = ${relErr.toFixed(4)}$<br>
+                $\\Delta \\rho = ${den.toFixed(4)} \\times ${relErr.toFixed(4)} = ${absErr.toPrecision(3)}$<br><br>
+                <b>$\\rho = (${formatted})$ g/cm³</b>
+            `;
+            showOut('out-s5', h); logToNotebook("Density Exp", h);
+        }
+
+        /* --- SECTION 6: Monte Carlo Smoothed Bins + Sigma Bounds --- */
+        function gaussian(m, s) { let u=0,v=0; while(u===0)u=Math.random(); while(v===0)v=Math.random(); return m+s*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+        let s6Chart;
+        
+        function calcS6() {
+            if(!validateInputs(['s6-L','s6-B'],['s6-eL','s6-eB'], true)) return;
+            const L = +document.getElementById('s6-L').value, eL = +document.getElementById('s6-eL').value;
+            const B = +document.getElementById('s6-B').value, eB = +document.getElementById('s6-eB').value;
+            const sigmaMult = +document.getElementById('s6-sigma').value;
+            const N = parseInt(document.getElementById('s6-N').value) || 5000;
+
+            if(eL===0 && eB===0) return alert("Errors must be > 0");
+            let areas=[], minA=Infinity, maxA=-Infinity;
+            for(let i=0; i<N; i++){ 
+                // Rejection sampling for true physical bounds
+                let L_sample = -1;
+                while (L_sample <= 0) { L_sample = gaussian(L, eL); }
+                let B_sample = -1;
+                while (B_sample <= 0) { B_sample = gaussian(B, eB); }
+                
+                let a = L_sample * B_sample; 
+                areas.push(a); 
+                if(a<minA) minA=a; 
+                if(a>maxA) maxA=a; 
+            }
+            
+            if(maxA === minA) { maxA += 1e-6; minA -= 1e-6; }
+
+            let mean = areas.reduce((a,b)=>a+b,0)/N;
+            let std = Math.sqrt(areas.reduce((s,x)=>s+Math.pow(x-mean,2),0)/(N - 1));
+            
+            let lowerBound = mean - (sigmaMult * std);
+            let upperBound = mean + (sigmaMult * std);
+            let percentTag = sigmaMult === 1 ? '68' : sigmaMult === 2 ? '95' : '99.7';
+
+            showOut('out-s6', `Mean Area = ${mean.toFixed(2)} cm²<br>Standard Deviation ($\\sigma$) = ${std.toFixed(2)} cm²<br><br><strong>${percentTag}% Interval bound (Mean ± ${sigmaMult}σ):</strong><br>${lowerBound.toFixed(2)} → ${upperBound.toFixed(2)} cm²`);
+            
+            let bins = Math.round(1 + 3.322 * Math.log10(N)); 
+            let step = (maxA - minA) / bins; 
+            let counts = new Array(bins).fill(0); 
+            let labels = [];
+            let gaussianCurve = [];
+
+            for(let i=0; i<bins; i++) {
+                let binCenter = minA + (i + 0.5) * step;
+                labels.push(binCenter.toFixed(2));
+                
+                if (std > 1e-8) {
+                    let exponent = -Math.pow(binCenter - mean, 2) / (2 * std * std);
+                    let expectedY = (N * step / (std * Math.sqrt(2 * Math.PI))) * Math.exp(exponent);
+                    gaussianCurve.push(expectedY);
+                } else {
+                    gaussianCurve.push(0);
+                }
+            }
+            
+            areas.forEach(a => { 
+                let idx = Math.floor((a - minA) / step); 
+                counts[idx >= bins ? bins - 1 : idx]++; 
+            });
+            
+            if(s6Chart) s6Chart.destroy();
+            s6Chart = new Chart(document.getElementById('s6-chart'), { 
+                type: 'bar', 
+                data: { 
+                    labels: labels, 
+                    datasets: [
+                        {
+                            type: 'line',
+                            label: 'Gaussian Fit',
+                            data: gaussianCurve,
+                            borderColor: '#e74c3c',
+                            borderWidth: 2,
+                            fill: false,
+                            pointRadius: 0,
+                            tension: 0.4
+                        },
+                        { 
+                            type: 'bar',
+                            label: 'Frequency', 
+                            data: counts, 
+                            backgroundColor: '#9b59b6' 
+                        }
+                    ] 
+                },
+                options: {
+                    scales: {
+                        x: { title: { display: true, text: 'Area (cm²)' } },
+                        y: { title: { display: true, text: 'Frequency' } }
+                    }
+                }
+            });
+        }
+
+        /* --- SECTION 7: ARENA 2.0 --- */
+        let arenaState = { score: 0, streak: 0, best: 0, attempts: 0, correct: 0, currentQ: null };
+        function randomRange(min, max, decimals=1) { return +(Math.random()*(max-min)+min).toFixed(decimals); }
+
+        function generateS7Question() {
+            document.getElementById('out-s7').style.display = 'none';
+            document.getElementById('s7-submit-btn').style.display = 'inline-block';
+            const diff = document.getElementById('arena-diff').value;
+            let q = {};
+
+            if(diff === 'easy') {
+                q.A = randomRange(10, 50); q.eA = randomRange(0.1, 0.9);
+                q.B = randomRange(10, 50); q.eB = randomRange(0.1, 0.9);
+                q.text = `Given lengths $L_1 = ${q.A} \\pm ${q.eA}$ m and $L_2 = ${q.B} \\pm ${q.eB}$ m. Find the total length $L = L_1 + L_2$.`;
+                q.val = q.A + q.B; q.err = q.eA + q.eB;
+                q.optsData = [
+                    { text: `${q.val.toFixed(1)} ± ${q.err.toFixed(2)}`, correct: true },
+                    { text: `${q.val.toFixed(1)} ± ${Math.abs(q.eA - q.eB).toFixed(2)}`, correct: false },
+                    { text: `${q.val.toFixed(1)} ± ${((q.eA/q.A + q.eB/q.B)*q.val).toFixed(2)}`, correct: false },
+                    { text: `${(q.A - q.B).toFixed(1)} ± ${q.err.toFixed(2)}`, correct: false }
+                ];
+                q.expl = `For addition, add absolute errors: $\\Delta L = ${q.eA} + ${q.eB} = ${q.err.toFixed(2)}$ m.`;
+            } else if (diff === 'medium') {
+                const type = Math.random() > 0.5 ? 'area' : 'resistance';
+                if(type === 'area') {
+                    q.A = randomRange(10, 30); q.eA = randomRange(0.2, 0.8);
+                    q.B = randomRange(5, 15); q.eB = randomRange(0.1, 0.5);
+                    q.text = `Rectangle: $L = ${q.A} \\pm ${q.eA}$ m, $B = ${q.B} \\pm ${q.eB}$ m. Find Area ($A = L \\times B$).`;
+                    q.val = q.A * q.B; q.err = q.val * ((q.eA/q.A) + (q.eB/q.B));
+                    q.expl = `Multiplication uses fractional errors: $\\frac{\\Delta A}{A} = \\frac{\\Delta L}{L} + \\frac{\\Delta B}{B}$. Multiply by $A$ to get absolute error.`;
+                } else {
+                    q.A = randomRange(10, 20); q.eA = randomRange(0.2, 0.8);
+                    q.B = randomRange(2, 5); q.eB = randomRange(0.1, 0.3);
+                    q.text = `Resistance: Voltage $V = ${q.A} \\pm ${q.eA}$ v, Current $I = ${q.B} \\pm ${q.eB}$ A. Find $R = V/I$.`;
+                    q.val = q.A / q.B; q.err = q.val * ((q.eA/q.A) + (q.eB/q.B));
+                    q.expl = `Division uses fractional errors: $\\frac{\\Delta R}{R} = \\frac{\\Delta V}{V} + \\frac{\\Delta I}{I}$. Multiply by $R$ to get absolute error.`;
+                }
+                q.optsData = [
+                    { text: `${q.val.toFixed(1)} ± ${q.err.toFixed(2)}`, correct: true },
+                    { text: `${q.val.toFixed(1)} ± ${(q.eA + q.eB).toFixed(2)}`, correct: false },
+                    { text: `${q.val.toFixed(1)} ± ${(q.val * Math.abs(q.eA/q.A - q.eB/q.B)).toFixed(2)}`, correct: false },
+                    { text: `${q.val.toFixed(1)} ± ${(q.err * 10).toFixed(2)}`, correct: false }
+                ];
+            } else if (diff === 'hard') {
+                const types = ['density', 'power', 'kinetic'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                let pA, pB, errVal;
+                if(type === 'density') {
+                    q.A = randomRange(20, 80); pA = randomRange(1, 3);
+                    q.B = randomRange(2, 5); pB = randomRange(1, 3);
+                    q.text = `A sphere has a mass measurement error of ${pA}% and a radius error of ${pB}%. Find the **percentage error in its Density** ($\\rho \\propto \\frac{m}{r^3}$).`;
+                    errVal = pA + 3 * pB;
+                    q.expl = `Power rule: $\\%\\rho = \\%m + 3(\\%r) = ${pA} + 3(${pB}) = ${errVal}\\%$.`;
+                } else if(type === 'power') {
+                    pA = randomRange(1, 4); pB = randomRange(1, 4);
+                    q.text = `In a circuit, current $I$ has an error of ${pA}% and resistance $R$ has an error of ${pB}%. Find the **percentage error in Power** ($P = I^2R$).`;
+                    errVal = 2 * pA + pB;
+                    q.expl = `Power rule: $\\%P = 2(\\%I) + \\%R = 2(${pA}) + ${pB} = ${errVal}\\%$.`;
+                } else {
+                    pA = randomRange(1, 4); pB = randomRange(1, 4);
+                    q.text = `Mass error is ${pA}%, velocity error is ${pB}%. Find **percentage error in Kinetic Energy** ($E = \\frac{1}{2}mv^2$).`;
+                    errVal = pA + 2 * pB;
+                    q.expl = `Power rule: $\\%E = \\%m + 2(\\%v) = ${pA} + 2(${pB}) = ${errVal}\\%$. Constants like 1/2 have no error.`;
+                }
+                q.optsData = [
+                    { text: `${errVal.toFixed(1)}%`, correct: true },
+                    { text: `${(pA + pB).toFixed(1)}%`, correct: false }, 
+                    { text: `${(pA + Math.pow(pB, 2)).toFixed(1)}%`, correct: false }, 
+                    { text: `${Math.abs(pA - pB * 2).toFixed(1)}%`, correct: false }
+                ];
+            } else {
+                const types = ['pendulum', 'spring', 'volume'];
+                const type = types[Math.floor(Math.random() * types.length)];
+                let pA, pB, errVal;
+                if(type === 'pendulum') {
+                    pA = randomRange(1, 3); pB = randomRange(1, 3);
+                    q.text = `Pendulum: Length error = ${pA}%, Time period error = ${pB}%. Find **percentage error in $g$** ($g \\propto \\frac{L}{T^2}$).`;
+                    errVal = pA + 2 * pB;
+                    q.expl = `Errors ALWAYS add, regardless of denominator. $\\%g = \\%L + 2(\\%T) = ${pA} + 2(${pB}) = ${errVal}\\%$.`;
+                } else if(type === 'spring') {
+                    pA = randomRange(1, 4); pB = randomRange(1, 4);
+                    q.text = `Spring constant $k = \\frac{4\\pi^2 m}{T^2}$. Mass error = ${pA}%, Time error = ${pB}%. Find **percentage error in $k$**.`;
+                    errVal = pA + 2 * pB;
+                    q.expl = `Constants ($4\\pi^2$) are ignored. $\\%k = \\%m + 2(\\%T) = ${errVal}\\%$.`;
+                } else {
+                    pA = randomRange(1, 3);
+                    q.text = `The radius of a sphere is measured with an error of ${pA}%. Find the **percentage error in its Volume** ($V = \\frac{4}{3}\\pi r^3$).`;
+                    errVal = 3 * pA;
+                    q.optsData = [
+                        { text: `${errVal.toFixed(1)}%`, correct: true },
+                        { text: `${pA.toFixed(1)}%`, correct: false },
+                        { text: `${Math.pow(pA, 3).toFixed(1)}%`, correct: false },
+                        { text: `${(pA * 1.33).toFixed(1)}%`, correct: false } 
+                    ].sort(() => Math.random() - 0.5);
+                    q.expl = `Volume scales by $r^3$, so $\\%V = 3 \\times \\%r = 3 \\times ${pA} = ${errVal}\\%$.`;
+                }
+                
+                if(!q.optsData) {
+                    q.optsData = [
+                        { text: `${errVal.toFixed(1)}%`, correct: true },
+                        { text: `${(pA + pB).toFixed(1)}%`, correct: false }, 
+                        { text: `${Math.abs(pA - 2*pB).toFixed(1)}%`, correct: false }, 
+                        { text: `${(pA * 2 + pB).toFixed(1)}%`, correct: false }
+                    ];
+                }
+            }
+
+            q.optsData = q.optsData.sort(() => Math.random() - 0.5);
+            arenaState.currentQ = q;
+
+            document.getElementById('s7-question-container').innerHTML = q.text;
+            let optHtml = '';
+            q.optsData.forEach((o, i) => { optHtml += `<label class="mcq-option"><input type="radio" name="s7-opt" value="${i}"> ${o.text}</label>`; });
+            document.getElementById('s7-options-container').innerHTML = optHtml;
+            typeset('s7-question-container');
+        }
+
+        function checkS7Answer() {
+            const sel = document.querySelector('input[name="s7-opt"]:checked');
+            if(!sel) return alert("Select an option!");
+            
+            arenaState.attempts += 1;
+            const q = arenaState.currentQ;
+
+            if(q.optsData[sel.value].correct) {
+                arenaState.correct += 1;
+                arenaState.score += 10; arenaState.streak += 1;
+                if(arenaState.streak > arenaState.best) arenaState.best = arenaState.streak;
+                showOut('out-s7', `<div class="correct">✓ Correct! +10 Points</div><p>${q.expl}</p><button class="btn-success" id="btn-s7-next">Next Challenge</button>`);
+                document.getElementById('btn-s7-next').addEventListener('click', generateS7Question);
+            } else {
+                arenaState.streak = 0;
+                let correctOpt = q.optsData.find(o => o.correct).text;
+                showOut('out-s7', `<div class="incorrect">✗ Incorrect. Streak broken!</div><p>${q.expl}</p><p>Correct answer: <b>${correctOpt}</b></p><button class="btn-secondary" id="btn-s7-retry">Try Again</button>`);
+                document.getElementById('btn-s7-retry').addEventListener('click', generateS7Question);
+            }
+            
+            let acc = (arenaState.correct / arenaState.attempts) * 100;
+
+            document.getElementById('arena-score').innerText = arenaState.score;
+            document.getElementById('arena-streak').innerText = arenaState.streak;
+            document.getElementById('arena-best').innerText = arenaState.best;
+            document.getElementById('arena-accuracy').innerText = `${acc.toFixed(0)}%`;
+            document.getElementById('s7-submit-btn').style.display = 'none';
+        }
+
+        function calcS8() {
+            const convention = document.getElementById('s8-convention').value;
+            const sel = document.getElementById('s8-inst');
+            const lc = +sel.value;
+            const val = +document.getElementById('s8-val').value;
+            const zErr = +document.getElementById('s8-zero').value;
+            
+            const isAnalog = sel.options[sel.selectedIndex].dataset.type === 'analog';
+            
+            let uncertainty;
+            if (convention === 'school') {
+                uncertainty = isAnalog ? lc / 2.0 : lc;
+            } else if (convention === 'uni') {
+                uncertainty = lc / 2.0;
+            } else {
+                uncertainty = lc;
+            }
+            
+            const corrected = val - zErr;
+            const formatted = formatMeasurement(corrected, uncertainty);
+
+            showOut('out-s8', `
+                Instrument Uncertainty applied: ±${uncertainty} cm<br>
+                Zero Error: ${zErr > 0 ? '+'+zErr : zErr} cm<br>
+                <b>Corrected Reading = Observed - (Zero Error)</b><br>
+                $= ${val} - (${zErr})$<br>
+                $= ${corrected.toFixed(3)} $<br><br>
+                <b>Final Result: ${formatted} cm</b>
+            `);
+        }
+
+        /* --- SECTION 9: REAL EXPERIMENTAL DATA + MAE + SEM Panels --- */
+        let s9Chart;
+        function calcS9() {
+            const raw = document.getElementById('s9-data').value;
+            const vals = raw.split(/[\n,]+/).map(v => parseFloat(v.trim())).filter(v => !isNaN(v));
+            if(vals.length < 2) return alert("Please enter at least 2 valid numerical measurements.");
+            
+            const n = vals.length;
+            const mean = vals.reduce((a,b)=>a+b, 0) / n;
+            const mae = vals.reduce((s,x)=>s+Math.abs(x-mean), 0) / n;
+            const maxVal = Math.max(...vals);
+            const minVal = Math.min(...vals);
+            const range = maxVal - minVal;
+            const halfRange = range / 2.0; 
+            const variance = vals.reduce((a,b)=>a+Math.pow(b-mean, 2), 0) / (n-1); 
+            const stdDev = Math.sqrt(variance);
+            const stdErr = stdDev / Math.sqrt(n);
+            const percErr = (stdErr / mean) * 100;
+
+            const formattedStat = formatMeasurement(mean, stdErr);
+            const formattedMAE = formatMeasurement(mean, mae);
+            const formattedHalf = formatMeasurement(mean, halfRange);
+
+            const h = `
+                <div class="explorer-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                    <div class="comparison-box">
+                        <h3 style="margin-top: 0; color: #e74c3c;">Half Range Method</h3>
+                        Mean Value ($\\bar{x}$) = ${mean.toFixed(4)}<br>
+                        Range ($x_{max} - x_{min}$) = ${range.toFixed(4)}<br>
+                        Half Range Error ($\\Delta \\bar{x}_{hr}$) = ${halfRange.toFixed(4)}<br><br>
+                        <strong>Final Result: ${formattedHalf}</strong><br>
+                        <span style="font-size:0.85rem; color:#e74c3c; display:block; margin-top:10px;">(Historical school approximation. Not recommended for scientific publications.)</span>
+                    </div>
+                    <div class="comparison-box">
+                        <h3 style="margin-top: 0; color: #f39c12;">Mean Absolute Error</h3>
+                        Mean Value ($\\bar{x}$) = ${mean.toFixed(4)}<br>
+                        Mean Absolute Error ($\\Delta \\bar{x}_{abs}$) = ${mae.toFixed(4)}<br><br>
+                        <strong>Final Result: ${formattedMAE}</strong><br>
+                        <span style="font-size:0.85rem; color:#f39c12; display:block; margin-top:10px;">(Common in CBSE/State board practicals.)</span>
+                    </div>
+                    <div class="comparison-box">
+                        <h3 style="margin-top: 0; color: #2980b9;">Standard Error (University)</h3>
+                        Standard Deviation ($\\sigma_{n-1}$) = ${stdDev.toFixed(4)}<br>
+                        Standard Error of Mean ($\\Delta x$) = ${stdErr.toFixed(4)}<br>
+                        Percentage Error = ${percErr.toFixed(2)}%<br><br>
+                        <strong>Final Result: ${formattedStat}</strong><br>
+                        <span style="font-size:0.85rem; color:#2980b9; display:block; margin-top:10px;">(Rigorous university/research standard.)</span>
+                    </div>
+                </div>
+            `;
+            showOut('out-s9', h);
+            logToNotebook("Experimental Data Analysis", h);
+
+            const ctx = document.getElementById('s9-chart').getContext('2d');
+            if(s9Chart) s9Chart.destroy();
+            
+            const meanData = vals.map((_, i) => ({ x: i + 1, y: mean }));
+            const upperData = vals.map((_, i) => ({ x: i + 1, y: mean + stdDev }));
+            const lowerData = vals.map((_, i) => ({ x: i + 1, y: mean - stdDev }));
+
+            s9Chart = new Chart(ctx, {
+                data: {
+                    datasets: [
+                        {
+                            label: 'Mean + 1σ',
+                            data: upperData,
+                            borderColor: 'rgba(52, 152, 219, 0.3)',
+                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            fill: '+1', 
+                            type: 'line',
+                            pointRadius: 0,
+                            borderDash: [5, 5]
+                        },
+                        {
+                            label: 'Mean - 1σ',
+                            data: lowerData,
+                            borderColor: 'rgba(52, 152, 219, 0.3)',
+                            fill: false,
+                            type: 'line',
+                            pointRadius: 0,
+                            borderDash: [5, 5]
+                        },
+                        {
+                            label: 'Mean',
+                            data: meanData,
+                            borderColor: '#2c3e50',
+                            borderWidth: 2,
+                            type: 'line',
+                            pointRadius: 0
+                        },
+                        {
+                            label: 'Observed Measurements',
+                            data: vals.map((v, i) => ({ x: i + 1, y: v })),
+                            backgroundColor: '#e74c3c',
+                            pointRadius: 6,
+                            type: 'scatter'
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        x: { title: { display: true, text: 'Measurement Number' }, ticks: { stepSize: 1 } },
+                        y: { title: { display: true, text: 'Observed Value' } }
+                    },
+                    plugins: {
+                        legend: { labels: { filter: item => item.text !== 'Mean - 1σ' } }
+                    }
+                }
+            });
+        }
+
+        /* --- SECTION 10: PERCENTAGE PROPAGATION EXPLORER --- */
+        const s10Presets = {
+            density: { name: 'Density', eq: '\\rho = m V^{-1}', vars: [{sym:'m', pow:1}, {sym:'V', pow:-1}] },
+            kinetic: { name: 'Kinetic Energy', eq: 'E = \\frac{1}{2}mv^2', vars: [{sym:'m', pow:1}, {sym:'v', pow:2}] },
+            pendulum: { name: 'Gravity', eq: 'g = 4\\pi^2 L T^{-2}', vars: [{sym:'L', pow:1}, {sym:'T', pow:-2}] },
+            resistance: { name: 'Resistance', eq: 'R = V I^{-1}', vars: [{sym:'V', pow:1}, {sym:'I', pow:-1}] }
+        };
+
+        let currentS10Vars = [];
+        let s10PieChart;
+
+        function loadS10Preset() {
+            const val = document.getElementById('s10-preset').value;
+            const builder = document.getElementById('s10-custom-builder');
+            if(val === 'custom') {
+                builder.style.display = 'block';
+                generateS10Inputs();
+            } else {
+                builder.style.display = 'none';
+                currentS10Vars = s10Presets[val].vars;
+                document.getElementById('s10-formula-display').innerHTML = `$${s10Presets[val].eq}$`;
+                typeset('s10-formula-display');
+                renderS10Inputs();
+            }
+        }
+
+        function generateS10Inputs() {
+            const pA = +document.getElementById('s10-pow-a').value;
+            const pB = +document.getElementById('s10-pow-b').value;
+            const pC = +document.getElementById('s10-pow-c').value;
+            
+            currentS10Vars = [];
+            let eqStr = 'Z = ';
+            if(pA !== 0) { currentS10Vars.push({sym:'A', pow:pA}); eqStr += `A^{${pA}} `; }
+            if(pB !== 0) { currentS10Vars.push({sym:'B', pow:pB}); eqStr += `B^{${pB}} `; }
+            if(pC !== 0) { currentS10Vars.push({sym:'C', pow:pC}); eqStr += `C^{${pC}} `; }
+            if(currentS10Vars.length === 0) eqStr = 'Z = 1';
+
+            document.getElementById('s10-formula-display').innerHTML = `$${eqStr}$`;
+            typeset('s10-formula-display');
+            renderS10Inputs();
+        }
+
+        function renderS10Inputs() {
+            const container = document.getElementById('s10-inputs-container');
+            let html = `<strong>Enter Measured % Errors:</strong><br><br>`;
+            currentS10Vars.forEach((v, i) => {
+                html += `<label style="display:inline-block; width:150px;">$\\Delta ${v.sym} / ${v.sym}$ (%) :</label> 
+                         <input type="number" id="s10-var-${i}" value="${(i+1)*2}" step="0.1" class="s10-input"><br><br>`;
+            });
+            container.innerHTML = html;
+            
+            document.querySelectorAll('.s10-input').forEach(el => {
+                el.addEventListener('input', updateS10Analysis);
+            });
+            
+            typeset('s10-inputs-container');
+            updateS10Analysis();
+        }
+
+        function updateS10Analysis() {
+            let totalErr = 0, maxCont = -1, dominantVar = '';
+            let chartLabels = [], chartData = [];
+
+            currentS10Vars.forEach((v, i) => {
+                const errVal = +document.getElementById(`s10-var-${i}`).value;
+                if(errVal >= 0) totalErr += Math.abs(v.pow) * errVal;
+            });
+
+            currentS10Vars.forEach((v, i) => {
+                const errVal = +document.getElementById(`s10-var-${i}`).value;
+                if(errVal < 0) return; 
+                const cont = Math.abs(v.pow) * errVal;
+                
+                if(cont > maxCont) { maxCont = cont; dominantVar = v.sym; }
+                
+                chartLabels.push(`Variable ${v.sym}`);
+                chartData.push(cont);
+            });
+
+            if(totalErr === 0) return;
+
+            document.getElementById('s10-dominant').innerHTML = `⚠️ <b>Dominant Source: Measurement $${dominantVar}$</b> (Contributes ${(maxCont/totalErr*100).toFixed(1)}%)`;
+            typeset('s10-dominant');
+
+            const dynamicColors = chartLabels.map((_, i) => `hsl(${i * (360 / chartLabels.length)}, 70%, 60%)`);
+
+            const ctx = document.getElementById('s10-chart').getContext('2d');
+            if(s10PieChart) { s10PieChart.destroy(); }
+            s10PieChart = new Chart(ctx, {
+                type: 'pie',
+                data: { labels: chartLabels, datasets: [{ data: chartData, backgroundColor: dynamicColors }] },
+                options: { 
+                    plugins: { 
+                        legend: { position: 'bottom' },
+                        title: { display: true, text: 'Relative Contribution to Maximum Percentage Error', font: { size: 14 } } 
+                    } 
+                }
+            });
+        }
+
+        /* --- SECTION 11: SIG FIGS CHALLENGE (Robust Parser) --- */
+        let sigState = { score: 0, streak: 0, best: 0, attempts: 0, correct: 0, currentQ: null };
+
+        function countSigFigs(numStr) {
+            let n = numStr.trim().toLowerCase().replace(/^-/, '');
+            if (n.includes('e')) n = n.split('e')[0]; 
+            
+            // Flag mathematical ambiguity for integers with trailing zeros and no decimal.
+            if (!n.includes('.') && n.replace(/0+$/, '').length !== n.length) {
+                return "Ambiguous";
+            }
+
+            if (parseFloat(n) === 0) {
+                if (!n.includes('.')) return 1;
+                return n.split('.')[1].length || 1; 
+            }
+            if (!n.includes('.')) return n.length; 
+            if (n.endsWith('.')) return n.replace('.', '').length; 
+            return n.replace('.', '').replace(/^0+/, '').length; 
+        }
+
+        function countDecimals(numStr) {
+            if(!numStr.includes('.')) return 0;
+            return numStr.split('.')[1].length;
+        }
+
+        function generateS11Question() {
+            document.getElementById('out-s11').style.display = 'none';
+            document.getElementById('s11-submit-btn').style.display = 'inline-block';
+            let q = {};
+            const isMul = Math.random() > 0.5;
+
+            // Generate unambiguous numbers (using toFixed inherently adds a decimal point or avoids trailing zeros without it)
+            if (isMul) {
+                let a = (Math.random() * 10 + 1).toFixed(Math.floor(Math.random()*3)+1);
+                let b = (Math.random() * 5 + 1).toFixed(Math.floor(Math.random()*2)+1);
+                
+                let sfA = countSigFigs(a);
+                let sfB = countSigFigs(b);
+                let targetSF = Math.min(sfA, sfB);
+                
+                let rawAns = parseFloat(a) * parseFloat(b);
+                let correctAns = rawAns.toPrecision(targetSF); 
+
+                q.text = `${a} &times; ${b}`;
+                q.expl = `Multiplication Rule: The result should have the same number of significant figures as the measurement with the fewest significant figures. <br><br>${a} has ${sfA} SF.<br>${b} has ${sfB} SF.<br>Result must be rounded to <b>${targetSF}</b> SF.`;
+                
+                q.optsData = [
+                    { text: correctAns, correct: true },
+                    { text: rawAns.toPrecision(targetSF + 1), correct: false },
+                    { text: rawAns.toPrecision(Math.max(1, targetSF - 1)), correct: false },
+                    { text: rawAns.toFixed(3), correct: false }
+                ];
+            } else {
+                let a = (Math.random() * 50 + 1).toFixed(Math.floor(Math.random()*3)+1);
+                let b = (Math.random() * 10 + 1).toFixed(Math.floor(Math.random()*2)+1);
+                
+                let dpA = countDecimals(a);
+                let dpB = countDecimals(b);
+                let targetDP = Math.min(dpA, dpB);
+                
+                let rawAns = parseFloat(a) + parseFloat(b);
+                let correctAns = rawAns.toFixed(targetDP);
+
+                q.text = `${a} + ${b}`;
+                q.expl = `Addition Rule: The result should have the same number of decimal places as the measurement with the fewest decimal places. <br><br>${a} has ${dpA} DP.<br>${b} has ${dpB} DP.<br>Result must be rounded to <b>${targetDP}</b> DP.`;
+                
+                q.optsData = [
+                    { text: correctAns, correct: true },
+                    { text: rawAns.toFixed(targetDP + 1), correct: false },
+                    { text: rawAns.toFixed(Math.max(0, targetDP - 1)), correct: false },
+                    { text: Number(rawAns.toPrecision(Math.min(countSigFigs(a), countSigFigs(b)))).toString(), correct: false }
+                ];
+            }
+
+            let uniqueOpts = [];
+            let seen = new Set();
+            for(let o of q.optsData) {
+                if(!seen.has(o.text)) {
+                    seen.add(o.text);
+                    uniqueOpts.push(o);
+                }
+            }
+            while(uniqueOpts.length < 4) {
+                let filler = (parseFloat(uniqueOpts[0].text) + Math.random()).toFixed(2);
+                if(!seen.has(filler)) {
+                    seen.add(filler);
+                    uniqueOpts.push({text: filler, correct: false});
+                }
+            }
+
+            q.optsData = uniqueOpts.sort(() => Math.random() - 0.5);
+            sigState.currentQ = q;
+
+            document.getElementById('s11-question-container').innerHTML = q.text;
+            let optHtml = '';
+            q.optsData.forEach((o, i) => { optHtml += `<label class="mcq-option"><input type="radio" name="s11-opt" value="${i}"> ${o.text}</label>`; });
+            document.getElementById('s11-options-container').innerHTML = optHtml;
+        }
+
+        function checkS11Answer() {
+            const sel = document.querySelector('input[name="s11-opt"]:checked');
+            if(!sel) return alert("Select an option!");
+            
+            sigState.attempts += 1;
+            const q = sigState.currentQ;
+
+            if(q.optsData[sel.value].correct) {
+                sigState.correct += 1;
+                sigState.score += 10; sigState.streak += 1;
+                if(sigState.streak > sigState.best) sigState.best = sigState.streak;
+                showOut('out-s11', `<div class="correct">✓ Correct! +10 Points</div><p>${q.expl}</p><button class="btn-success" id="btn-s11-next">Next Challenge</button>`);
+                document.getElementById('btn-s11-next').addEventListener('click', generateS11Question);
+            } else {
+                sigState.streak = 0;
+                let correctOpt = q.optsData.find(o => o.correct).text;
+                showOut('out-s11', `<div class="incorrect">✗ Incorrect. Streak broken!</div><p>${q.expl}</p><p>Correct answer: <b>${correctOpt}</b></p><button class="btn-secondary" id="btn-s11-retry">Try Again</button>`);
+                document.getElementById('btn-s11-retry').addEventListener('click', generateS11Question);
+            }
+            
+            let acc = (sigState.correct / sigState.attempts) * 100;
+
+            document.getElementById('sig-score').innerText = sigState.score;
+            document.getElementById('sig-streak').innerText = sigState.streak;
+            document.getElementById('sig-best').innerText = sigState.best;
+            document.getElementById('sig-accuracy').innerText = `${acc.toFixed(0)}%`;
+            document.getElementById('s11-submit-btn').style.display = 'none';
+        }
+
+        /* --- SECTION 12: VIVA PREPARATION ARENA --- */
+        let vivaState = { score: 0, streak: 0, best: 0, attempts: 0, correct: 0, currentQ: null };
+
+        const vivaQuestions = [
+            {
+                q: "What is meant by the 'least count' of an instrument?",
+                opts: [
+                    {text: "The smallest value that can be measured accurately by the instrument.", correct: true},
+                    {text: "The largest value the instrument can measure.", correct: false},
+                    {text: "The error present in the instrument before taking a measurement.", correct: false},
+                    {text: "The average of all readings taken by the instrument.", correct: false}
+                ],
+                expl: "Least count is the smallest accurate measurement an instrument can make. For a standard ruler, it's typically 0.1 cm."
+            },
+            {
+                q: "What is the difference between Accuracy and Precision?",
+                opts: [
+                    {text: "Accuracy is how close a measurement is to the true value; Precision is how close repeated measurements are to each other.", correct: true},
+                    {text: "Precision is how close a measurement is to the true value; Accuracy is how close repeated measurements are to each other.", correct: false},
+                    {text: "They are exactly the same thing in physics.", correct: false},
+                    {text: "Accuracy relates to random errors, while precision relates to systematic errors.", correct: false}
+                ],
+                expl: "Accuracy means hitting the bullseye. Precision means hitting the exact same spot repeatedly, even if it's far from the bullseye."
+            },
+            {
+                q: "Why do we take repeated measurements in physics experiments?",
+                opts: [
+                    {text: "To minimize random errors by taking an average.", correct: true},
+                    {text: "To eliminate systematic errors completely.", correct: false},
+                    {text: "To change the least count of the instrument.", correct: false},
+                    {text: "To practice using the instrument.", correct: false}
+                ],
+                expl: "Repeated measurements allow us to calculate a mean, which mathematically reduces the impact of random, unpredictable fluctuations (random errors)."
+            },
+            {
+                q: "What is Systematic Error?",
+                opts: [
+                    {text: "An error that occurs consistently in the same direction, often due to faulty instruments or flawed techniques.", correct: true},
+                    {text: "An error that fluctuates randomly above and below the true value.", correct: false},
+                    {text: "An error caused by a sudden change in temperature.", correct: false},
+                    {text: "A mistake made by calculating incorrectly.", correct: false}
+                ],
+                expl: "Systematic errors (like zero error on a vernier caliper) shift all measurements consistently in one direction."
+            },
+            {
+                q: "Define 'Absolute Error'.",
+                opts: [
+                    {text: "The magnitude of the difference between the true value and the measured value.", correct: true},
+                    {text: "The ratio of the mean error to the true value.", correct: false},
+                    {text: "The error multiplied by 100.", correct: false},
+                    {text: "The smallest division on the scale.", correct: false}
+                ],
+                expl: "Absolute Error is simply the absolute difference: |True Value - Measured Value|."
+            }
+        ];
+
+        function generateS12Question() {
+            document.getElementById('out-s12').style.display = 'none';
+            document.getElementById('s12-submit-btn').style.display = 'inline-block';
+            
+            const qObj = vivaQuestions[Math.floor(Math.random() * vivaQuestions.length)];
+            
+            let q = JSON.parse(JSON.stringify(qObj)); 
+            q.opts = q.opts.sort(() => Math.random() - 0.5); 
+            vivaState.currentQ = q;
+
+            document.getElementById('s12-question-container').innerHTML = q.q;
+            let optHtml = '';
+            q.opts.forEach((o, i) => { 
+                optHtml += `<label class="mcq-option"><input type="radio" name="s12-opt" value="${i}"> ${o.text}</label>`; 
+            });
+            document.getElementById('s12-options-container').innerHTML = optHtml;
+        }
+
+        function checkS12Answer() {
+            const sel = document.querySelector('input[name="s12-opt"]:checked');
+            if(!sel) return alert("Select an option!");
+            
+            vivaState.attempts += 1;
+            const q = vivaState.currentQ;
+
+            if(q.opts[sel.value].correct) {
+                vivaState.correct += 1;
+                vivaState.score += 10; vivaState.streak += 1;
+                if(vivaState.streak > vivaState.best) vivaState.best = vivaState.streak;
+                showOut('out-s12', `<div class="correct">✓ Correct! +10 Points</div><p>${q.expl}</p><button class="btn-success" id="btn-s12-next">Next Question</button>`);
+                document.getElementById('btn-s12-next').addEventListener('click', generateS12Question);
+            } else {
+                vivaState.streak = 0;
+                let correctOpt = q.opts.find(o => o.correct).text;
+                showOut('out-s12', `<div class="incorrect">✗ Incorrect. Streak broken!</div><p>${q.expl}</p><p>Correct answer: <b>${correctOpt}</b></p><button class="btn-secondary" id="btn-s12-retry">Try Again</button>`);
+                document.getElementById('btn-s12-retry').addEventListener('click', generateS12Question);
+            }
+            
+            let acc = (vivaState.correct / vivaState.attempts) * 100;
+
+            document.getElementById('viva-score').innerText = vivaState.score;
+            document.getElementById('viva-streak').innerText = vivaState.streak;
+            document.getElementById('viva-best').innerText = vivaState.best;
+            document.getElementById('viva-accuracy').innerText = `${acc.toFixed(0)}%`;
+            document.getElementById('s12-submit-btn').style.display = 'none';
+        }
+
+        /* --- SECTION 13: ERROR SOURCE DETECTIVE --- */
+        let detState = { score: 0, streak: 0, best: 0, attempts: 0, correct: 0, currentQ: null };
+
+        function generateS13Question() {
+            document.getElementById('out-s13').style.display = 'none';
+            document.getElementById('s13-submit-btn').style.display = 'inline-block';
+            
+            let val = (Math.random() * 20 + 5).toFixed(2);
+            let err = (Math.random() * 1.5 + 0.1).toFixed(2);
+            let varsList = [['Mass', 'Diameter'], ['Voltage', 'Current'], ['Length', 'Time'], ['Force', 'Area']];
+            let pair = varsList[Math.floor(Math.random() * varsList.length)];
+            
+            let p1 = Math.floor(Math.random() * 25) + 1; 
+            let p2 = 100 - p1; 
+            
+            if(Math.random() > 0.5) {
+                let temp = p1; p1 = p2; p2 = temp;
+            }
+            
+            let qText = `<strong>Measured Result:</strong> ${val} ± ${err} units<br><br>
+                         <strong>Uncertainty Contributions:</strong><br>
+                         ${pair[0]} contribution: ${p1}%<br>
+                         ${pair[1]} contribution: ${p2}%<br><br>
+                         <em>To most effectively reduce the overall uncertainty of this experiment, which measurement should you improve?</em>`;
+            
+            let dominantVar = p1 > p2 ? pair[0] : pair[1];
+            let expl = `When designing experiments, always target the <strong>dominant source of error</strong> first. Improving a measurement that only contributes a tiny fraction to the total uncertainty is an inefficient use of time and resources. Here, you should improve the <b>${dominantVar}</b> measurement.`;
+            
+            detState.currentQ = {
+                expl: expl,
+                optsData: [
+                    { text: pair[0], correct: p1 > p2 },
+                    { text: pair[1], correct: p2 > p1 },
+                    { text: "Both equally", correct: false },
+                    { text: "Neither", correct: false }
+                ]
+            };
+            
+            document.getElementById('s13-question-container').innerHTML = qText;
+            let optHtml = '';
+            detState.currentQ.optsData.forEach((o, i) => { 
+                optHtml += `<label class="mcq-option"><input type="radio" name="s13-opt" value="${i}"> ${o.text}</label>`; 
+            });
+            document.getElementById('s13-options-container').innerHTML = optHtml;
+        }
+
+        function checkS13Answer() {
+            const sel = document.querySelector('input[name="s13-opt"]:checked');
+            if(!sel) return alert("Select an option!");
+            
+            detState.attempts += 1;
+            const q = detState.currentQ;
+
+            if(q.optsData[sel.value].correct) {
+                detState.correct += 1;
+                detState.score += 10; detState.streak += 1;
+                if(detState.streak > detState.best) detState.best = detState.streak;
+                showOut('out-s13', `<div class="correct">✓ Correct! +10 Points</div><p>${q.expl}</p><button class="btn-success" id="btn-s13-next">Next Case</button>`);
+                document.getElementById('btn-s13-next').addEventListener('click', generateS13Question);
+            } else {
+                detState.streak = 0;
+                let correctOpt = q.optsData.find(o => o.correct).text;
+                showOut('out-s13', `<div class="incorrect">✗ Incorrect. Streak broken!</div><p>${q.expl}</p><p>Correct answer: <b>${correctOpt}</b></p><button class="btn-secondary" id="btn-s13-retry">Try Again</button>`);
+                document.getElementById('btn-s13-retry').addEventListener('click', generateS13Question);
+            }
+            
+            let acc = (detState.correct / detState.attempts) * 100;
+
+            document.getElementById('det-score').innerText = detState.score;
+            document.getElementById('det-streak').innerText = detState.streak;
+            document.getElementById('det-best').innerText = detState.best;
+            document.getElementById('det-accuracy').innerText = `${acc.toFixed(0)}%`;
+            document.getElementById('s13-submit-btn').style.display = 'none';
+        }
+
+        /* --- SECTION 14: OLYMPIAD SANDBOX (WEIGHTED MEAN) --- */
+        function calcS14() {
+            const raw = document.getElementById('s14-data').value;
+            const lines = raw.split('\n');
+            let sumW = 0, sumWX = 0, valid = true;
+
+            for(let line of lines) {
+                if(!line.trim()) continue;
+                let parts = line.split(',');
+                if(parts.length !== 2) { valid = false; break; }
+                
+                let x = parseFloat(parts[0].trim());
+                let err = parseFloat(parts[1].trim());
+                
+                if(isNaN(x) || isNaN(err) || err <= 0) { valid = false; break; }
+
+                let w = 1.0 / (err * err);
+                sumW += w;
+                sumWX += w * x;
+            }
+
+            if(!valid || sumW === 0) return alert("Please enter valid pairs of 'value, error' separated by a comma on each line. Error must be > 0.");
+
+            let bestX = sumWX / sumW;
+            let bestErr = 1.0 / Math.sqrt(sumW);
+            let formatted = formatMeasurement(bestX, bestErr);
+
+            const h = `
+                $\\sum w_i = ${sumW.toFixed(4)}$<br>
+                $\\sum w_i x_i = ${sumWX.toFixed(4)}$<br><br>
+                Weighted Mean ($x_{best}$) = ${bestX.toFixed(4)}<br>
+                Uncertainty ($\\Delta x_{best}$) = ${bestErr.toFixed(4)}<br><br>
+                <b>Final Optimum Result: ${formatted}</b>
+            `;
+            
+            showOut('out-s14', h);
+            logToNotebook("Weighted Mean Calculation", h);
+        }
+
+        /* --- SECTION 15: ACCURACY VS PRECISION BOARD --- */
+        function drawDartboard(state) {
+            const canvas = document.getElementById('dartboard-canvas');
+            const ctx = canvas.getContext('2d');
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            ctx.clearRect(0,0, canvas.width, canvas.height);
+            
+            // Draw Target
+            ctx.fillStyle = '#e74c3c'; ctx.beginPath(); ctx.arc(cx, cy, 100, 0, 2*Math.PI); ctx.fill();
+            ctx.fillStyle = '#ecf0f1'; ctx.beginPath(); ctx.arc(cx, cy, 75, 0, 2*Math.PI); ctx.fill();
+            ctx.fillStyle = '#e74c3c'; ctx.beginPath(); ctx.arc(cx, cy, 50, 0, 2*Math.PI); ctx.fill();
+            ctx.fillStyle = '#f1c40f'; ctx.beginPath(); ctx.arc(cx, cy, 25, 0, 2*Math.PI); ctx.fill();
+
+            // Establish shared offset for systematic bias
+            let sharedOffX = 0, sharedOffY = 0;
+            if (state === 'pna' || state === 'none') {
+                let offsetTheta = Math.random() * 2 * Math.PI;
+                let rOff = (state === 'pna') ? 60 : 50 + Math.random() * 20; 
+                sharedOffX = rOff * Math.cos(offsetTheta);
+                sharedOffY = rOff * Math.sin(offsetTheta);
+            }
+
+            // Draw Dots via True 2D Gaussian Scatter
+            ctx.fillStyle = '#2c3e50';
+            for(let i=0; i<8; i++) {
+                let px = cx, py = cy;
+                if(state === 'ap') { 
+                    px += gaussian(0, 8); 
+                    py += gaussian(0, 8);
+                } else if(state === 'anp') { 
+                    px += gaussian(0, 35);
+                    py += gaussian(0, 35);
+                } else if(state === 'pna') { 
+                    px += sharedOffX + gaussian(0, 8);
+                    py += sharedOffY + gaussian(0, 8);
+                } else if (state === 'none') { 
+                    px += sharedOffX + gaussian(0, 35);
+                    py += sharedOffY + gaussian(0, 35);
+                }
+                ctx.beginPath(); ctx.arc(px, py, 6, 0, 2*Math.PI); ctx.fill();
+            }
+        }
+
+        /* --- SECTION 16: LINEAR REGRESSION --- */
+        let s16Chart, s16ResChart;
+        function calcS16() {
+            const raw = document.getElementById('s16-data').value;
+            const lines = raw.split('\n');
+            let dataX = [], dataY = [], dataDx = [], dataDy = [];
+
+            for(let line of lines) {
+                if(!line.trim()) continue;
+                let parts = line.split(',');
+                if(parts.length < 2) continue;
+                let x = parseFloat(parts[0].trim());
+                let y = parseFloat(parts[1].trim());
+                let dx = parts.length > 2 ? parseFloat(parts[2].trim()) : 0;
+                let dy = parts.length > 3 ? parseFloat(parts[3].trim()) : 0;
+                if(!isNaN(x) && !isNaN(y)) { 
+                    dataX.push(x); dataY.push(y);
+                    dataDx.push(isNaN(dx)?0:dx); dataDy.push(isNaN(dy)?0:dy);
+                }
+            }
+
+            const N = dataX.length;
+            if(N < 3) return alert("Please enter at least 3 valid coordinate pairs.");
+
+            // Check if we should use Weighted Least Squares (WLS)
+            let useWLS = dataDy.every(d => d > 0) && dataDy.length === N;
+
+            let m = 0, c = 0, dm = 0, dc = 0;
+            let sumX=0, sumY=0, sumXY=0, sumXX=0, delta=0;
+            let W = 0, meanY = 0;
+
+            if (useWLS) {
+                for(let i=0; i<N; i++) {
+                    let w = 1 / (dataDy[i] * dataDy[i]);
+                    W += w;
+                    sumX += w * dataX[i];
+                    sumY += w * dataY[i];
+                    sumXY += w * dataX[i] * dataY[i];
+                    sumXX += w * dataX[i] * dataX[i];
+                }
+                delta = (W * sumXX) - (sumX * sumX);
+                m = ((W * sumXY) - (sumX * sumY)) / delta;
+                c = ((sumXX * sumY) - (sumX * sumXY)) / delta;
+                dm = Math.sqrt(W / delta);
+                dc = Math.sqrt(sumXX / delta);
+                meanY = sumY / W; 
+            } else {
+                for(let i=0; i<N; i++) {
+                    sumX += dataX[i]; sumY += dataY[i];
+                    sumXY += dataX[i]*dataY[i]; sumXX += dataX[i]*dataX[i];
+                }
+                delta = (N * sumXX) - (sumX * sumX);
+                m = ((N * sumXY) - (sumX * sumY)) / delta;
+                c = ((sumXX * sumY) - (sumX * sumXY)) / delta;
+                meanY = sumY / N;
+
+                let Syy = 0;
+                for(let i=0; i<N; i++) { Syy += Math.pow(dataY[i] - m*dataX[i] - c, 2); }
+                Syy = Syy / (N - 2);
+
+                dm = Math.sqrt((N * Syy) / delta);
+                dc = Math.sqrt((sumXX * Syy) / delta);
+            }
+
+            let SStot = 0, SSres = 0, chiSq = 0;
+            for(let i=0; i<N; i++) {
+                let expectedY = m*dataX[i] + c;
+                let residual = dataY[i] - expectedY;
+                SSres += Math.pow(residual, 2);
+                SStot += Math.pow(dataY[i] - meanY, 2);
+                if (useWLS) {
+                    chiSq += Math.pow(residual / dataDy[i], 2);
+                }
+            }
+            
+            let R2 = 1 - (SSres / SStot);
+            let chiSqHTML = useWLS ? `$\\chi^2 = ${chiSq.toFixed(4)}$<br>Reduced $\\chi^2_\\nu = ${(chiSq/(N-2)).toFixed(4)}$<br>` : '';
+            let fitMethod = useWLS ? "Weighted Least Squares (WLS)" : "Ordinary Least Squares (OLS)";
+
+            const h = `
+                <b>Linear Fit ($y = mx + c$) via ${fitMethod}</b><br><br>
+                Slope ($m$) = ${m.toFixed(4)} ± ${dm.toFixed(4)}<br>
+                Intercept ($c$) = ${c.toFixed(4)} ± ${dc.toFixed(4)}<br>
+                Goodness of Fit ($R^2$) = ${R2.toFixed(4)}<br>
+                ${chiSqHTML}<br>
+                <b>Final Slope = ${formatMeasurement(m, dm)}</b><br><br>
+                <details>
+                    <summary>View Derivation Formulas</summary>
+                    <div style="margin-top:10px;">
+                        ${useWLS ? 
+                        `$W = \\sum \\frac{1}{(\\Delta y_i)^2}$<br><br>
+                        $\\Delta = W \\sum w_i x_i^2 - \\left(\\sum w_i x_i\\right)^2$<br><br>
+                        $m = \\frac{W \\sum w_i x_i y_i - \\sum w_i x_i \\sum w_i y_i}{\\Delta}$<br><br>
+                        $c = \\frac{\\sum w_i x_i^2 \\sum w_i y_i - \\sum w_i x_i \\sum w_i x_i y_i}{\\Delta}$<br><br>
+                        $\\Delta m = \\sqrt{\\frac{W}{\\Delta}}$<br><br>
+                        $\\Delta c = \\sqrt{\\frac{\\sum w_i x_i^2}{\\Delta}}$`
+                        :
+                        `$\\Delta = N \\sum x_i^2 - \\left(\\sum x_i\\right)^2$<br><br>
+                        $m = \\frac{N \\sum (x_iy_i) - \\sum x_i \\sum y_i}{\\Delta}$<br><br>
+                        $c = \\frac{\\sum x_i^2 \\sum y_i - \\sum x_i \\sum (x_iy_i)}{\\Delta}$<br><br>
+                        $S_{yy} = \\frac{\\sum (y_i - mx_i - c)^2}{N-2}$<br><br>
+                        $\\Delta m = \\sqrt{\\frac{N S_{yy}}{\\Delta}}$<br><br>
+                        $\\Delta c = \\sqrt{\\frac{\\sum x_i^2 S_{yy}}{\\Delta}}$`
+                        }
+                    </div>
+                </details>
+            `;
+            showOut('out-s16', h); logToNotebook("Linear Regression Fit", h);
+
+            const ctx = document.getElementById('s16-chart').getContext('2d');
+            if(s16Chart) s16Chart.destroy();
+            
+            const minX = Math.min(...dataX);
+            const maxX = Math.max(...dataX);
+            const fitLine = [ {x: minX, y: m*minX + c}, {x: maxX, y: m*maxX + c} ];
+
+            const scatterData = dataX.map((x,i) => ({x: x, y: dataY[i], rawX: x, rawY: dataY[i], dx: dataDx[i], dy: dataDy[i]}));
+
+            s16Chart = new Chart(ctx, {
+                plugins: [errorBarPlugin],
+                data: {
+                    datasets: [
+                        { label: 'Best Fit Line', data: fitLine, borderColor: '#3498db', type: 'line', pointRadius: 0 },
+                        { label: 'Experimental Data', customErrorBars: true, data: scatterData, backgroundColor: '#e74c3c', type: 'scatter', pointRadius: 6 }
+                    ]
+                },
+                options: {
+                    scales: { x: { title: { display: true, text: 'X Data' } }, y: { title: { display: true, text: 'Y Data' } } }
+                }
+            });
+
+            // Residual Plot Generation
+            const ctxRes = document.getElementById('s16-res-chart').getContext('2d');
+            if(s16ResChart) s16ResChart.destroy();
+            
+            const resData = dataX.map((x, i) => ({x: x, y: dataY[i] - (m*x + c)}));
+
+            s16ResChart = new Chart(ctxRes, {
+                data: {
+                    datasets: [
+                        { label: 'Ideal Fit (y=0)', data: [{x: minX, y: 0}, {x: maxX, y: 0}], borderColor: '#7f8c8d', type: 'line', pointRadius: 0, borderDash: [5, 5] },
+                        { label: 'Residuals $r_i$', data: resData, backgroundColor: '#f39c12', type: 'scatter', pointRadius: 5 }
+                    ]
+                },
+                options: {
+                    scales: { x: { title: { display: true, text: 'X Data' } }, y: { title: { display: true, text: 'Residuals (Observation - Fit)' } } }
+                }
+            });
+        }
+
+        /* --- SECTION 17: ERROR PROPAGATION SHOWDOWN --- */
+        function calcS17() {
+            if(!validateInputs(['s17-A','s17-B'],['s17-eA','s17-eB'], false)) return;
+            const A = +document.getElementById('s17-A').value, eA = +document.getElementById('s17-eA').value;
+            const B = +document.getElementById('s17-B').value, eB = +document.getElementById('s17-eB').value;
+            const op = document.getElementById('s17-op').value;
+            
+            if((op === 'mul' || op === 'div') && (A === 0 || B === 0)) {
+                alert("Base values cannot be zero in multiplication or division error propagation (fractional error becomes infinite).");
+                return;
+            }
+
+            let val = 0;
+            let cbseErr = 0;
+            let statErr = 0;
+            let cbseH = "";
+            let statH = "";
+
+            if(op === 'add' || op === 'sub') {
+                val = op === 'add' ? A + B : A - B;
+                cbseErr = eA + eB;
+                statErr = Math.sqrt((eA * eA) + (eB * eB));
+                
+                cbseH = `
+                    $\\Delta Z = \\Delta A + \\Delta B$<br>
+                    $\\Delta Z = ${eA} + ${eB} = ${cbseErr.toFixed(2)}$<br><br>
+                    <b>$Z = ${formatMeasurement(val, cbseErr)}$</b>
+                `;
+                statH = `
+                    $\\Delta Z = \\sqrt{(\\Delta A)^2 + (\\Delta B)^2}$<br>
+                    $\\Delta Z = \\sqrt{${eA}^2 + ${eB}^2} = ${statErr.toFixed(2)}$<br><br>
+                    <b>$Z = ${formatMeasurement(val, statErr)}$</b>
+                `;
+            } else {
+                val = op === 'mul' ? A * B : A / B;
+                let fracA = eA / Math.abs(A);
+                let fracB = eB / Math.abs(B);
+                
+                let cbseFrac = fracA + fracB;
+                cbseErr = Math.abs(val) * cbseFrac;
+                
+                let statFrac = Math.sqrt((fracA * fracA) + (fracB * fracB));
+                statErr = Math.abs(val) * statFrac;
+
+                cbseH = `
+                    $\\frac{\\Delta Z}{Z} = \\frac{\\Delta A}{A} + \\frac{\\Delta B}{B}$<br>
+                    $\\frac{\\Delta Z}{Z} = ${fracA.toFixed(4)} + ${fracB.toFixed(4)} = ${cbseFrac.toFixed(4)}$<br>
+                    $\\Delta Z = ${Math.abs(val).toFixed(2)} \\times ${cbseFrac.toFixed(4)} = ${cbseErr.toFixed(2)}$<br><br>
+                    <b>$Z = ${formatMeasurement(val, cbseErr)}$</b>
+                `;
+                statH = `
+                    $\\left(\\frac{\\sigma_Z}{Z}\\right)^2 = \\left(\\frac{\\sigma_A}{A}\\right)^2 + \\left(\\frac{\\sigma_B}{B}\\right)^2$<br>
+                    $\\frac{\\Delta Z}{Z} = \\sqrt{\\left(\\frac{\\Delta A}{A}\\right)^2 + \\left(\\frac{\\Delta B}{B}\\right)^2}$<br>
+                    $\\frac{\\Delta Z}{Z} = \\sqrt{${fracA.toFixed(4)}^2 + ${fracB.toFixed(4)}^2} = ${statFrac.toFixed(4)}$<br>
+                    $\\Delta Z = ${Math.abs(val).toFixed(2)} \\times ${statFrac.toFixed(4)} = ${statErr.toFixed(2)}$<br><br>
+                    <b>$Z = ${formatMeasurement(val, statErr)}$</b>
+                `;
+            }
+
+            document.getElementById('out-s17-cbse').innerHTML = cbseH;
+            document.getElementById('out-s17-stat').innerHTML = statH;
+            document.getElementById('s17-grid').style.display = 'grid';
+            typeset('s17-grid');
+        }
+
+        /* --- SECTION 18: LEAST COUNT CALCULATOR --- */
+        function toggleS18Inputs() {
+            const type = document.getElementById('s18-type').value;
+            if (type === 'vernier') {
+                document.getElementById('s18-vernier-inputs').style.display = 'block';
+                document.getElementById('s18-screw-inputs').style.display = 'none';
+            } else {
+                document.getElementById('s18-vernier-inputs').style.display = 'none';
+                document.getElementById('s18-screw-inputs').style.display = 'block';
+            }
+        }
+
+        function calcS18() {
+            const type = document.getElementById('s18-type').value;
+            let h = "";
+            if (type === 'vernier') {
+                const msd = +document.getElementById('s18-v-msd').value;
+                const vsd = +document.getElementById('s18-v-vsd').value;
+                const match = +document.getElementById('s18-v-match').value;
+                
+                if (vsd === 0) return alert("VSD cannot be zero.");
+                if (msd <= 0 || match < 0) return alert("Please enter valid scale dimensions.");
+                
+                const oneVsdVal = (match / vsd) * msd;
+                const lc = Math.abs(msd - oneVsdVal);
+                
+                h = `
+                    <strong>Vernier Caliper LC:</strong><br>
+                    $1 \\text{ VSD} = \\frac{${match}}{${vsd}} \\times ${msd} = ${oneVsdVal.toPrecision(3)} \\text{ mm}$<br><br>
+                    $\\text{LC} = |1 \\text{ MSD} - 1 \\text{ VSD}|$<br>
+                    $\\text{LC} = |${msd} - ${oneVsdVal.toPrecision(3)}| = ${lc.toPrecision(3)} \\text{ mm}$
+                `;
+            } else {
+                const pitch = +document.getElementById('s18-s-pitch').value;
+                const div = +document.getElementById('s18-s-div').value;
+                if (div === 0) return alert("Circular Divisions cannot be zero.");
+                const lc = pitch / div;
+                h = `
+                    <strong>Screw Gauge / Spherometer LC:</strong><br>
+                    $\\text{LC} = \\frac{\\text{Pitch}}{\\text{Circular Divisions}}$<br><br>
+                    $\\text{LC} = \\frac{${pitch}}{${div}} = ${lc.toPrecision(3)} \\text{ units}$
+                `;
+            }
+            showOut('out-s18', h); logToNotebook("Least Count Calculator", h);
+        }
+
+        /* --- SECTION 19: FULL EXPERIMENTAL ERROR CALCULATOR --- */
+        function calcS19() {
+            if(!validateInputs(['s19-A','s19-B','s19-C'],['s19-eA','s19-eB','s19-eC'], false)) return;
+            
+            const A = +document.getElementById('s19-A').value, eA = +document.getElementById('s19-eA').value, pA = +document.getElementById('s19-pA').value;
+            const B = +document.getElementById('s19-B').value, eB = +document.getElementById('s19-eB').value, pB = +document.getElementById('s19-pB').value;
+            const C = +document.getElementById('s19-C').value, eC = +document.getElementById('s19-eC').value, pC = +document.getElementById('s19-pC').value;
+
+            if((A === 0 && pA < 0) || (B === 0 && pB < 0) || (C === 0 && pC < 0)) {
+                return alert("Division by zero detected based on negative powers.");
+            }
+
+            const Z = Math.pow(A, pA) * Math.pow(B, pB) * Math.pow(C, pC);
+            
+            const errFracA = Math.abs(pA) * (eA / Math.abs(A || 1e-9));
+            const errFracB = Math.abs(pB) * (eB / Math.abs(B || 1e-9));
+            const errFracC = Math.abs(pC) * (eC / Math.abs(C || 1e-9));
+
+            const totalFracErr = errFracA + errFracB + errFracC;
+            const dZ = Math.abs(Z) * totalFracErr;
+
+            const formatted = formatMeasurement(Z, dZ);
+
+            let budgetTable = `<table style="margin-top:15px; font-size:0.95rem; background:#fff;">
+                <tr style="background:#ecf0f1;"><th>Variable</th><th>Absolute Value</th><th>Uncertainty</th><th>Power $|n|$</th><th>Total Budget Contribution</th></tr>`;
+
+            budgetTable += `<tr><td>A</td><td>${A}</td><td>±${eA}</td><td>${Math.abs(pA)}</td><td><strong>${totalFracErr>0 ? ((errFracA/totalFracErr)*100).toFixed(1) : 0}%</strong></td></tr>`;
+            budgetTable += `<tr><td>B</td><td>${B}</td><td>±${eB}</td><td>${Math.abs(pB)}</td><td><strong>${totalFracErr>0 ? ((errFracB/totalFracErr)*100).toFixed(1) : 0}%</strong></td></tr>`;
+            budgetTable += `<tr><td>C</td><td>${C}</td><td>±${eC}</td><td>${Math.abs(pC)}</td><td><strong>${totalFracErr>0 ? ((errFracC/totalFracErr)*100).toFixed(1) : 0}%</strong></td></tr>`;
+            budgetTable += `</table>`;
+
+            const h = `
+                <strong>Formula:</strong> $Z = A^{${pA}} B^{${pB}} C^{${pC}}$<br><br>
+                <strong>Calculated Base Value:</strong> $Z = ${Z.toExponential(4)}$<br><br>
+                <strong>Error Propagation (Maximum Error):</strong><br>
+                $\\frac{\\Delta Z}{Z} = |${pA}|\\left(\\frac{${eA}}{${Math.abs(A)}}\\right) + |${pB}|\\left(\\frac{${eB}}{${Math.abs(B)}}\\right) + |${pC}|\\left(\\frac{${eC}}{${Math.abs(C)}}\\right)$<br>
+                $\\frac{\\Delta Z}{Z} = ${errFracA.toFixed(4)} + ${errFracB.toFixed(4)} + ${errFracC.toFixed(4)} = ${totalFracErr.toFixed(4)}$<br>
+                $\\Delta Z = ${Math.abs(Z).toExponential(4)} \\times ${totalFracErr.toFixed(4)} = ${dZ.toExponential(4)}$<br><br>
+                <strong>Final Experimental Record:</strong><br>
+                $Z = ${formatted}$
+                <hr>
+                <strong>Error Budget Analysis</strong>
+                ${budgetTable}
+            `;
+
+            showOut('out-s19', h);
+            logToNotebook("Full Experimental Record", h);
+        }
+
+        /* --- GLOBAL INITIALIZATION --- */
+        function setupEventListeners() {
+            document.getElementById('btn-s1').addEventListener('click', calcS1);
+            document.getElementById('btn-s2').addEventListener('click', calcS2);
+            document.getElementById('s3-slider').addEventListener('input', updateS3);
+            document.getElementById('btn-s4').addEventListener('click', calcS4);
+            document.getElementById('btn-s5').addEventListener('click', calcS5);
+            document.getElementById('btn-s6').addEventListener('click', calcS6);
+            
+            document.getElementById('arena-diff').addEventListener('change', generateS7Question);
+            document.getElementById('btn-s7-skip').addEventListener('click', generateS7Question);
+            document.getElementById('s7-submit-btn').addEventListener('click', checkS7Answer);
+            
+            document.getElementById('s8-inst').addEventListener('change', () => document.getElementById('out-s8').style.display = 'none');
+            document.getElementById('btn-s8').addEventListener('click', calcS8);
+            document.getElementById('btn-s9').addEventListener('click', calcS9);
+            
+            document.getElementById('s10-preset').addEventListener('change', loadS10Preset);
+            document.getElementById('btn-s10-update').addEventListener('click', generateS10Inputs);
+            
+            document.getElementById('btn-s11-new').addEventListener('click', generateS11Question);
+            document.getElementById('s11-submit-btn').addEventListener('click', checkS11Answer);
+            
+            document.getElementById('btn-s12-new').addEventListener('click', generateS12Question);
+            document.getElementById('s12-submit-btn').addEventListener('click', checkS12Answer);
+            
+            document.getElementById('btn-s13-new').addEventListener('click', generateS13Question);
+            document.getElementById('s13-submit-btn').addEventListener('click', checkS13Answer);
+            
+            document.getElementById('btn-s14').addEventListener('click', calcS14);
+
+            document.getElementById('btn-s15-ap').addEventListener('click', () => drawDartboard('ap'));
+            document.getElementById('btn-s15-anp').addEventListener('click', () => drawDartboard('anp'));
+            document.getElementById('btn-s15-pna').addEventListener('click', () => drawDartboard('pna'));
+            document.getElementById('btn-s15-none').addEventListener('click', () => drawDartboard('none'));
+
+            document.getElementById('btn-s16').addEventListener('click', calcS16);
+            document.getElementById('btn-s17').addEventListener('click', calcS17);
+            document.getElementById('s17-op').addEventListener('change', calcS17);
+
+            document.getElementById('s18-type').addEventListener('change', toggleS18Inputs);
+            document.getElementById('btn-s18').addEventListener('click', calcS18);
+
+            document.getElementById('btn-s19').addEventListener('click', calcS19);
+
+            document.getElementById('btn-print').addEventListener('click', () => window.print());
+        }
+
+        window.onload = function() {
+            setupEventListeners();
+            initS3();
+            generateS7Question(); 
+            loadS10Preset();
+            generateS11Question();
+            generateS12Question();
+            generateS13Question();
+            drawDartboard('ap'); 
+        };
     </script>
 </body>
 </html>
