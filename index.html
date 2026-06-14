@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Parallel Conductors & Ampere's Law Lab</title>
+    <title>Parallel Conductors & Ampere's Law Lab</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -322,7 +322,7 @@
                     <input type="range" id="slip-d" min="0.4" max="2.0" step="0.1" value="1">
                 </div>
                 <div class="toggle-row">
-                    <label style="cursor:pointer;"><input type="checkbox" id="chk-fields" checked> Show Field B-Rings</label>
+                    <label style="cursor:pointer;"><input type="checkbox" id="chk-fields" checked> Show Field Circulation Tracers</label>
                     <label style="cursor:pointer;"><input type="checkbox" id="chk-rhr" checked> Show Right-Hand Rule</label>
                 </div>
             </div>
@@ -688,6 +688,7 @@
             }
 
             if (cRHR.checked) {
+                // Kept physics orientation accurate mapped to inverted canvas coordinates
                 if (I1 !== 0) {
                     const b1Dir = I1 > 0 ? -1 : 1; 
                     drawArrow(w2x, midY, w2x, midY + (b1Dir * 35), '#db6d28', 2.5);
@@ -789,12 +790,28 @@
                 ctx.fillText("F₂₁", w2_currX - (vectorScale > 0 ? 24 : -8), canvasMidY + 4);
             }
 
+            // CHANGED: Expanded Canvas Legend Block to clarify visual metaphors
             if (I1 !== 0 || I2 !== 0) {
                 ctx.save();
+                
+                // Electrons Legend
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; ctx.font = '10px sans-serif';
                 ctx.beginPath(); ctx.arc(20, boxY + boxHeight - 16, 3, 0, 2 * Math.PI);
                 ctx.fillStyle = '#ffffff'; ctx.fill();
                 ctx.fillText("= Moving Charge Carriers (Electrons, e⁻)", 30, boxY + boxHeight - 13);
+                
+                // Field Tracers & Circulation Legend (if checked)
+                if (cFields.checked) {
+                    ctx.fillStyle = 'rgba(255, 150, 80, 0.8)';
+                    ctx.beginPath(); ctx.arc(20, boxY + boxHeight - 28, 3, 0, 2 * Math.PI); ctx.fill();
+                    ctx.fillStyle = '#8b949e';
+                    ctx.fillText("= Animated tracer showing field direction", 30, boxY + boxHeight - 25);
+
+                    ctx.strokeStyle = 'rgba(219, 109, 40, 0.6)'; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]);
+                    ctx.beginPath(); ctx.moveTo(15, boxY + boxHeight - 40); ctx.lineTo(25, boxY + boxHeight - 40); ctx.stroke();
+                    ctx.fillText("= Field circulation around conductor", 30, boxY + boxHeight - 37);
+                }
+                
                 ctx.restore();
             }
 
@@ -855,7 +872,6 @@
             ctx.restore(); ctx.restore();
         }
 
-        // FIXED MOBILE SYSTEM COMPATIBILITY BUG: Dropped experimental .letterSpacing property layer to enforce Android Chrome wrapper stability
         function drawSectionLabel(text, x, y) {
             ctx.save(); 
             ctx.fillStyle = '#8b949e'; 
