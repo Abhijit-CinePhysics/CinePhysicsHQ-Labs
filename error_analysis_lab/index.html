@@ -8,10 +8,8 @@
     <meta name="description" content="An interactive virtual physics laboratory by CinePhysicsHQ. Learn error propagation, measurement uncertainty, Monte Carlo simulations, and linear regression.">
     <meta name="robots" content="index, follow">
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        MathJax = { tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] } };
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
     
     <style>
@@ -109,7 +107,7 @@
         <h1>Uncertainty & Error Analysis</h1>
         
         <div class="info-note" style="background: #e8f4f8; padding: 15px; border-radius: 8px; border-left: 4px solid #3498db; margin-bottom: 30px; font-size: 1.1rem;">
-            <strong>🧪 Teaching Note:</strong> Sections 1–5 utilize <em>Maximum Possible Error</em> propagation (Standard CBSE/JEE convention). Sections 6, 9 & 16 utilize <em>Statistical Uncertainty</em> methods. Understanding the difference between absolute bounds and statistical likelihood is a fundamental skill in experimental physics!
+            <strong>🧪 Teaching Note:</strong> Sections 1–5 and 19 utilize <em>Maximum Possible Error</em> propagation. Sections 6, 9 & 16 utilize <em>Statistical Uncertainty</em> methods. Understanding the difference between absolute worst-case bounds and statistical likelihood is a fundamental skill in experimental physics!
         </div>
 
         <div class="lab-section" id="section-1">
@@ -184,7 +182,7 @@
                 <strong>⚠️ Important:</strong> In this section, entered uncertainties are treated as <strong>1σ standard deviations</strong>, not maximum possible errors.
             </div>
             <div class="info-note" style="margin-bottom: 15px;">
-                <em>Physics Note:</em> Gaussian distributions mathematically extend to negative infinity. To maintain physically meaningful dimensions, we employ <strong>rejection sampling</strong> to discard non-physical negative values without skewing the distribution.<br>
+                <em>Physics Note:</em> Gaussian distributions mathematically extend to negative infinity. To maintain physically meaningful dimensions, we employ <strong>rejection sampling</strong> to discard non-physical negative values without skewing the core distribution.<br>
                 <em>Advanced Note:</em> The area is a product ($A = L \times B$). The resulting distribution becomes approximately Gaussian only for small relative uncertainties.
             </div>
             
@@ -201,9 +199,9 @@
             
             <label for="s6-sigma">Desired Interval Bound: </label>
             <select id="s6-sigma" style="width:120px;">
-                <option value="1">1σ (68%)</option>
-                <option value="2">2σ (95%)</option>
-                <option value="3" selected>3σ (99.7%)</option>
+                <option value="1">1σ (Approx 68%)</option>
+                <option value="2">2σ (Approx 95%)</option>
+                <option value="3" selected>3σ (Approx 99.7%)</option>
             </select><br>
             
             <button id="btn-s6">Run Simulation</button>
@@ -243,7 +241,7 @@
             <label for="s8-convention"><strong>Convention:</strong> </label>
             <select id="s8-convention" style="margin-bottom: 15px; width: 300px;">
                 <option value="school">School Convention (Scale = LC/2, Vernier/Screw = LC)</option>
-                <option value="uni">University (All Instruments = LC/2)</option>
+                <option value="uni">University Convention (All Instruments = LC/2)</option>
                 <option value="mfg">Manufacturer (All Instruments = LC)</option>
             </select><br>
 
@@ -261,8 +259,8 @@
         </div>
 
         <div class="lab-section" id="section-9">
-            <h2>Section 9: Real Experimental Data Mode</h2>
-            <p>Paste repeated practical measurements to generate standard statistical uncertainties and error bands. Compare across three standard methodologies.</p>
+            <h2>Section 9: Statistical Data Analysis</h2>
+            <p>Compare standard methodologies. Note: Standard Deviation is calculated using the Bessel-corrected formula ($\sigma_{n-1}$).</p>
             <textarea id="s9-data" rows="5" style="width:100%; max-width:300px;">2.51&#10;2.48&#10;2.52&#10;2.50&#10;2.49</textarea><br>
             <button id="btn-s9">Analyze Data</button>
             <div id="out-s9" class="output-box"></div>
@@ -383,7 +381,7 @@
         <div class="lab-section" id="section-16">
             <h2>Section 16: Linear Regression Laboratory (Undergraduate)</h2>
             <p>Input experimental coordinates to perform Least Squares Fitting. If strictly positive $\Delta y$ uncertainties are provided for all points, the system automatically shifts to <strong>Weighted Least Squares (WLS)</strong> fitting.</p>
-            <div class="info-note">Format: <code>x, y, dx, dy</code> <br><strong>Note:</strong> $\Delta x$ error bars are for visual purposes only and are not included in the regression mathematics.</div>
+            <div class="info-note">Format: <code>x, y, dx, dy</code> <br><strong>Note:</strong> $\Delta x$ error bars are for visual purposes only and are not included in the mathematical fit algorithm.</div>
             <textarea id="s16-data" rows="6" style="width:100%; max-width:300px; margin-top: 10px;">1.0, 2.1, 0, 0.4&#10;2.0, 3.9, 0, 0.5&#10;3.0, 6.2, 0, 0.6&#10;4.0, 8.1, 0, 0.5&#10;5.0, 9.8, 0, 0.7</textarea><br>
             <button id="btn-s16">Compute Best Fit Line & Residuals</button>
             <div id="out-s16" class="output-box"></div>
@@ -455,7 +453,7 @@
             
             <div class="info-note">Calculate propagation for a general power-law equation: $Z = \frac{A^a B^b}{C^c}$</div>
 
-            <div style="background:#f8f9fa; padding:15px; border-radius:8px; border:1px solid #ddd; margin-top: 15px;">
+            <div style="background:#f8f9fa; padding:15px; border-radius:8px; border:1px solid #ddd; margin-top: 15px; overflow-x: auto;">
                 <label style="display:inline-block; width:40px;"><b>A = </b></label> <input type="number" id="s19-A" value="5" style="width:80px"> ± <input type="number" id="s19-eA" value="0.1" style="width:80px"> | Power ($a$) <input type="number" id="s19-pA" value="2" style="width:60px"><br><br>
                 <label style="display:inline-block; width:40px;"><b>B = </b></label> <input type="number" id="s19-B" value="2" style="width:80px"> ± <input type="number" id="s19-eB" value="0.2" style="width:80px"> | Power ($b$) <input type="number" id="s19-pB" value="1" style="width:60px"><br><br>
                 <label style="display:inline-block; width:40px;"><b>C = </b></label> <input type="number" id="s19-C" value="8" style="width:80px"> ± <input type="number" id="s19-eC" value="0.1" style="width:80px"> | Power ($c$) <input type="number" id="s19-pC" value="-3" style="width:60px"><br>
@@ -554,7 +552,7 @@
 
         /* --- Robust Scientific Result Formatting --- */
         function formatMeasurement(value, error) {
-            if (error === 0) return `${value} ± 0`;
+            if (error <= 0) return `${value} ± 0`;
             const firstDigit = parseInt(Math.abs(error).toExponential().charAt(0));
             const sigFigs = (firstDigit === 1 || firstDigit === 2) ? 2 : 1;
             let errVal = parseFloat(error.toPrecision(sigFigs));
@@ -570,7 +568,9 @@
             const H = +document.getElementById('s1-H').value, eH = +document.getElementById('s1-eH').value;
             const V = L*B*H, rel = (eL/L)+(eB/B)+(eH/H), eV = V*rel;
             const formatted = formatMeasurement(V, eV);
-            const h = `V = ${V.toFixed(2)} m³<br>$\\frac{\\Delta V}{V} = ${rel.toFixed(4)}$<br>Percentage Error = ${(rel*100).toFixed(2)}%<br><b>Final: V = (${formatted}) m³</b>`;
+            const h = `V = ${V.toFixed(2)} m³<br>
+                $\\Delta V = V \\left(\\frac{\\Delta L}{L} + \\frac{\\Delta B}{B} + \\frac{\\Delta H}{H}\\right)$<br>
+                $\\frac{\\Delta V}{V} = ${rel.toFixed(4)}$<br>Percentage Error = ${(rel*100).toFixed(2)}%<br><b>Final: V = (${formatted}) m³</b>`;
             showOut('out-s1', h); logToNotebook("Volume Calculation", h);
         }
 
@@ -667,7 +667,6 @@
             if(eL===0 && eB===0) return alert("Errors must be > 0");
             let areas=[], minA=Infinity, maxA=-Infinity;
             for(let i=0; i<N; i++){ 
-                // Rejection sampling for true physical bounds
                 let L_sample = -1;
                 while (L_sample <= 0) { L_sample = gaussian(L, eL); }
                 let B_sample = -1;
@@ -686,7 +685,7 @@
             
             let lowerBound = mean - (sigmaMult * std);
             let upperBound = mean + (sigmaMult * std);
-            let percentTag = sigmaMult === 1 ? '68' : sigmaMult === 2 ? '95' : '99.7';
+            let percentTag = sigmaMult === 1 ? 'Approx 68' : sigmaMult === 2 ? 'Approx 95' : 'Approx 99.7';
 
             showOut('out-s6', `Mean Area = ${mean.toFixed(2)} cm²<br>Standard Deviation ($\\sigma$) = ${std.toFixed(2)} cm²<br><br><strong>${percentTag}% Interval bound (Mean ± ${sigmaMult}σ):</strong><br>${lowerBound.toFixed(2)} → ${upperBound.toFixed(2)} cm²`);
             
@@ -967,7 +966,7 @@
                     <div class="comparison-box">
                         <h3 style="margin-top: 0; color: #2980b9;">Standard Error (University)</h3>
                         Standard Deviation ($\\sigma_{n-1}$) = ${stdDev.toFixed(4)}<br>
-                        Standard Error of Mean ($\\Delta x$) = ${stdErr.toFixed(4)}<br>
+                        Standard Error of Mean ($SEM$) = ${stdErr.toFixed(4)}<br>
                         Percentage Error = ${percErr.toFixed(2)}%<br><br>
                         <strong>Final Result: ${formattedStat}</strong><br>
                         <span style="font-size:0.85rem; color:#2980b9; display:block; margin-top:10px;">(Rigorous university/research standard.)</span>
@@ -983,6 +982,10 @@
             const meanData = vals.map((_, i) => ({ x: i + 1, y: mean }));
             const upperData = vals.map((_, i) => ({ x: i + 1, y: mean + stdDev }));
             const lowerData = vals.map((_, i) => ({ x: i + 1, y: mean - stdDev }));
+            
+            // New SEM Band
+            const semUpperData = vals.map((_, i) => ({ x: i + 1, y: mean + stdErr }));
+            const semLowerData = vals.map((_, i) => ({ x: i + 1, y: mean - stdErr }));
 
             s9Chart = new Chart(ctx, {
                 data: {
@@ -990,8 +993,8 @@
                         {
                             label: 'Mean + 1σ',
                             data: upperData,
-                            borderColor: 'rgba(52, 152, 219, 0.3)',
-                            backgroundColor: 'rgba(52, 152, 219, 0.1)',
+                            borderColor: 'rgba(231, 76, 60, 0.3)',
+                            backgroundColor: 'rgba(231, 76, 60, 0.05)',
                             fill: '+1', 
                             type: 'line',
                             pointRadius: 0,
@@ -1000,11 +1003,30 @@
                         {
                             label: 'Mean - 1σ',
                             data: lowerData,
-                            borderColor: 'rgba(52, 152, 219, 0.3)',
+                            borderColor: 'rgba(231, 76, 60, 0.3)',
                             fill: false,
                             type: 'line',
                             pointRadius: 0,
                             borderDash: [5, 5]
+                        },
+                        {
+                            label: 'Mean + SEM',
+                            data: semUpperData,
+                            borderColor: 'rgba(52, 152, 219, 0.5)',
+                            backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                            fill: '+1', 
+                            type: 'line',
+                            pointRadius: 0,
+                            borderDash: [2, 2]
+                        },
+                        {
+                            label: 'Mean - SEM',
+                            data: semLowerData,
+                            borderColor: 'rgba(52, 152, 219, 0.5)',
+                            fill: false,
+                            type: 'line',
+                            pointRadius: 0,
+                            borderDash: [2, 2]
                         },
                         {
                             label: 'Mean',
@@ -1029,7 +1051,7 @@
                         y: { title: { display: true, text: 'Observed Value' } }
                     },
                     plugins: {
-                        legend: { labels: { filter: item => item.text !== 'Mean - 1σ' } }
+                        legend: { labels: { filter: item => !item.text.includes('-') } }
                     }
                 }
             });
@@ -1139,22 +1161,19 @@
         /* --- SECTION 11: SIG FIGS CHALLENGE (Robust Parser) --- */
         let sigState = { score: 0, streak: 0, best: 0, attempts: 0, correct: 0, currentQ: null };
 
-        function countSigFigs(numStr) {
-            let n = numStr.trim().toLowerCase().replace(/^-/, '');
-            if (n.includes('e')) n = n.split('e')[0]; 
+        function countSigFigs(str) {
+            str = str.trim().toLowerCase().replace(/^-/, '');
+            if(str.includes('e')) str = str.split(/[eE]/)[0];
             
-            // Flag mathematical ambiguity for integers with trailing zeros and no decimal.
-            if (!n.includes('.') && n.replace(/0+$/, '').length !== n.length) {
-                return "Ambiguous";
+            // Explicit ambiguity check (integers ending in zero without decimal)
+            if (!str.includes('.') && str.replace(/0+$/, '').length !== str.length) {
+                return "Ambiguous"; 
             }
 
-            if (parseFloat(n) === 0) {
-                if (!n.includes('.')) return 1;
-                return n.split('.')[1].length || 1; 
+            if(str.includes('.')){
+                return str.replace('.', '').replace(/^0+/, '').length || 1;
             }
-            if (!n.includes('.')) return n.length; 
-            if (n.endsWith('.')) return n.replace('.', '').length; 
-            return n.replace('.', '').replace(/^0+/, '').length; 
+            return str.replace(/^0+/, '').replace(/0+$/, '').length || 1;
         }
 
         function countDecimals(numStr) {
@@ -1207,7 +1226,8 @@
                     { text: correctAns, correct: true },
                     { text: rawAns.toFixed(targetDP + 1), correct: false },
                     { text: rawAns.toFixed(Math.max(0, targetDP - 1)), correct: false },
-                    { text: Number(rawAns.toPrecision(Math.min(countSigFigs(a), countSigFigs(b)))).toString(), correct: false }
+                    // Force an ambiguous evaluation fallback string if countSigFigs returns 'Ambiguous'
+                    { text: Number(rawAns.toPrecision(Math.min(typeof countSigFigs(a) === 'number' ? countSigFigs(a) : 1, typeof countSigFigs(b) === 'number' ? countSigFigs(b) : 1))).toString(), correct: false }
                 ];
             }
 
@@ -1528,6 +1548,53 @@
 
         /* --- SECTION 16: LINEAR REGRESSION --- */
         let s16Chart, s16ResChart;
+        function performRegression(dataX, dataY, dataDy, N) {
+            let hasDy = dataDy.some(d => d > 0);
+            let m, c, dm, dc, chiSq = 0, R2 = 0;
+
+            if (hasDy) { // Weighted Least Squares
+                let W = 0, sX = 0, sY = 0, sXY = 0, sXX = 0;
+                for(let i=0; i<N; i++) {
+                    let w = 1 / Math.pow(dataDy[i], 2);
+                    W += w; sX += w*dataX[i]; sY += w*dataY[i]; 
+                    sXY += w*dataX[i]*dataY[i]; sXX += w*dataX[i]*dataX[i];
+                }
+                let delta = W * sXX - sX * sX;
+                m = (W * sXY - sX * sY) / delta;
+                c = (sXX * sY - sX * sXY) / delta;
+                dm = Math.sqrt(W / delta);
+                dc = Math.sqrt(sXX / delta);
+            } else { // Ordinary Least Squares
+                let sX = 0, sY = 0, sXY = 0, sXX = 0;
+                for(let i=0; i<N; i++) {
+                    sX += dataX[i]; sY += dataY[i]; sXY += dataX[i]*dataY[i]; sXX += dataX[i]*dataX[i];
+                }
+                let delta = (N * sXX) - (sX * sX);
+                m = (N * sXY - sX * sY) / delta;
+                c = (sXX * sY - sX * sXY) / delta;
+                
+                let Syy = 0;
+                for(let i=0; i<N; i++) Syy += Math.pow(dataY[i] - (m*dataX[i] + c), 2);
+                let var_m = (N * (Syy / (N - 2))) / delta;
+                let var_c = (sXX * (Syy / (N - 2))) / delta;
+                dm = Math.sqrt(var_m);
+                dc = Math.sqrt(var_c);
+            }
+
+            // Diagnostics
+            let sY = dataY.reduce((a,b)=>a+b,0)/N;
+            let SSres = 0, SStot = 0;
+            for(let i=0; i<N; i++) {
+                let res = dataY[i] - (m*dataX[i] + c);
+                SSres += Math.pow(res, 2);
+                SStot += Math.pow(dataY[i] - sY, 2);
+                if (hasDy && dataDy[i] > 0) chiSq += Math.pow(res / dataDy[i], 2);
+            }
+            R2 = 1 - (SSres / SStot);
+            
+            return { m, c, dm, dc, chiSq: hasDy ? chiSq : null, R2, hasDy };
+        }
+
         function calcS16() {
             const raw = document.getElementById('s16-data').value;
             const lines = raw.split('\n');
@@ -1550,72 +1617,23 @@
             const N = dataX.length;
             if(N < 3) return alert("Please enter at least 3 valid coordinate pairs.");
 
-            // Check if we should use Weighted Least Squares (WLS)
-            let useWLS = dataDy.every(d => d > 0) && dataDy.length === N;
+            const { m, c, dm, dc, chiSq, R2, hasDy } = performRegression(dataX, dataY, dataDy, N);
 
-            let m = 0, c = 0, dm = 0, dc = 0;
-            let sumX=0, sumY=0, sumXY=0, sumXX=0, delta=0;
-            let W = 0, meanY = 0;
-
-            if (useWLS) {
-                for(let i=0; i<N; i++) {
-                    let w = 1 / (dataDy[i] * dataDy[i]);
-                    W += w;
-                    sumX += w * dataX[i];
-                    sumY += w * dataY[i];
-                    sumXY += w * dataX[i] * dataY[i];
-                    sumXX += w * dataX[i] * dataX[i];
-                }
-                delta = (W * sumXX) - (sumX * sumX);
-                m = ((W * sumXY) - (sumX * sumY)) / delta;
-                c = ((sumXX * sumY) - (sumX * sumXY)) / delta;
-                dm = Math.sqrt(W / delta);
-                dc = Math.sqrt(sumXX / delta);
-                meanY = sumY / W; 
-            } else {
-                for(let i=0; i<N; i++) {
-                    sumX += dataX[i]; sumY += dataY[i];
-                    sumXY += dataX[i]*dataY[i]; sumXX += dataX[i]*dataX[i];
-                }
-                delta = (N * sumXX) - (sumX * sumX);
-                m = ((N * sumXY) - (sumX * sumY)) / delta;
-                c = ((sumXX * sumY) - (sumX * sumXY)) / delta;
-                meanY = sumY / N;
-
-                let Syy = 0;
-                for(let i=0; i<N; i++) { Syy += Math.pow(dataY[i] - m*dataX[i] - c, 2); }
-                Syy = Syy / (N - 2);
-
-                dm = Math.sqrt((N * Syy) / delta);
-                dc = Math.sqrt((sumXX * Syy) / delta);
-            }
-
-            let SStot = 0, SSres = 0, chiSq = 0;
-            for(let i=0; i<N; i++) {
-                let expectedY = m*dataX[i] + c;
-                let residual = dataY[i] - expectedY;
-                SSres += Math.pow(residual, 2);
-                SStot += Math.pow(dataY[i] - meanY, 2);
-                if (useWLS) {
-                    chiSq += Math.pow(residual / dataDy[i], 2);
-                }
-            }
-            
-            let R2 = 1 - (SSres / SStot);
-            let chiSqHTML = useWLS ? `$\\chi^2 = ${chiSq.toFixed(4)}$<br>Reduced $\\chi^2_\\nu = ${(chiSq/(N-2)).toFixed(4)}$<br>` : '';
-            let fitMethod = useWLS ? "Weighted Least Squares (WLS)" : "Ordinary Least Squares (OLS)";
+            let chiSqHTML = hasDy ? `$\\chi^2 = ${chiSq.toFixed(4)}$<br>Reduced $\\chi^2_\\nu = ${(chiSq/(N-2)).toFixed(4)}$<br>` : '';
+            let fitMethod = hasDy ? "Weighted Least Squares (WLS)" : "Ordinary Least Squares (OLS)";
+            let r2Note = hasDy ? '<span style="font-size:0.85rem; color:#e67e22;">(R² provided for qualitative guidance in WLS)</span>' : '';
 
             const h = `
                 <b>Linear Fit ($y = mx + c$) via ${fitMethod}</b><br><br>
                 Slope ($m$) = ${m.toFixed(4)} ± ${dm.toFixed(4)}<br>
                 Intercept ($c$) = ${c.toFixed(4)} ± ${dc.toFixed(4)}<br>
-                Goodness of Fit ($R^2$) = ${R2.toFixed(4)}<br>
+                Goodness of Fit ($R^2$) = ${R2.toFixed(4)} ${r2Note}<br>
                 ${chiSqHTML}<br>
                 <b>Final Slope = ${formatMeasurement(m, dm)}</b><br><br>
                 <details>
                     <summary>View Derivation Formulas</summary>
                     <div style="margin-top:10px;">
-                        ${useWLS ? 
+                        ${hasDy ? 
                         `$W = \\sum \\frac{1}{(\\Delta y_i)^2}$<br><br>
                         $\\Delta = W \\sum w_i x_i^2 - \\left(\\sum w_i x_i\\right)^2$<br><br>
                         $m = \\frac{W \\sum w_i x_i y_i - \\sum w_i x_i \\sum w_i y_i}{\\Delta}$<br><br>
