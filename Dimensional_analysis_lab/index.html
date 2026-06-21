@@ -178,11 +178,27 @@
         .jee-source-tag { color: var(--gold); font-size: 0.8rem; font-weight: bold; letter-spacing: 1px; margin-bottom: 0.4rem; }
         .jee-q-text { font-size: 1.05rem; color: var(--text-main); line-height: 1.6; }
 
-        /* Difficulty color pills */
-        .diff-easy { color: var(--success) !important; border-color: var(--success) !important; }
-        .diff-medium { color: var(--gold) !important; border-color: var(--gold) !important; }
-        .diff-hard { color: var(--chaos) !important; border-color: var(--chaos) !important; }
-        .diff-jee { color: var(--xp-color) !important; border-color: var(--xp-color) !important; }
+        /* Buckingham Pi Advanced UI */
+        .pi-panel { background: var(--bg-color); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; }
+        .pi-panel-title { font-size: 1.1rem; font-weight: 700; text-transform: uppercase; margin-bottom: 1.5rem; color: var(--text-main); letter-spacing: 0.5px; }
+        .pi-grid-top { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .pi-var-table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        .pi-var-table th { text-align: left; color: var(--text-muted); font-size: 0.85rem; font-weight: 600; padding-bottom: 1rem; border-bottom: 1px solid var(--border); }
+        .pi-var-table td { padding: 0.75rem 0; font-family: monospace; }
+        .pi-edit-input { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); padding: 0.4rem; border-radius: 4px; width: 42px; text-align: center; font-family: monospace; margin-right: 0.1rem;}
+        .pi-edit-name { width: 80px; text-align: left; color: var(--gold); font-weight: bold;}
+        .pi-summary-row { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border); color: var(--text-muted); }
+        .pi-glow-box { margin-top: 1.5rem; border: 1px solid var(--success); background: rgba(34, 197, 94, 0.05); border-radius: 8px; padding: 1.5rem; text-align: center; box-shadow: 0 0 15px rgba(34, 197, 94, 0.1); }
+        .pi-result-layout { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+        .pi-math-display { border: 1px solid var(--success); background: rgba(34, 197, 94, 0.05); padding: 1rem 2rem; border-radius: 8px; display: flex; align-items: center; gap: 1rem; font-family: monospace; font-size: 1.5rem; color: var(--success); box-shadow: 0 0 15px rgba(34, 197, 94, 0.1); flex-wrap: wrap; }
+        .pi-fraction { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; margin: 0 0.5rem; }
+        .pi-num { padding: 0 0.5rem; border-bottom: 2px solid var(--success); }
+        .pi-den { padding: 0 0.5rem; }
+        .pi-matrix-table { border-collapse: collapse; font-family: monospace; text-align: center; width: 100%; overflow-x: auto; display: block; }
+        .pi-matrix-table th, .pi-matrix-table td { padding: 0.75rem 1.25rem; border: 1px solid var(--border); }
+        .pi-matrix-table th { color: var(--gold); }
+        .pi-add-btn { width: 100%; padding: 0.75rem; background: transparent; border: 1px solid var(--accent); color: var(--accent); border-radius: 4px; cursor: pointer; font-weight: 600; transition: 0.2s; }
+        .pi-add-btn:hover { background: rgba(59, 130, 246, 0.1); }
 
         /* Mobile Optimization */
         @media (max-width: 768px) {
@@ -196,6 +212,7 @@
             .tree-row { flex-direction: column; }
             .theme-toggle { position: static; margin-bottom: 1rem; display: inline-block; }
             .mc-header { flex-direction: column; text-align: center; gap: 0.5rem; }
+            .pi-grid-top { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -228,7 +245,7 @@
     <header>
         <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙 Theme</button>
         <h1>⚡ CinePhysicsHQ-Labs</h1>
-        <div class="version-tag">VERSION 4.1 — JEE PYQ EDITION</div>
+        <div class="version-tag">VERSION 4.2 — PI MATRIX EDITION</div>
         <p>Interactive Physics Learning • Research • Exploration</p>
     </header>
 
@@ -258,7 +275,7 @@
                 <div><span class="feature-icon">🌳</span> Visual Dimension Derivation Trees</div>
                 <div><span class="feature-icon">🗂️</span> Memory Cards with JEE tips & common mistakes</div>
                 <div><span class="feature-icon">🧮</span> Formula Derivator via dimensional analysis</div>
-                <div><span class="feature-icon">π</span> Buckingham π Theorem Calculator</div>
+                <div><span class="feature-icon">π</span> Advanced Buckingham π Matrix Calculator</div>
                 <div><span class="feature-icon">⚔️</span> Boss Battle — 4 modes including <strong style="color:var(--gold);">⚡ JEE PYQ Mode</strong></div>
                 <div><span class="feature-icon">📜</span> Printable Worksheets — Standard + JEE MCQ types</div>
             </div>
@@ -391,11 +408,79 @@
                 <button onclick="loadPiPreset('P, rho, v, d')">Pipe Flow Power</button>
                 <button onclick="loadPiPreset('ST, rho, g, d')">Capillary Rise</button>
             </div>
-            <div class="input-group">
-                <input type="text" id="pi-input" placeholder="e.g., rho, v, d, mu" />
-                <button class="primary-btn" onclick="solveBuckingham()">Find π Groups</button>
+            
+            <div class="input-group" style="margin-bottom: 2rem;">
+                <input type="text" id="pi-input" placeholder="Quick load variables (e.g., rho, v, d, mu)" onkeydown="if(event.key==='Enter') solveBuckingham();" />
+                <button class="primary-btn" onclick="solveBuckingham()">Load Variables into Table ↓</button>
             </div>
-            <div id="pi-output" class="output-panel">Awaiting variables...</div>
+
+            <div class="pi-grid-top">
+                <div class="pi-panel">
+                    <div class="pi-panel-title">Input Variables</div>
+                    <table class="pi-var-table" id="pi-varTable">
+                        <thead>
+                            <tr id="pi-varHeader">
+                                <th>VARIABLE</th>
+                                <th>DIMENSION</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="pi-varBody">
+                            </tbody>
+                    </table>
+                    <button class="pi-add-btn" onclick="addPiVariable()">+ ADD VARIABLE</button>
+                </div>
+
+                <div class="pi-panel">
+                    <div class="pi-panel-title">Summary</div>
+                    <div class="pi-summary-row">
+                        <span>Total Variables (n)</span>
+                        <span class="pi-summary-val" id="pi-sumN" style="color:var(--text-main); font-weight:bold;">0</span>
+                    </div>
+                    <div class="pi-summary-row">
+                        <span>Fundamental Dimensions (k)</span>
+                        <span class="pi-summary-val" id="pi-sumK" style="color:var(--text-main); font-weight:bold;">0</span>
+                    </div>
+                    <div class="pi-summary-row" style="border:none;">
+                        <span>Number of π terms (n - k)</span>
+                        <span class="pi-summary-val" id="pi-sumPi" style="color:var(--success); font-weight:bold;">0</span>
+                    </div>
+
+                    <div class="pi-glow-box">
+                        <div style="color:var(--text-main); font-weight:600; font-size:0.9rem; margin-bottom:0.5rem; letter-spacing:1px;">NUMBER OF PI TERMS</div>
+                        <div id="pi-glowPi" style="color:var(--success); font-size:3rem; font-weight:700; font-family:monospace; line-height:1;">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pi-panel">
+                <div class="pi-panel-title">Result – Dimensionless Pi Term</div>
+                <div class="pi-result-layout">
+                    <div class="pi-math-display" id="pi-mathDisplay">
+                        </div>
+                    <div style="display:flex; align-items:center; gap:1rem; color:var(--success); font-weight:bold;" id="pi-statusBadge">
+                        <div style="width:40px; height:40px; border:3px solid var(--success); border-radius:50%; display:flex; align-items:center; justify-content:center;">✔</div>
+                        <div>DIMENSIONLESS<br>VERIFIED</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pi-panel">
+                <div class="pi-panel-title">Dimensional Matrix (M)</div>
+                <div style="display:flex; gap:2rem; align-items:flex-start; flex-wrap:wrap;">
+                    <table class="pi-matrix-table">
+                        <thead>
+                            <tr id="pi-matrixHeader">
+                                <th style="border:none;"></th>
+                                </tr>
+                        </thead>
+                        <tbody id="pi-matrixBody">
+                            </tbody>
+                    </table>
+                    <div style="background:var(--card-bg); border:1px solid var(--border); padding:1rem 1.5rem; border-radius:8px; font-family:monospace; color:var(--text-muted); line-height:1.8;" id="pi-matrixInfo">
+                        </div>
+                </div>
+            </div>
         </div>
 
         <div id="challenge" class="tab-content">
@@ -725,40 +810,26 @@
 
         // ---------------------------------------------------------------
         // MATH FUNCTION DIMENSION RULES
-        // 'dimensionless_arg_out' → argument must be dimensionless, output is dimensionless
-        // 'preserve'             → output has same dimension as argument (e.g. abs)
-        // 'sqrt'                 → output = arg^(1/2)
-        // 'cbrt'                 → output = arg^(1/3)
-        // 'diff'                 → handled by parseDiff()
-        // 'int'                  → handled by parseIntegral()
         // ---------------------------------------------------------------
         window.mathFuncRules = {
-            // Roots
             'sqrt':    'sqrt',
             'cbrt':    'cbrt',
             'nthroot': 'sqrt',          // fallback; ideally user provides power separately
-            // Trig — argument MUST be dimensionless (angle = rad = dimensionless)
             'sin': 'dimensionless_arg_out', 'cos': 'dimensionless_arg_out', 'tan': 'dimensionless_arg_out',
             'cot': 'dimensionless_arg_out', 'sec': 'dimensionless_arg_out', 'csc': 'dimensionless_arg_out',
             'sind':'dimensionless_arg_out', 'cosd':'dimensionless_arg_out', 'tand':'dimensionless_arg_out',
-            // Inverse trig — output is dimensionless angle (radians)
             'arcsin':'dimensionless_arg_out','arccos':'dimensionless_arg_out','arctan':'dimensionless_arg_out',
             'arccot':'dimensionless_arg_out','arcsec':'dimensionless_arg_out','arccsc':'dimensionless_arg_out',
             'asin':'dimensionless_arg_out','acos':'dimensionless_arg_out','atan':'dimensionless_arg_out',
             'atan2':'dimensionless_arg_out','acot':'dimensionless_arg_out',
-            // Hyperbolic — argument dimensionless
             'sinh':'dimensionless_arg_out','cosh':'dimensionless_arg_out','tanh':'dimensionless_arg_out',
             'coth':'dimensionless_arg_out','sech':'dimensionless_arg_out','csch':'dimensionless_arg_out',
-            // Inverse hyperbolic
             'arcsinh':'dimensionless_arg_out','arccosh':'dimensionless_arg_out','arctanh':'dimensionless_arg_out',
             'asinh':'dimensionless_arg_out','acosh':'dimensionless_arg_out','atanh':'dimensionless_arg_out',
-            // Exponential & log — argument must be dimensionless
             'exp': 'dimensionless_arg_out', 'log': 'dimensionless_arg_out', 'ln': 'dimensionless_arg_out',
             'log2':'dimensionless_arg_out','log10':'dimensionless_arg_out','lg':'dimensionless_arg_out',
-            // Misc — preserve dimension of argument
             'abs':   'preserve', 'sgn': 'dimensionless_arg_out', 'sign': 'dimensionless_arg_out',
             'floor': 'preserve', 'ceil':'preserve', 'round':'preserve',
-            // Calculus — special parsers
             'diff':     'diff',
             'deriv':    'diff',
             'int':      'integral',
@@ -812,20 +883,16 @@
                 let currentVal = sel.value;
                 let defaultText = selId === 'equation-symbol-picker' ? 'Insert Any Quantity...' : 'Select a quantity...';
                 
-                // Keep the placeholder dynamically unselected if the user is typing
                 sel.innerHTML = `<option value="" disabled ${!filterText ? 'selected' : ''}>${defaultText}</option>`;
                 
-                let matchAdded = false;
                 sortedKeys.forEach(key => {
                     if (key.startsWith('__TMP')) return;
                     let name = window.dimDict[key].name;
                     if (name.toLowerCase().includes(filterText.toLowerCase()) || key.toLowerCase().includes(filterText.toLowerCase())) {
                         sel.add(new Option(`${name} (${key})`, key));
-                        matchAdded = true;
                     }
                 });
                 
-                // UX Fix: Auto-select the top valid option so typing actually works without needing to click
                 if(filterText && sel.options.length > 1) {
                     sel.selectedIndex = 1; 
                 } else if(currentVal && Array.from(sel.options).some(opt => opt.value === currentVal)) {
@@ -842,34 +909,23 @@
         // --- MODULE: SAVES & PROGRESS ---
         window.SAVE_VERSION = 1;
         window.userStats = { 
-            playerName: "",
-            askedQIds: { mechanics: [], thermo: [], em: [], modern: [], eqs: [], jee: [] }, 
-            chapterCorrect: { mechanics: 0, thermo: 0, em: 0, modern: 0 }, 
-            chapterTotal: { mechanics: 0, thermo: 0, em: 0, modern: 0 }, 
+            playerName: "", askedQIds: { mechanics: [], thermo: [], em: [], modern: [], eqs: [], jee: [] }, 
+            chapterCorrect: { mechanics: 0, thermo: 0, em: 0, modern: 0 }, chapterTotal: { mechanics: 0, thermo: 0, em: 0, modern: 0 }, 
             badges: [], streak: 0, xp: 0, highestStreak: 0, perfectRounds: 0, totalQsSolved: 0, bossesDefeated: 0, lastDailyDate: null, dailyCompleted: false 
         };
 
         window.allBadges = { 
-            'daily_scholar': '🎖️ Daily Scholar', 
-            'first_perfect': '🏆 First Perfect Score', 
-            'streak_10': '🔥 10 Streak', 
-            'century': '🧠 Century Club',
-            'boss_slayer': '⚔️ Boss Slayer (5 wins)',
-            'dimension_lord': '🌌 Dimension Lord (Level 5)'
+            'daily_scholar': '🎖️ Daily Scholar', 'first_perfect': '🏆 First Perfect Score', 
+            'streak_10': '🔥 10 Streak', 'century': '🧠 Century Club',
+            'boss_slayer': '⚔️ Boss Slayer (5 wins)', 'dimension_lord': '🌌 Dimension Lord (Level 5)'
         };
 
         window.initStats = function() {
             let saved = localStorage.getItem('cinePhysicsHQ_Save');
             if (saved) {
-                try {
-                    let parsed = JSON.parse(saved);
-                    if(parsed.data) window.userStats = parsed.data;
-                }
-                catch(err) {
-                    localStorage.removeItem('cinePhysicsHQ_Save');
-                }
+                try { let parsed = JSON.parse(saved); if(parsed.data) window.userStats = parsed.data; }
+                catch(err) { localStorage.removeItem('cinePhysicsHQ_Save'); }
             }
-            
             if(!window.userStats.playerName) window.userStats.playerName = "";
             if(!window.userStats.chapterCorrect) window.userStats.chapterCorrect = { mechanics: 0, thermo: 0, em: 0, modern: 0 };
             if(!window.userStats.chapterTotal) window.userStats.chapterTotal = { mechanics: 0, thermo: 0, em: 0, modern: 0 };
@@ -880,10 +936,8 @@
 
             const today = new Date().toDateString();
             if(window.userStats.lastDailyDate !== today) { window.userStats.lastDailyDate = today; window.userStats.dailyCompleted = false; }
-            
             const questUi = document.getElementById('daily-quest-ui');
             if(questUi && window.userStats.dailyCompleted) { questUi.innerHTML = `⚡ <strong>Daily Mission:</strong> Completed!`; questUi.style.color = "var(--success)"; }
-            
             window.renderBadges(); window.populateDashboard();
         }
 
@@ -905,35 +959,24 @@
 
         window.populateDashboard = function() {
             let lvl = window.getLevelInfo(window.userStats.xp); 
-            
             let pName = window.userStats.playerName || "";
             let journeyEl = document.getElementById('dash-journey-title');
-            if(journeyEl) {
-                journeyEl.innerText = pName ? `🏆 ${pName}'s Physics Journey` : `🏆 Your Physics Journey`;
-            }
-            
+            if(journeyEl) journeyEl.innerText = pName ? `🏆 ${pName}'s Physics Journey` : `🏆 Your Physics Journey`;
             let dashNameEl = document.getElementById('dash-player-name');
-            if(dashNameEl) {
-                dashNameEl.innerText = pName ? pName : "Physics Cadet";
-            }
+            if(dashNameEl) dashNameEl.innerText = pName ? pName : "Physics Cadet";
 
             let dashRank = document.getElementById('dash-rank');
             if(dashRank) {
                 dashRank.innerText = window.userStats.xp >= 10000 ? '🌌 DIMENSION MARSHALL' : lvl.title;
                 document.getElementById('dash-level').innerText = `Level ${lvl.level}`; document.getElementById('dash-xp').innerText = window.userStats.xp + " XP";
                 document.getElementById('dash-total-qs').innerText = window.userStats.totalQsSolved || 0;
-                
                 const dashPerfect = document.getElementById('dash-perfect');
-                if (dashPerfect) {
-                    dashPerfect.innerText = window.userStats.perfectRounds || 0;
-                }
-                
+                if (dashPerfect) dashPerfect.innerText = window.userStats.perfectRounds || 0;
                 document.getElementById('dash-streak').innerText = window.userStats.highestStreak || 0;
                 document.getElementById('dash-boss').innerText = window.userStats.bossesDefeated || 0;
 
                 let rate = window.userStats.totalQsSolved > 0 ? Math.round(((window.userStats.chapterCorrect.mechanics + window.userStats.chapterCorrect.thermo + window.userStats.chapterCorrect.em + window.userStats.chapterCorrect.modern) / window.userStats.totalQsSolved) * 100) : 0;
                 document.getElementById('dash-rate').innerText = rate + "%";
-
                 const calcMastery = (chap) => window.userStats.chapterTotal[chap] > 0 ? Math.round((window.userStats.chapterCorrect[chap] / window.userStats.chapterTotal[chap]) * 100) : 0;
                 document.getElementById('dash-mech').innerText = calcMastery('mechanics') + "%"; document.getElementById('dash-therm').innerText = calcMastery('thermo') + "%";
                 document.getElementById('dash-em').innerText = calcMastery('em') + "%"; document.getElementById('dash-mod').innerText = calcMastery('modern') + "%";
@@ -949,37 +992,19 @@
             let elXp = document.getElementById('chal-xp');
             if(elXp) {
                 elXp.innerText = window.userStats.xp + " XP";
-                
-                const pbStreak = document.getElementById('pb-streak');
-                if (pbStreak) {
-                    pbStreak.innerText = window.userStats.highestStreak || 0;
-                }
-
-                const pbPerfect = document.getElementById('pb-perfect');
-                if (pbPerfect) {
-                    pbPerfect.innerText = window.userStats.bossesDefeated || 0;
-                }
-                
+                const pbStreak = document.getElementById('pb-streak'); if (pbStreak) pbStreak.innerText = window.userStats.highestStreak || 0;
+                const pbPerfect = document.getElementById('pb-perfect'); if (pbPerfect) pbPerfect.innerText = window.userStats.bossesDefeated || 0;
                 document.getElementById('chal-level-display').innerText = window.userStats.xp > 10000 ? '🌌 DIMENSION MARSHALL' : `Level ${lvl.level} • ${lvl.title}`;
             }
         }
         
         window.shareResults = function(percent, title) {
             const shareText = `I just scored ${percent}% and achieved [${title}] in the CinePhysics Dimension Boss Battle! ⚔️⚡\n\nTest your physics skills here: https://abhijit-cinephysics.github.io/CinePhysicsHQ-Labs/Dimension%20Analysis%20lab/`;
-            
-            if (navigator.share) {
-                navigator.share({
-                    title: 'CinePhysics Boss Battle',
-                    text: shareText,
-                }).catch(console.error);
-            } else {
-                const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-                window.open(whatsappUrl, '_blank');
-            }
+            if (navigator.share) { navigator.share({ title: 'CinePhysics Boss Battle', text: shareText, }).catch(console.error); } 
+            else { const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`; window.open(whatsappUrl, '_blank'); }
         }
       
         // --- MODULE: ENGINE (PARSING & TEXT FORMATTING) ---
-        // Enhanced mapping to support negative signs, parentheses and fractions cleanly
         window.toSuperscript = function(numStr) { 
             const map = { '-': '⁻', '0': '⁰', '1': '¹', '2': '²', '3': '³', '4': '⁴', '5': '⁵', '6': '⁶', '7': '⁷', '8': '⁸', '9': '⁹', '.': '⋅', '/': 'ᐟ', '(': '⁽', ')': '⁾' };
             return numStr.toString().split('').map(char => map[char] || char).join(''); 
@@ -1004,359 +1029,172 @@
 
         window.parseFlatMultiplication = function(expr) {
             let result = {M:0, L:0, T:0, I:0, K:0, mol:0};
-            
-            expr = expr.replace(/([0-9])([a-zA-Zπ])/g, '$1 * $2');
-            expr = expr.replace(/\*/g, ' '); 
-            
+            expr = expr.replace(/([0-9])([a-zA-Zπ])/g, '$1 * $2'); expr = expr.replace(/\*/g, ' '); 
             const regex = /(__TMP_\d+__|[a-zA-Z_0-9π]+)([\²\³\⁴\⁵\⁻]|\^(?:\-?\d*\.?\d+|\(\-?\d+\/\d+\)))?/g;
             let match;
             
             while ((match = regex.exec(expr)) !== null) {
-                let rawVar = match[1];
-                let vLower = rawVar.toLowerCase();
-                let variable = null;
-                
-                if(vLower === 'ke') variable = 'KE'; 
-                else if(vLower === 'pe') variable = 'PE'; 
-                else if(vLower === 'pr') variable = 'Pr';
-                else if(window.aliasMap[rawVar]) variable = window.aliasMap[rawVar];
-                else if(window.aliasMap[vLower]) variable = window.aliasMap[vLower];
+                let rawVar = match[1]; let vLower = rawVar.toLowerCase(); let variable = null;
+                if(vLower === 'ke') variable = 'KE'; else if(vLower === 'pe') variable = 'PE'; else if(vLower === 'pr') variable = 'Pr';
+                else if(window.aliasMap[rawVar]) variable = window.aliasMap[rawVar]; else if(window.aliasMap[vLower]) variable = window.aliasMap[vLower];
                 else if(window.dimDict[rawVar]) variable = rawVar;
                 
                 if(variable && (window.mathFuncNames.includes(variable) || !isNaN(variable))) continue; 
                 if(!variable && !isNaN(rawVar)) continue;
-                // CRITICAL FIX: skip if the raw token itself is a math function (e.g. 'sqrt', 'sin', 'cos')
-                // without this, 'sqrt' falls into char-split → s, q, r, t are each looked up as physics vars
                 if(window.mathFuncNames.includes(vLower)) continue;
 
-                let powerStr = match[2] || "1";
-                let power = 1;
+                let powerStr = match[2] || "1"; let power = 1;
+                if(powerStr.startsWith('^(')) { let parts = powerStr.replace('^(', '').replace(')', '').split('/'); power = parseFloat(parts[0]) / parseFloat(parts[1]); } 
+                else { power = parseFloat(powerStr.replace('²', '2').replace('³', '3').replace('⁴', '4').replace('⁵', '5').replace('⁻', '-').replace('^', '')); }
                 
-                if(powerStr.startsWith('^(')) {
-                    let parts = powerStr.replace('^(', '').replace(')', '').split('/');
-                    power = parseFloat(parts[0]) / parseFloat(parts[1]);
-                } else {
-                    power = parseFloat(powerStr.replace('²', '2').replace('³', '3').replace('⁴', '4').replace('⁵', '5').replace('⁻', '-').replace('^', ''));
-                }
-                
-                if (variable && window.dimDict[variable]) {
-                    result = window.operateDims(result, window.dimDict[variable], 'add', power);
-                } else if (!variable) {
-                    // This block fixes Bug 1: Splitting implicit equations like "mc2"
-                    let chars = rawVar.split('');
-                    let tempDims = {M:0, L:0, T:0, I:0, K:0, mol:0};
-                    let allRecognized = true;
-                    
-                    let i = 0;
+                if (variable && window.dimDict[variable]) { result = window.operateDims(result, window.dimDict[variable], 'add', power); } 
+                else if (!variable) {
+                    let chars = rawVar.split(''); let tempDims = {M:0, L:0, T:0, I:0, K:0, mol:0}; let allRecognized = true; let i = 0;
                     while (i < chars.length) {
-                        let char = chars[i];
-                        let charMapped = window.aliasMap[char] || window.aliasMap[char.toLowerCase()] || char;
-                        
+                        let char = chars[i]; let charMapped = window.aliasMap[char] || window.aliasMap[char.toLowerCase()] || char;
                         if (window.dimDict[charMapped]) {
-                            let charPower = 1;
-                            let nextIdx = i + 1;
-                            let powStr = "";
-                            
-                            // Check if the directly following characters are numbers (e.g. the "2" in "mc2")
-                            while(nextIdx < chars.length && /[0-9\.\-]/.test(chars[nextIdx])) {
-                                powStr += chars[nextIdx];
-                                nextIdx++;
-                            }
-                            if(powStr !== "" && powStr !== "-" && powStr !== ".") {
-                                charPower = parseFloat(powStr);
-                                i = nextIdx - 1; // skip past the numbers
-                            }
-                            // Add to tempDims for this character
+                            let charPower = 1; let nextIdx = i + 1; let powStr = "";
+                            while(nextIdx < chars.length && /[0-9\.\-]/.test(chars[nextIdx])) { powStr += chars[nextIdx]; nextIdx++; }
+                            if(powStr !== "" && powStr !== "-" && powStr !== ".") { charPower = parseFloat(powStr); i = nextIdx - 1; }
                             tempDims = window.operateDims(tempDims, window.dimDict[charMapped], 'add', charPower);
-                        } else if (/[0-9\.\-]/.test(char)) {
-                            // Safely ignore stray mathematical coefficients
-                        } else {
-                            allRecognized = false;
-                            break;
-                        }
+                        } else if (/[0-9\.\-]/.test(char)) { } else { allRecognized = false; break; }
                         i++;
                     }
-                    if (allRecognized) {
-                        result = window.operateDims(result, tempDims, 'add', power);
-                    }
+                    if (allRecognized) { result = window.operateDims(result, tempDims, 'add', power); }
                 }
             }
             return result;
         }
 
         window.parseDivision = function(expr) {
-            let parts = expr.split('/');
-            let result = window.parseFlatMultiplication(parts[0]);
+            let parts = expr.split('/'); let result = window.parseFlatMultiplication(parts[0]);
             for(let i = 1; i < parts.length; i++) result = window.operateDims(result, window.parseFlatMultiplication(parts[i]), 'subtract');
             return result;
         }
 
         window.activeTempTokens = [];
 
-        // ---------------------------------------------------------------
-        // HELPER: Resolve dimension of a single function application
-        // funcName: string like 'sqrt', 'sin', 'diff', 'int'
-        // innerDim: dimension object of the argument
-        // extraArg: for diff/int, the dimension of the differential variable
-        // returns: { dim, error } or just dim object
-        // ---------------------------------------------------------------
         window.applyFuncDim = function(funcName, innerDim, extraArg) {
-            const rule = window.mathFuncRules[funcName] || 'dimensionless_arg_out';
-            const zero = {M:0, L:0, T:0, I:0, K:0, mol:0};
-
-            if (rule === 'sqrt') {
-                let d = {}; for(let k in innerDim) d[k] = innerDim[k] * 0.5; return { dim: d };
-            }
-            if (rule === 'cbrt') {
-                let d = {}; for(let k in innerDim) d[k] = innerDim[k] / 3; return { dim: d };
-            }
-            if (rule === 'preserve') {
-                return { dim: { ...innerDim } };
-            }
+            const rule = window.mathFuncRules[funcName] || 'dimensionless_arg_out'; const zero = {M:0, L:0, T:0, I:0, K:0, mol:0};
+            if (rule === 'sqrt') { let d = {}; for(let k in innerDim) d[k] = innerDim[k] * 0.5; return { dim: d }; }
+            if (rule === 'cbrt') { let d = {}; for(let k in innerDim) d[k] = innerDim[k] / 3; return { dim: d }; }
+            if (rule === 'preserve') { return { dim: { ...innerDim } }; }
             if (rule === 'dimensionless_arg_out') {
-                if (!window.isDimensionless(innerDim)) {
-                    const argStr = window.formatDim(innerDim);
-                    return { error: `Argument of ${funcName}() must be dimensionless (received ${argStr}). Remember: angles in radians are dimensionless.` };
-                }
+                if (!window.isDimensionless(innerDim)) { const argStr = window.formatDim(innerDim); return { error: `Argument of ${funcName}() must be dimensionless (received ${argStr}). Remember: angles in radians are dimensionless.` }; }
                 return { dim: { ...zero } };
             }
             if (rule === 'diff') {
-                // diff(f, x) → [f] / [x]  (derivative of f w.r.t. x)
-                // extraArg = dimension of the differential variable
                 if (!extraArg) return { error: `diff() needs two arguments: diff(function, variable). E.g. diff(v, t) for dv/dt.` };
-                let d = window.operateDims(innerDim, extraArg, 'subtract');
-                return { dim: d };
+                let d = window.operateDims(innerDim, extraArg, 'subtract'); return { dim: d };
             }
             if (rule === 'integral') {
-                // int(f, x) → [f] × [x]  (integral of f w.r.t. x)
                 if (!extraArg) return { error: `int() needs two arguments: int(function, variable). E.g. int(F, s) for ∫F·ds.` };
-                let d = window.operateDims(innerDim, extraArg, 'add');
-                return { dim: d };
+                let d = window.operateDims(innerDim, extraArg, 'add'); return { dim: d };
             }
-            // fallback
             return { dim: { ...zero } };
         };
 
-        // ---------------------------------------------------------------
-        // PREPROCESSOR: Handle special notations before recursive eval
-        //   d(f)/d(x)  →  diff(f, x)
-        //   df/dx      →  diff(f, x)  (Leibniz shorthand)
-        //   e^(...)    →  exp(...)
-        //   |expr|     →  abs(expr)
-        // ---------------------------------------------------------------
         window.preprocessExpression = function(expr) {
-            // e^(...) → exp(...)
-            expr = expr.replace(/\be\s*\^\s*\(/g, 'exp(');
-            expr = expr.replace(/\be\s*\^\s*(-?\d+\.?\d*)/g, 'exp($1)');
-
-            // |expr| → abs(expr)   — simple single-level only
+            expr = expr.replace(/\be\s*\^\s*\(/g, 'exp('); expr = expr.replace(/\be\s*\^\s*(-?\d+\.?\d*)/g, 'exp($1)');
             expr = expr.replace(/\|([^|]+)\|/g, 'abs($1)');
-
-            // d(f)/d(x) → diff(f, x)
             expr = expr.replace(/d\s*\(([^)]+)\)\s*\/\s*d\s*\(([^)]+)\)/g, 'diff($1, $2)');
-
-            // df/dx  (single letter Leibniz) → diff(f, x)
-            // Matches "d" + word + "/" + "d" + word but NOT "d" standalone
             expr = expr.replace(/\bd([A-Za-z_]\w*)\s*\/\s*d([A-Za-z_]\w*)/g, 'diff($1, $2)');
-
-            // ∂f/∂x (partial) → diff(f, x)
             expr = expr.replace(/∂([A-Za-z_]\w*)\s*\/\s*∂([A-Za-z_]\w*)/g, 'diff($1, $2)');
-
-            // d²f/dx²  (second derivative) → diff(diff(f, x), x)
             expr = expr.replace(/d\^2\s*([A-Za-z_]\w*)\s*\/\s*d([A-Za-z_]\w*)\^2/g, 'diff(diff($1, $2), $2)');
             expr = expr.replace(/d²([A-Za-z_]\w*)\s*\/\s*d([A-Za-z_]\w*)²/g, 'diff(diff($1, $2), $2)');
-
-            // ∫f dx  →  int(f, x)   (simple inline integral notation)
             expr = expr.replace(/∫\s*([A-Za-z_]\w*)\s+d([A-Za-z_]\w*)/g, 'int($1, $2)');
-
-            // Normalize ** to ^ (Python-style power)
             expr = expr.replace(/\*\*/g, '^');
-
             return expr;
         };
 
         window.evaluateTermRecursively = function(term) {
-            // Run preprocessor first
-            let currentStr = window.preprocessExpression(term.trim());
-            let tempCounter = 0;
-
-            // Iteratively resolve innermost parentheses
-            let safetyLimit = 60;
+            let currentStr = window.preprocessExpression(term.trim()); let tempCounter = 0; let safetyLimit = 60;
             while (currentStr.includes('(') && safetyLimit-- > 0) {
-                let lastOpen = currentStr.lastIndexOf('(');
-                let nextClose = currentStr.indexOf(')', lastOpen);
-                if (nextClose === -1) break;
-
-                let innerRaw = currentStr.substring(lastOpen + 1, nextClose);
-
-                // Detect fraction literals like (1/2) used as exponents — don't evaluate as physics
+                let lastOpen = currentStr.lastIndexOf('('); let nextClose = currentStr.indexOf(')', lastOpen);
+                if (nextClose === -1) break; let innerRaw = currentStr.substring(lastOpen + 1, nextClose);
                 if (/^\s*-?\d+\.?\d*\s*\/\s*-?\d+\.?\d*\s*$/.test(innerRaw)) break;
 
-                // Find function name immediately before this '('
-                let prefix = currentStr.substring(0, lastOpen).trimEnd();
-                let funcName = null;
-                for (let fn of window.mathFuncNames) {
-                    if (prefix.toLowerCase().endsWith(fn.toLowerCase())) {
-                        funcName = fn.toLowerCase();
-                        break;
-                    }
-                }
+                let prefix = currentStr.substring(0, lastOpen).trimEnd(); let funcName = null;
+                for (let fn of window.mathFuncNames) { if (prefix.toLowerCase().endsWith(fn.toLowerCase())) { funcName = fn.toLowerCase(); break; } }
 
-                // For diff() and int() split inner on comma to get two args
                 let innerDim = null, extraArgDim = null, evalError = null;
 
-                if (funcName === 'diff' || funcName === 'deriv' ||
-                    funcName === 'int'  || funcName === 'integral') {
-                    // Split on first top-level comma
+                if (funcName === 'diff' || funcName === 'deriv' || funcName === 'int'  || funcName === 'integral') {
                     let commaIdx = -1, depth = 0;
                     for (let ci = 0; ci < innerRaw.length; ci++) {
-                        if (innerRaw[ci] === '(') depth++;
-                        else if (innerRaw[ci] === ')') depth--;
-                        else if (innerRaw[ci] === ',' && depth === 0) { commaIdx = ci; break; }
+                        if (innerRaw[ci] === '(') depth++; else if (innerRaw[ci] === ')') depth--; else if (innerRaw[ci] === ',' && depth === 0) { commaIdx = ci; break; }
                     }
-                    if (commaIdx === -1) {
-                        evalError = `${funcName}() requires two arguments separated by a comma. Example: diff(v, t) or int(F, s)`;
-                    } else {
-                        let arg1 = innerRaw.substring(0, commaIdx).trim();
-                        let arg2 = innerRaw.substring(commaIdx + 1).trim().replace(/^\s*d\s*/, ''); // strip leading 'd' e.g. "dt" → "t"
+                    if (commaIdx === -1) { evalError = `${funcName}() requires two arguments separated by a comma. Example: diff(v, t) or int(F, s)`; } 
+                    else {
+                        let arg1 = innerRaw.substring(0, commaIdx).trim(); let arg2 = innerRaw.substring(commaIdx + 1).trim().replace(/^\s*d\s*/, '');
                         let r1 = window.evaluateTermRecursively(arg1);
-                        // Resolve differential variable: diffVarMap first, then dimDict, then full eval
                         let arg2key = arg2.trim();
-                        let r2dim = window.diffVarMap[arg2key]
-                            || (window.dimDict[arg2key] ? window.dimDict[arg2key] : null)
-                            || (window.aliasMap[arg2key] && window.dimDict[window.aliasMap[arg2key]] ? window.dimDict[window.aliasMap[arg2key]] : null);
+                        let r2dim = window.diffVarMap[arg2key] || (window.dimDict[arg2key] ? window.dimDict[arg2key] : null) || (window.aliasMap[arg2key] && window.dimDict[window.aliasMap[arg2key]] ? window.dimDict[window.aliasMap[arg2key]] : null);
                         let r2 = r2dim ? { dim: r2dim, error: null } : window.evaluateTermRecursively(arg2);
-                        if (r1.error) evalError = r1.error;
-                        else if (r2.error) evalError = r2.error;
-                        else { innerDim = r1.dim; extraArgDim = r2.dim; }
+                        if (r1.error) evalError = r1.error; else if (r2.error) evalError = r2.error; else { innerDim = r1.dim; extraArgDim = r2.dim; }
                     }
                 } else {
-                    // Standard single-argument function — evaluate inner expression
                     let innerTerms = innerRaw.split(/[\+\-](?![^\(]*\))/).map(t => t.trim()).filter(t => t);
                     let firstDim = null, firstDimStr = '';
                     for (let i = 0; i < innerTerms.length; i++) {
-                        let ev = window.parseDivision(innerTerms[i]);
-                        let ds = window.formatDim(ev);
-                        if (i === 0) { firstDim = ev; firstDimStr = ds; }
-                        else if (ds !== firstDimStr) {
-                            evalError = `Inside ${funcName || 'parentheses'}, cannot combine ${firstDimStr} and ${ds}`;
-                            break;
-                        }
+                        let ev = window.parseDivision(innerTerms[i]); let ds = window.formatDim(ev);
+                        if (i === 0) { firstDim = ev; firstDimStr = ds; } else if (ds !== firstDimStr) { evalError = `Inside ${funcName || 'parentheses'}, cannot combine ${firstDimStr} and ${ds}`; break; }
                     }
                     innerDim = firstDim || {M:0, L:0, T:0, I:0, K:0, mol:0};
                 }
 
                 if (evalError) { window.cleanupTempTokens(); return { error: evalError }; }
 
-                // Apply the function's dimensional rule
                 let result;
-                if (funcName) {
-                    result = window.applyFuncDim(funcName, innerDim, extraArgDim);
-                    if (result.error) { window.cleanupTempTokens(); return { error: result.error }; }
-                } else {
-                    // Plain parentheses — just carry the inner dimension through
-                    result = { dim: innerDim };
-                }
+                if (funcName) { result = window.applyFuncDim(funcName, innerDim, extraArgDim); if (result.error) { window.cleanupTempTokens(); return { error: result.error }; } } 
+                else { result = { dim: innerDim }; }
 
-                // Check for exponent after closing paren e.g. (...)^2
-                let afterParen = currentStr.substring(nextClose + 1);
-                let expMatch = afterParen.match(/^([\²\³\⁴\⁵\⁻]|\^(?:-?\d*\.?\d+|\(-?\d+\/\d+\)))/);
-                let charsToReplace = nextClose + 1;
-                let powerToApply = 1;
+                let afterParen = currentStr.substring(nextClose + 1); let expMatch = afterParen.match(/^([\²\³\⁴\⁵\⁻]|\^(?:-?\d*\.?\d+|\(-?\d+\/\d+\)))/);
+                let charsToReplace = nextClose + 1; let powerToApply = 1;
 
                 if (expMatch && !funcName) {
                     let powerStr = expMatch[1];
-                    if (powerStr.startsWith('^(')) {
-                        let parts = powerStr.replace('^(', '').replace(')', '').split('/');
-                        powerToApply = parseFloat(parts[0]) / parseFloat(parts[1]);
-                    } else {
-                        powerToApply = parseFloat(
-                            powerStr.replace('²','2').replace('³','3').replace('⁴','4')
-                                    .replace('⁵','5').replace('⁻','-').replace('^','')
-                        );
-                    }
+                    if (powerStr.startsWith('^(')) { let parts = powerStr.replace('^(', '').replace(')', '').split('/'); powerToApply = parseFloat(parts[0]) / parseFloat(parts[1]); } 
+                    else { powerToApply = parseFloat(powerStr.replace('²','2').replace('³','3').replace('⁴','4').replace('⁵','5').replace('⁻','-').replace('^','')); }
                     charsToReplace += expMatch[1].length;
                 }
 
                 let finalDim = result.dim;
-                if (powerToApply !== 1) {
-                    finalDim = {};
-                    for (let k in result.dim) finalDim[k] = result.dim[k] * powerToApply;
-                }
+                if (powerToApply !== 1) { finalDim = {}; for (let k in result.dim) finalDim[k] = result.dim[k] * powerToApply; }
 
-                // Store as temp token
-                let tempToken = `__TMP_${tempCounter}__`;
-                window.dimDict[tempToken] = { ...finalDim };
-                window.activeTempTokens.push(tempToken);
-                tempCounter++;
-
-                // Determine how far back to trim (remove function name from prefix)
-                let trimStart = lastOpen;
-                if (funcName) {
-                    let fnStart = prefix.toLowerCase().lastIndexOf(funcName);
-                    trimStart = fnStart;
-                }
+                let tempToken = `__TMP_${tempCounter}__`; window.dimDict[tempToken] = { ...finalDim }; window.activeTempTokens.push(tempToken); tempCounter++;
+                let trimStart = lastOpen; if (funcName) { trimStart = prefix.toLowerCase().lastIndexOf(funcName); }
                 currentStr = currentStr.substring(0, trimStart) + tempToken + currentStr.substring(charsToReplace);
             }
-
             return { dim: window.parseDivision(currentStr), error: null };
         }
 
-        window.cleanupTempTokens = function() {
-            window.activeTempTokens.forEach(token => delete window.dimDict[token]);
-            window.activeTempTokens = [];
-        }
+        window.cleanupTempTokens = function() { window.activeTempTokens.forEach(token => delete window.dimDict[token]); window.activeTempTokens = []; }
 
         // --- MODULE: EQUATION CHECKER ---
         window.explainTerm = function(term) {
-            let explanation = "";
-            let processed = new Set();
-            
-            const regex = /[a-zA-Z_]+/g;
-            let match;
+            let explanation = ""; let processed = new Set(); const regex = /[a-zA-Z_]+/g; let match;
             while((match = regex.exec(term)) !== null) {
-                let rawVar = match[0];
-                let vLower = rawVar.toLowerCase();
-
-                // CRITICAL: Skip & annotate math function names FIRST
+                let rawVar = match[0]; let vLower = rawVar.toLowerCase();
                 if(window.mathFuncNames.includes(vLower)) {
                     if (!processed.has(vLower)) {
-                        const rule = window.mathFuncRules ? (window.mathFuncRules[vLower] || '') : '';
-                        let note = '';
-                        if (rule === 'sqrt') note = '√ — raises dimension to power ½';
-                        else if (rule === 'cbrt') note = '∛ — raises dimension to power ⅓';
-                        else if (rule === 'diff') note = 'derivative — output dim = [f]/[variable]';
-                        else if (rule === 'integral') note = 'integral — output dim = [f]×[variable]';
-                        else if (rule === 'preserve') note = 'preserves dimension of argument';
-                        else if (rule === 'dimensionless_arg_out') note = 'argument must be dimensionless → output is dimensionless';
-                        if (note) explanation += `<span style="color:var(--xp-color); font-size:0.88rem;">⟨${rawVar}⟩ ${note}</span><br>`;
-                        processed.add(vLower);
+                        const rule = window.mathFuncRules ? (window.mathFuncRules[vLower] || '') : ''; let note = '';
+                        if (rule === 'sqrt') note = '√ — raises dimension to power ½'; else if (rule === 'cbrt') note = '∛ — raises dimension to power ⅓';
+                        else if (rule === 'diff') note = 'derivative — output dim = [f]/[variable]'; else if (rule === 'integral') note = 'integral — output dim = [f]×[variable]';
+                        else if (rule === 'preserve') note = 'preserves dimension of argument'; else if (rule === 'dimensionless_arg_out') note = 'argument must be dimensionless → output is dimensionless';
+                        if (note) explanation += `<span style="color:var(--xp-color); font-size:0.88rem;">⟨${rawVar}⟩ ${note}</span><br>`; processed.add(vLower);
                     }
                     continue;
                 }
-
                 let lookupVar = null;
-                if(vLower === 'ke') lookupVar = 'KE';
-                else if(vLower === 'pe') lookupVar = 'PE';
-                else if(vLower === 'pr') lookupVar = 'Pr';
-                else if(window.aliasMap[rawVar]) lookupVar = window.aliasMap[rawVar];
-                else if(window.aliasMap[vLower]) lookupVar = window.aliasMap[vLower];
-                else if(window.dimDict[rawVar]) lookupVar = rawVar;
+                if(vLower === 'ke') lookupVar = 'KE'; else if(vLower === 'pe') lookupVar = 'PE'; else if(vLower === 'pr') lookupVar = 'Pr';
+                else if(window.aliasMap[rawVar]) lookupVar = window.aliasMap[rawVar]; else if(window.aliasMap[vLower]) lookupVar = window.aliasMap[vLower]; else if(window.dimDict[rawVar]) lookupVar = rawVar;
 
                 if (lookupVar && window.dimDict[lookupVar]) {
-                    if (!processed.has(lookupVar)) {
-                        explanation += `<span style="color:var(--text-muted); font-size: 0.95rem;">↳ ${rawVar} = ${window.dimDict[lookupVar].name} = ${window.formatDim(window.dimDict[lookupVar])}</span><br>`;
-                        processed.add(lookupVar);
-                    }
+                    if (!processed.has(lookupVar)) { explanation += `<span style="color:var(--text-muted); font-size: 0.95rem;">↳ ${rawVar} = ${window.dimDict[lookupVar].name} = ${window.formatDim(window.dimDict[lookupVar])}</span><br>`; processed.add(lookupVar); }
                 } else if (!lookupVar) {
                     let chars = rawVar.split('');
-                    for(let char of chars) {
-                        let charMapped = window.aliasMap[char] || window.aliasMap[char.toLowerCase()] || char;
-                        if(window.dimDict[charMapped] && !processed.has(charMapped)) {
-                            explanation += `<span style="color:var(--text-muted); font-size: 0.95rem;">↳ ${char} = ${window.dimDict[charMapped].name} = ${window.formatDim(window.dimDict[charMapped])}</span><br>`;
-                            processed.add(charMapped);
-                        }
-                    }
+                    for(let char of chars) { let charMapped = window.aliasMap[char] || window.aliasMap[char.toLowerCase()] || char; if(window.dimDict[charMapped] && !processed.has(charMapped)) { explanation += `<span style="color:var(--text-muted); font-size: 0.95rem;">↳ ${char} = ${window.dimDict[charMapped].name} = ${window.formatDim(window.dimDict[charMapped])}</span><br>`; processed.add(charMapped); } }
                 }
             }
             return explanation;
@@ -1364,161 +1202,95 @@
 
         window.getDimExplanation = function(lhsObj, rhsObj) {
             let diffs = []; const labels = {M:'Mass', L:'Length', T:'Time', I:'Current', K:'Temperature', mol:'Amount'};
-            for(let key in lhsObj) if(lhsObj[key] !== rhsObj[key]) diffs.push(`${labels[key]} exponent differs (LHS: ${lhsObj[key]}, RHS: ${rhsObj[key]})`);
-            return diffs.join('<br>• ');
+            for(let key in lhsObj) if(lhsObj[key] !== rhsObj[key]) diffs.push(`${labels[key]} exponent differs (LHS: ${lhsObj[key]}, RHS: ${rhsObj[key]})`); return diffs.join('<br>• ');
         }
 
         window.loadPreset = function(eq) { document.getElementById('equation-input').value = eq; window.verifyEquation(); }
 
         window.verifyEquation = function() {
-            const input = document.getElementById('equation-input').value;
-            const outputPanel = document.getElementById('checker-output');
+            const input = document.getElementById('equation-input').value; const outputPanel = document.getElementById('checker-output');
             if (!input.includes('=')) { outputPanel.innerHTML = '<span class="error-text">❌ Error: Equation must contain an "=" sign.</span>'; return; }
-            
             let safeInput = input.replace(/(^|\s)(\d+)\/(\d+)(\s|\*)/g, (match, pre, n, d, post) => pre + (n/d).toString() + post);
-
-            const [lhsRaw, rhsRaw] = safeInput.split('=');
-            const lhsTerms = lhsRaw.split(/[\+\-](?![^\(]*\))/).map(t => t.trim()).filter(t => t);
-            const rhsTerms = rhsRaw.split(/[\+\-](?![^\(]*\))/).map(t => t.trim()).filter(t => t);
-            
-            let outputHTML = `<div class="animate-pop">Equation: <strong style="font-size: 1.2rem;">${input}</strong>\n\n`;
-            let globalError = null;
+            const [lhsRaw, rhsRaw] = safeInput.split('='); const lhsTerms = lhsRaw.split(/[\+\-](?![^\(]*\))/).map(t => t.trim()).filter(t => t); const rhsTerms = rhsRaw.split(/[\+\-](?![^\(]*\))/).map(t => t.trim()).filter(t => t);
+            let outputHTML = `<div class="animate-pop">Equation: <strong style="font-size: 1.2rem;">${input}</strong>\n\n`; let globalError = null;
 
             function evaluateSide(sideName, terms) {
                 let html = `<div style="margin-bottom:0.5rem;"><strong style="color:var(--accent); font-size:1.1rem;">${sideName} Breakdown:</strong></div>`;
                 let firstDimObj = null, firstDimStr = null, isInternallyConsistent = true;
-                
                 for (let i = 0; i < terms.length; i++) {
-                    let evalResult = window.evaluateTermRecursively(terms[i]);
-                    if(evalResult.error) { globalError = evalResult.error; return { error: true }; }
-                    let dimStr = window.formatDim(evalResult.dim);
-                    let explanation = window.explainTerm(terms[i]);
-
+                    let evalResult = window.evaluateTermRecursively(terms[i]); if(evalResult.error) { globalError = evalResult.error; return { error: true }; }
+                    let dimStr = window.formatDim(evalResult.dim); let explanation = window.explainTerm(terms[i]);
                     html += `<div style="background:rgba(255,255,255,0.02); padding:1rem; border-radius:6px; margin-bottom:1rem; border:1px solid var(--border);">`;
-                    html += `<strong>Term:</strong> [${terms[i]}]\n`;
-                    if(explanation) html += `${explanation}`;
-                    html += `\n<strong>➜ Result: <span style="color:var(--gold);">${dimStr}</span></strong></div>`;
-
-                    if (i === 0) { firstDimObj = evalResult.dim; firstDimStr = dimStr; }
-                    else if (dimStr !== firstDimStr) isInternallyConsistent = false;
+                    html += `<strong>Term:</strong> [${terms[i]}]\n`; if(explanation) html += `${explanation}`; html += `\n<strong>➜ Result: <span style="color:var(--gold);">${dimStr}</span></strong></div>`;
+                    if (i === 0) { firstDimObj = evalResult.dim; firstDimStr = dimStr; } else if (dimStr !== firstDimStr) isInternallyConsistent = false;
                 }
                 return { html, isInternallyConsistent, dimObj: firstDimObj, dimStr: firstDimStr };
             }
 
-            const lhsData = evaluateSide('LHS', lhsTerms);
-            if(globalError) { outputPanel.innerHTML = outputHTML + `<div class="edu-note"><span class="marshall-text">⚡ Dimension Marshall:</span><br><span class="dialogue-quote">"Math error detected. ${globalError}"</span></div></div>`; window.cleanupTempTokens(); return; }
-            
-            const rhsData = evaluateSide('RHS', rhsTerms);
-            if(globalError) { outputPanel.innerHTML = outputHTML + `<div class="edu-note"><span class="marshall-text">⚡ Dimension Marshall:</span><br><span class="dialogue-quote">"Math error detected. ${globalError}"</span></div></div>`; window.cleanupTempTokens(); return; }
+            const lhsData = evaluateSide('LHS', lhsTerms); if(globalError) { outputPanel.innerHTML = outputHTML + `<div class="edu-note"><span class="marshall-text">⚡ Dimension Marshall:</span><br><span class="dialogue-quote">"Math error detected. ${globalError}"</span></div></div>`; window.cleanupTempTokens(); return; }
+            const rhsData = evaluateSide('RHS', rhsTerms); if(globalError) { outputPanel.innerHTML = outputHTML + `<div class="edu-note"><span class="marshall-text">⚡ Dimension Marshall:</span><br><span class="dialogue-quote">"Math error detected. ${globalError}"</span></div></div>`; window.cleanupTempTokens(); return; }
 
             outputHTML += lhsData.html + rhsData.html + `<strong>Final Verification:</strong>\n`;
-            let marshallTutor = "";
-            let pName = window.userStats.playerName || "Cadet";
+            let marshallTutor = ""; let pName = window.userStats.playerName || "Cadet";
 
-            if (!lhsData.isInternallyConsistent) {
-                outputHTML += `<span class="error-text">✖ LHS terms are not dimensionally identical.</span>`;
-                marshallTutor = `"${pName}, you cannot add apples to oranges. The terms on the left side of the equation have different dimensions."`;
-            } else if (!rhsData.isInternallyConsistent) {
-                outputHTML += `<span class="error-text">✖ RHS terms are not dimensionally identical.</span>`;
-                marshallTutor = `"The terms on the right side are mathematically incompatible. Check your addition/subtraction."`;
-            } else if (lhsData.dimStr !== rhsData.dimStr) {
-                outputHTML += `[LHS] = ${lhsData.dimStr}\n[RHS] = ${rhsData.dimStr}\n<span class="error-text">✖ [LHS] ≠ [RHS] -> Invalid</span>`;
-                marshallTutor = `"The dimensions disagree. Here is exactly why:<br>• ` + window.getDimExplanation(lhsData.dimObj, rhsData.dimObj) + `"`;
-            } else {
-                outputHTML += `[LHS] = ${lhsData.dimStr}\n[RHS] = ${rhsData.dimStr}\n<span class="success-text">✔ [LHS] = [RHS] -> Homogeneous</span>`;
-                marshallTutor = `"Well done, ${pName}. The equation is perfectly balanced."`;
-            }
+            if (!lhsData.isInternallyConsistent) { outputHTML += `<span class="error-text">✖ LHS terms are not dimensionally identical.</span>`; marshallTutor = `"${pName}, you cannot add apples to oranges. The terms on the left side of the equation have different dimensions."`; } 
+            else if (!rhsData.isInternallyConsistent) { outputHTML += `<span class="error-text">✖ RHS terms are not dimensionally identical.</span>`; marshallTutor = `"The terms on the right side are mathematically incompatible. Check your addition/subtraction."`; } 
+            else if (lhsData.dimStr !== rhsData.dimStr) { outputHTML += `[LHS] = ${lhsData.dimStr}\n[RHS] = ${rhsData.dimStr}\n<span class="error-text">✖ [LHS] ≠ [RHS] -> Invalid</span>`; marshallTutor = `"The dimensions disagree. Here is exactly why:<br>• ` + window.getDimExplanation(lhsData.dimObj, rhsData.dimObj) + `"`; } 
+            else { outputHTML += `[LHS] = ${lhsData.dimStr}\n[RHS] = ${rhsData.dimStr}\n<span class="success-text">✔ [LHS] = [RHS] -> Homogeneous</span>`; marshallTutor = `"Well done, ${pName}. The equation is perfectly balanced."`; }
             
-            outputHTML += `\n\n<div class="edu-note"><span class="marshall-text">⚡ Dimension Marshall:</span><br><span class="dialogue-quote">${marshallTutor}</span></div></div>`;
-            outputPanel.innerHTML = outputHTML;
-            window.cleanupTempTokens();
+            outputHTML += `\n\n<div class="edu-note"><span class="marshall-text">⚡ Dimension Marshall:</span><br><span class="dialogue-quote">${marshallTutor}</span></div></div>`; outputPanel.innerHTML = outputHTML; window.cleanupTempTokens();
         }
 
         // --- MODULE: QUANTITY DISCOVERY ---
         window.parseDirectDimInput = function() {
             let str = document.getElementById('direct-dim-search').value.replace(/\[|\]/g, '').replace(/\s+/g, '').replace(/\^/g, '').toUpperCase();
-            let target = { M:0, L:0, T:0, I:0, K:0, mol:0 };
-            const regex = /([MLTIK]|MOL)([\²\³\⁴\⁵\⁻]|-?\d*\.?\d+)?/g; let match;
-            while((match = regex.exec(str)) !== null) {
-                let dim = match[1], pow = parseFloat((match[2] || "1").replace('²', '2').replace('³', '3').replace('⁴', '4').replace('⁵', '5').replace('⁻', '-'));
-                if(dim === 'M') target.M = pow; if(dim === 'L') target.L = pow; if(dim === 'T') target.T = pow;
-                if(dim === 'I') target.I = pow; if(dim === 'K') target.K = pow; if(dim === 'MOL') target.mol = pow;
-            }
+            let target = { M:0, L:0, T:0, I:0, K:0, mol:0 }; const regex = /([MLTIK]|MOL)([\²\³\⁴\⁵\⁻]|-?\d*\.?\d+)?/g; let match;
+            while((match = regex.exec(str)) !== null) { let dim = match[1], pow = parseFloat((match[2] || "1").replace('²', '2').replace('³', '3').replace('⁴', '4').replace('⁵', '5').replace('⁻', '-'));
+                if(dim === 'M') target.M = pow; if(dim === 'L') target.L = pow; if(dim === 'T') target.T = pow; if(dim === 'I') target.I = pow; if(dim === 'K') target.K = pow; if(dim === 'MOL') target.mol = pow; }
             document.getElementById('spin-m').value = target.M; document.getElementById('spin-l').value = target.L; document.getElementById('spin-t').value = target.T;
-            document.getElementById('spin-i').value = target.I; document.getElementById('spin-k').value = target.K; document.getElementById('spin-mol').value = target.mol;
-            window.discoverQuantity();
+            document.getElementById('spin-i').value = target.I; document.getElementById('spin-k').value = target.K; document.getElementById('spin-mol').value = target.mol; window.discoverQuantity();
         }
 
         window.discoverQuantity = function() {
-            let targetDim = {
-                M: parseFloat(document.getElementById('spin-m').value)||0, L: parseFloat(document.getElementById('spin-l').value)||0, 
-                T: parseFloat(document.getElementById('spin-t').value)||0, I: parseFloat(document.getElementById('spin-i').value)||0, 
-                K: parseFloat(document.getElementById('spin-k').value)||0, mol: parseFloat(document.getElementById('spin-mol').value)||0
-            };
-            let matches = [];
-            for(let key in window.dimDict) {
-                if(!key.startsWith('__TMP') && window.formatDim(window.dimDict[key]) === window.formatDim(targetDim)) matches.push({ key: key, name: window.dimDict[key].name, units: window.dimDict[key].units });
-            }
+            let targetDim = { M: parseFloat(document.getElementById('spin-m').value)||0, L: parseFloat(document.getElementById('spin-l').value)||0, T: parseFloat(document.getElementById('spin-t').value)||0, I: parseFloat(document.getElementById('spin-i').value)||0, K: parseFloat(document.getElementById('spin-k').value)||0, mol: parseFloat(document.getElementById('spin-mol').value)||0 };
+            let matches = []; for(let key in window.dimDict) { if(!key.startsWith('__TMP') && window.formatDim(window.dimDict[key]) === window.formatDim(targetDim)) matches.push({ key: key, name: window.dimDict[key].name, units: window.dimDict[key].units }); }
             let html = `<div class="animate-pop"><strong>Searching for:</strong> ${window.formatDim(targetDim)}\n\n`;
             if(matches.length > 0) {
                 html += `<span class="success-text">Matches Found (${matches.length}):</span>\n\n`;
-                matches.forEach(m => {
-                    let unitStr = m.units ? ` <span style="font-size:0.9rem; color:var(--text-muted);">(${m.units[0]})</span>` : "";
-                    html += `<div style="margin-bottom: 0.5rem;">✓ ${m.name}${unitStr} <button class="secondary-btn" onclick="window.switchTab(null, 'calculator'); document.getElementById('calc-select').value='${m.key}'; window.calculateDimensionTree();">Show Tree</button></div>`;
-                });
-            } else {
-                html += `<span class="error-text">No standard quantity found.</span>\n\nPossible constructed quantity:\n<strong style="color:var(--accent);">${window.buildSyntheticDerivation(targetDim.M, targetDim.L, targetDim.T, targetDim.I, targetDim.K, targetDim.mol)}</strong>`;
-            }
+                matches.forEach(m => { let unitStr = m.units ? ` <span style="font-size:0.9rem; color:var(--text-muted);">(${m.units[0]})</span>` : ""; html += `<div style="margin-bottom: 0.5rem;">✓ ${m.name}${unitStr} <button class="secondary-btn" onclick="window.switchTab(null, 'calculator'); document.getElementById('calc-select').value='${m.key}'; window.calculateDimensionTree();">Show Tree</button></div>`; });
+            } else { html += `<span class="error-text">No standard quantity found.</span>\n\nPossible constructed quantity:\n<strong style="color:var(--accent);">${window.buildSyntheticDerivation(targetDim.M, targetDim.L, targetDim.T, targetDim.I, targetDim.K, targetDim.mol)}</strong>`; }
             document.getElementById('discovery-output').innerHTML = html + `</div>`;
         }
 
         window.buildSyntheticDerivation = function(M, L, T, I, K, mol) {
             if(M===0 && L===0 && T===0 && I===0 && K===0 && mol===0) return 'Pure Number (Dimensionless)';
             let num = [], den = [];
-            const addPart = (exp, name) => { 
-                if(exp > 0) num.push(`${name}${exp>1 ? window.toSuperscript(exp) : ''}`); 
-                else if(exp < 0) den.push(`${name}${exp<-1 ? window.toSuperscript(-exp) : ''}`); 
-            };
+            const addPart = (exp, name) => { if(exp > 0) num.push(`${name}${exp>1 ? window.toSuperscript(exp) : ''}`); else if(exp < 0) den.push(`${name}${exp<-1 ? window.toSuperscript(-exp) : ''}`); };
             addPart(M, 'Mass'); addPart(L, 'Length'); addPart(T, 'Time'); addPart(I, 'Current'); addPart(K, 'Temperature'); addPart(mol, 'Amount');
-            let nStr = num.length > 0 ? num.join(' × ') : '1', dStr = den.length > 0 ? den.join(' × ') : '';
-            return dStr ? `(${nStr}) / (${dStr})` : nStr;
+            let nStr = num.length > 0 ? num.join(' × ') : '1', dStr = den.length > 0 ? den.join(' × ') : ''; return dStr ? `(${nStr}) / (${dStr})` : nStr;
         }
 
         // --- MODULE: DIMENSION TREE & MEMORY CARDS ---
         window.calculateDimensionTree = function() {
-            const sym = document.getElementById('calc-select').value;
-            if(!sym) return;
-            const data = window.dimDict[sym];
+            const sym = document.getElementById('calc-select').value; if(!sym) return; const data = window.dimDict[sym];
             let html = `<div class="tree-container animate-pop"><div class="card-node final"><div class="card-title">${data.name}</div><div class="card-final-dim">${window.formatDim(data)}</div></div>`;
-            if (data.concept.length > 1) {
-                html += `<div class="tree-arrow">↑<br><span style="font-size:1rem;">(${data.op || "derived"})</span></div><div class="tree-row">`;
-                html += `<div class="card-node"><div class="card-title">${data.concept[0]}</div><div class="card-dim">${data.breakdown[0]}</div></div>`;
-                html += `<div class="card-node"><div class="card-title">${data.concept[1]}</div><div class="card-dim">${data.breakdown[1]}</div></div></div>`;
-            } else {
-                html += `<div class="tree-arrow">↑</div><div class="card-node"><div class="card-title">${data.concept[0] || ""}</div><div class="card-dim">${data.breakdown[0] || ""}</div></div>`;
-            }
-            html += `<div class="app-box">`;
-            if(data.units && data.units.length > 0) html += `<strong>Units:</strong> ${data.units.join(', ')}<br>`;
-            if(data.app) html += `<strong>Application:</strong> ${data.app}`;
+            if (data.concept.length > 1) { html += `<div class="tree-arrow">↑<br><span style="font-size:1rem;">(${data.op || "derived"})</span></div><div class="tree-row">`; html += `<div class="card-node"><div class="card-title">${data.concept[0]}</div><div class="card-dim">${data.breakdown[0]}</div></div>`; html += `<div class="card-node"><div class="card-title">${data.concept[1]}</div><div class="card-dim">${data.breakdown[1]}</div></div></div>`; } 
+            else { html += `<div class="tree-arrow">↑</div><div class="card-node"><div class="card-title">${data.concept[0] || ""}</div><div class="card-dim">${data.breakdown[0] || ""}</div></div>`; }
+            html += `<div class="app-box">`; if(data.units && data.units.length > 0) html += `<strong>Units:</strong> ${data.units.join(', ')}<br>`; if(data.app) html += `<strong>Application:</strong> ${data.app}`;
             document.getElementById('calc-output').innerHTML = html + `</div></div>`;
         }
 
         window.generateMemoryCard = function() {
-            const sym = document.getElementById('card-select').value;
-            if(!sym) return;
-            const data = window.dimDict[sym];
+            const sym = document.getElementById('card-select').value; if(!sym) return; const data = window.dimDict[sym];
             document.getElementById('card-output').innerHTML = `
-            <div class="memory-card animate-pop">
-                <div class="mc-header"><h3 class="mc-title">${data.name}</h3><div class="mc-dim">${window.formatDim(data)}</div></div>
-                <div class="mc-section"><div class="mc-label">Formula / Derivation</div><div class="mc-value">${data.concept.join(` ${data.op || 'derived'} `)}</div></div>
-                <div class="mc-section"><div class="mc-label">Standard Units</div><div class="mc-value">${data.units ? data.units.join(', ') : 'Dimensionless'}</div></div>
-                <div class="mc-section"><div class="mc-label">Physics Application</div><div class="mc-value">${data.app || 'Theoretical modeling'}</div></div>
-                <div class="mc-mistake"><strong>⚠️ Common Mistake:</strong><br>${data.mistake}</div>
-                <div class="mc-tip"><strong>💡 JEE / NEET Tip:</strong><br>${data.jeeTip}</div>
-            </div>`;
+            <div class="memory-card animate-pop"><div class="mc-header"><h3 class="mc-title">${data.name}</h3><div class="mc-dim">${window.formatDim(data)}</div></div>
+            <div class="mc-section"><div class="mc-label">Formula / Derivation</div><div class="mc-value">${data.concept.join(` ${data.op || 'derived'} `)}</div></div>
+            <div class="mc-section"><div class="mc-label">Standard Units</div><div class="mc-value">${data.units ? data.units.join(', ') : 'Dimensionless'}</div></div>
+            <div class="mc-section"><div class="mc-label">Physics Application</div><div class="mc-value">${data.app || 'Theoretical modeling'}</div></div>
+            <div class="mc-mistake"><strong>⚠️ Common Mistake:</strong><br>${data.mistake}</div><div class="mc-tip"><strong>💡 JEE / NEET Tip:</strong><br>${data.jeeTip}</div></div>`;
         }
 
-        // --- MODULE: FORMULA DERIVATOR & BUCKINGHAM PI ---
+        // --- MODULE: FORMULA DERIVATOR ---
         window.loadDerivatorPreset = function(target, vars) { document.getElementById('deriv-target').value = target; document.getElementById('deriv-vars').value = vars; window.deriveFormula(); }
 
         window.deriveFormula = function() {
@@ -1536,8 +1308,7 @@
                 if (lead >= cols) break; let i = r; while (matrix[i][lead] === 0) { i++; if (i === rows) { i = r; lead++; if (lead === cols) break; } }
                 if (lead < cols) {
                     let temp = matrix[i]; matrix[i] = matrix[r]; matrix[r] = temp; let lv = matrix[r][lead]; for (let j = 0; j <= cols; j++) matrix[r][j] /= lv; 
-                    for (let x = 0; x < rows; x++) { if (x !== r) { let mult = matrix[x][lead]; for (let j = 0; j <= cols; j++) matrix[x][j] -= mult * matrix[r][j]; } }
-                    lead++;
+                    for (let x = 0; x < rows; x++) { if (x !== r) { let mult = matrix[x][lead]; for (let j = 0; j <= cols; j++) matrix[x][j] -= mult * matrix[r][j]; } } lead++;
                 }
             }
             for(let r = 0; r < rows; r++) {
@@ -1555,18 +1326,12 @@
             for(let c=0; c<cols; c++) {
                 let power = 0;
                 for(let r=0; r<rows; r++) { if(Math.abs(matrix[r][c] - 1) < 1e-7) { let isP = true; for(let x=0; x<rows; x++) if(x!==r && Math.abs(matrix[x][c]) > 1e-7) isP = false; if(isP) { power = matrix[r][cols]; break; } } }
-                
-                // This block fixes Bug 2: Generating properly formatted superscripts 
                 if(Math.abs(power) > 1e-7) {
-                    let absPower = Math.abs(power);
-                    let pStr = "";
+                    let absPower = Math.abs(power); let pStr = "";
                     if (Math.abs(absPower - 1) > 1e-7) {
                         let fracStr = "";
-                        if (Math.abs(absPower - 0.5) < 1e-7) fracStr = "1/2";
-                        else if (Math.abs(absPower - 0.3333333) < 1e-7) fracStr = "1/3";
-                        else if (Math.abs(absPower - 1.5) < 1e-7) fracStr = "3/2";
-                        else fracStr = parseFloat(absPower.toFixed(2)).toString();
-                        
+                        if (Math.abs(absPower - 0.5) < 1e-7) fracStr = "1/2"; else if (Math.abs(absPower - 0.3333333) < 1e-7) fracStr = "1/3";
+                        else if (Math.abs(absPower - 1.5) < 1e-7) fracStr = "3/2"; else fracStr = parseFloat(absPower.toFixed(2)).toString();
                         pStr = window.toSuperscript(fracStr);
                     }
                     if(power > 0) numStr += `${validVars[c].orig}${pStr} `; else denStr += `${validVars[c].orig}${pStr} `;
@@ -1575,63 +1340,228 @@
             out.innerHTML = `<div class="animate-pop"><span class="success-text" style="font-size:1.4rem;">${targetSym} ∝ ${numStr.trim()||'1'} ${denStr?'/ ('+denStr.trim()+')':''}</span></div>`;
         }
 
-        window.loadPiPreset = function(v) { document.getElementById('pi-input').value = v; window.solveBuckingham(); }
+
+        // --- MODULE: ADVANCED BUCKINGHAM PI MATRIX CALCULATOR ---
+        window.piVariables = [];
+        
+        window.loadPiPreset = function(v) { 
+            document.getElementById('pi-input').value = v; 
+            window.solveBuckingham(); 
+        }
+
         window.solveBuckingham = function() {
-            const out = document.getElementById('pi-output'), input = document.getElementById('pi-input').value;
-            let vars = input.split(',').map(v => v.trim()).filter(v => v), validVars = [];
-            for(let v of vars) { let m = window.aliasMap[v] || v; if(!window.dimDict[m]){ out.innerHTML=`<span class="error-text">❌ Unknown variable: ${v}</span>`; return; } validVars.push({orig:v, mapped:m, dims:window.dimDict[m]}); }
-            if(validVars.length === 0) return;
-            let matrix=[], activeDims=[];
-            for(let d of ['M','L','T','I','K','mol']) {
-                let row=[], hasNonZero=false; for(let v of validVars) { row.push(v.dims[d]); if(v.dims[d]!==0) hasNonZero=true; }
-                if(hasNonZero) { matrix.push(row); activeDims.push(d); }
-            }
-            let rows = matrix.length, cols = validVars.length;
-            let lead=0;
-            for (let r = 0; r < rows; r++) {
-                if (lead >= cols) break; let i = r; while (matrix[i][lead] === 0) { i++; if (i === rows) { i = r; lead++; if (lead === cols) break; } }
-                if (lead < cols) {
-                    let temp = matrix[i]; matrix[i] = matrix[r]; matrix[r] = temp; let lv = matrix[r][lead]; for (let j = 0; j < cols; j++) matrix[r][j] /= lv;
-                    for (let x = 0; x < rows; x++) { if (x !== r) { let mult = matrix[x][lead]; for (let j = 0; j < cols; j++) matrix[x][j] -= mult * matrix[r][j]; } } lead++;
+            const input = document.getElementById('pi-input').value;
+            if(!input.trim()) return;
+            
+            let vars = input.split(',').map(v => v.trim()).filter(v => v);
+            window.piVariables = [];
+            
+            for(let v of vars) {
+                let m = window.aliasMap[v] || v;
+                if(window.dimDict[m]) {
+                    let d = window.dimDict[m];
+                    window.piVariables.push({ name: v, M: d.M||0, L: d.L||0, T: d.T||0, I: d.I||0, K: d.K||0, mol: d.mol||0 });
+                } else {
+                    window.piVariables.push({ name: v, M: 0, L: 0, T: 0, I: 0, K: 0, mol: 0 });
                 }
             }
-            let pivotCols = [], freeCols = [];
-            for (let r = 0; r < rows; r++) { for (let c = 0; c < cols; c++) { if (Math.abs(matrix[r][c] - 1) < 1e-7) { let isP = true; for (let x = 0; x < rows; x++) if (x !== r && Math.abs(matrix[x][c]) > 1e-7) isP = false; if (isP) { pivotCols.push(c); break; } } } }
-            for(let c = 0; c < cols; c++) if(!pivotCols.includes(c)) freeCols.push(c);
+            window.renderPiInputs();
+        }
 
-            let numGroups = cols - pivotCols.length;
-            if(numGroups <= 0) { out.innerHTML = `<span class="error-text">Not enough variables. Require more variables than fundamental dimensions.</span>`; return; }
+        window.addPiVariable = function() {
+            window.piVariables.push({ name: 'x', M: 0, L: 0, T: 0, I: 0, K: 0, mol: 0 });
+            window.renderPiInputs();
+        }
 
-            let html = `<div class="animate-pop">Analyzing: ${validVars.map(v=>v.orig).join(', ')}\nExpected Groups: ${numGroups}\n\n`;
-            let sortedInput = vars.map(v => (window.aliasMap[v.toLowerCase()] || v.toLowerCase())).slice().sort().join(',');
-            if(window.knownPiGroups[sortedInput]) html += `<div class="known-pi"><strong>Known Dimensionless Group:</strong><br>${window.knownPiGroups[sortedInput]}</div>\n`;
+        window.removePiVariable = function(index) {
+            window.piVariables.splice(index, 1);
+            window.renderPiInputs();
+        }
 
-            for(let i=0; i<freeCols.length; i++) {
-                let free = freeCols[i], vec = new Array(cols).fill(0); vec[free] = 1;
-                for(let r = 0; r < pivotCols.length; r++) vec[pivotCols[r]] = -matrix[r][free];
-                let numStr = "", denStr = "";
-                
-                // Formatted for Buckingham Pi as well
-                for(let j=0; j<cols; j++) {
-                    let exp = vec[j];
-                    if(Math.abs(exp) > 1e-7) {
-                        let varName = validVars[j].orig;
-                        let absExp = Math.abs(exp);
-                        let powerStr = "";
-                        if(Math.abs(absExp - 1) > 1e-7) {
-                            let fracStr = "";
-                            if (Math.abs(absExp - 0.5) < 1e-7) fracStr = "1/2";
-                            else if (Math.abs(absExp - 0.3333333) < 1e-7) fracStr = "1/3";
-                            else if (Math.abs(absExp - 1.5) < 1e-7) fracStr = "3/2";
-                            else fracStr = parseFloat(absExp.toFixed(2)).toString();
-                            powerStr = window.toSuperscript(fracStr);
-                        }
-                        if(exp > 0) numStr += `${varName}${powerStr} `; else denStr += `${varName}${powerStr} `;
+        window.updatePiVar = function(index, field, value) {
+            if (field === 'name') window.piVariables[index][field] = value;
+            else window.piVariables[index][field] = parseFloat(value) || 0;
+            window.renderPiInputs();
+        }
+
+        window.rref = function(mat) {
+            let matrix = mat.map(row => [...row]);
+            let lead = 0;
+            let rowCount = matrix.length;
+            let colCount = matrix[0].length;
+            for (let r = 0; r < rowCount; r++) {
+                if (colCount <= lead) return matrix;
+                let i = r;
+                while (Math.abs(matrix[i][lead]) < 1e-10) {
+                    i++;
+                    if (rowCount == i) { i = r; lead++; if (colCount == lead) return matrix; }
+                }
+                let temp = matrix[i]; matrix[i] = matrix[r]; matrix[r] = temp;
+                let val = matrix[r][lead];
+                for (let j = 0; j < colCount; j++) matrix[r][j] /= val;
+                for (let i = 0; i < rowCount; i++) {
+                    if (i == r) continue;
+                    val = matrix[i][lead];
+                    for (let j = 0; j < colCount; j++) matrix[i][j] -= val * matrix[r][j];
+                }
+                lead++;
+            }
+            return matrix;
+        }
+
+        window.renderPiInputs = function() {
+            const tbody = document.getElementById('pi-varBody');
+            const thead = document.getElementById('pi-varHeader');
+            tbody.innerHTML = '';
+            
+            // Dynamically show columns if they are used by ANY variable, keeping M, L, T always visible
+            let useI = window.piVariables.some(v => v.I !== 0);
+            let useK = window.piVariables.some(v => v.K !== 0);
+            let useMol = window.piVariables.some(v => v.mol !== 0);
+
+            let headerHTML = `<th>VARIABLE</th><th>DIMENSION (M, L, T${useI?', I':''}${useK?', K':''}${useMol?', mol':''})</th><th></th>`;
+            thead.innerHTML = headerHTML;
+
+            window.piVariables.forEach((v, index) => {
+                const tr = document.createElement('tr');
+                let inputsHTML = `
+                    <input class="pi-edit-input" value="${v.M}" onchange="updatePiVar(${index}, 'M', this.value)" title="Mass">
+                    <input class="pi-edit-input" value="${v.L}" onchange="updatePiVar(${index}, 'L', this.value)" title="Length">
+                    <input class="pi-edit-input" value="${v.T}" onchange="updatePiVar(${index}, 'T', this.value)" title="Time">
+                `;
+                if(useI) inputsHTML += `<input class="pi-edit-input" value="${v.I}" onchange="updatePiVar(${index}, 'I', this.value)" title="Current">`;
+                if(useK) inputsHTML += `<input class="pi-edit-input" value="${v.K}" onchange="updatePiVar(${index}, 'K', this.value)" title="Temperature">`;
+                if(useMol) inputsHTML += `<input class="pi-edit-input" value="${v.mol}" onchange="updatePiVar(${index}, 'mol', this.value)" title="Amount">`;
+
+                tr.innerHTML = `
+                    <td><input class="pi-edit-input pi-edit-name" value="${v.name}" onchange="updatePiVar(${index}, 'name', this.value)"></td>
+                    <td>${inputsHTML}</td>
+                    <td><button style="background:none; border:none; color:var(--error); cursor:pointer; font-size:1.1rem;" onclick="removePiVariable(${index})">✖</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            window.calculatePiMatrix();
+        }
+
+        window.calculatePiMatrix = function() {
+            if (window.piVariables.length === 0) return;
+
+            let dimensions = ['M', 'L', 'T'];
+            if(window.piVariables.some(v => v.I !== 0)) dimensions.push('I');
+            if(window.piVariables.some(v => v.K !== 0)) dimensions.push('K');
+            if(window.piVariables.some(v => v.mol !== 0)) dimensions.push('mol');
+
+            let matrix = [];
+            let activeDimensions = [];
+
+            // Build Matrix removing rows of absolute zero to find true rank
+            dimensions.forEach(dim => {
+                let row = window.piVariables.map(v => v[dim]);
+                if (row.some(x => x !== 0)) {
+                    matrix.push(row);
+                    activeDimensions.push(dim);
+                }
+            });
+
+            let n = window.piVariables.length;
+            let k = matrix.length; 
+
+            // RREF to find precise rank
+            let rrefMat = matrix.length > 0 ? window.rref(matrix) : [];
+            let rank = 0;
+            let pivotCols = [];
+            
+            rrefMat.forEach((row) => {
+                let isZero = true;
+                for(let c=0; c<n; c++) {
+                    if(Math.abs(row[c]) > 1e-5) {
+                        isZero = false;
+                        pivotCols.push(c);
+                        break;
                     }
                 }
-                html += `<span class="success-text" style="font-size:1.2rem;">π${i+1} = ${numStr.trim()||'1'} ${denStr ? '/ (' + denStr.trim() + ')' : ''}</span>\n\n`;
+                if(!isZero) rank++;
+            });
+
+            k = rank;
+            let numTerms = n - k;
+
+            // UI Updates - Summary
+            document.getElementById('pi-sumN').innerText = n;
+            document.getElementById('pi-sumK').innerText = k;
+            document.getElementById('pi-sumPi').innerText = numTerms;
+            document.getElementById('pi-glowPi').innerText = numTerms;
+
+            // UI Updates - Matrix rendering
+            document.getElementById('pi-matrixHeader').innerHTML = '<th style="border:none;"></th>' + window.piVariables.map(v => `<th>${v.name}</th>`).join('');
+            
+            let matrixBodyHTML = "";
+            activeDimensions.forEach(dim => {
+                let rowVals = window.piVariables.map(v => v[dim]);
+                matrixBodyHTML += `<tr><td style="color:var(--gold); font-weight:bold; border:none; text-align:left; padding-left:0;">${dim}</td>${rowVals.map(v => `<td>${v}</td>`).join('')}</tr>`;
+            });
+            document.getElementById('pi-matrixBody').innerHTML = matrixBodyHTML;
+
+            let infoHTML = `n = ${n}, k = ${k}<br>n - k = ${numTerms}<br>`;
+            if(numTerms > 0) infoHTML += `<span style="color:var(--success); font-weight:bold;">${numTerms === 1 ? 'One independent' : numTerms + ' independent'} π term${numTerms > 1 ? 's' : ''}</span>`;
+            else infoHTML += `<span style="color:var(--error);">No dimensionless terms possible.</span>`;
+            document.getElementById('pi-matrixInfo').innerHTML = infoHTML;
+
+            // UI Updates - Pi terms calculation
+            let mathDisplay = document.getElementById('pi-mathDisplay');
+            if (numTerms <= 0) {
+                mathDisplay.innerHTML = `<span style="color:var(--text-muted); font-size:1.1rem;">Requires more variables than fundamental dimensions.</span>`;
+                document.getElementById('pi-statusBadge').style.display = 'none';
+                return;
             }
-            out.innerHTML = html + `</div>`;
+
+            document.getElementById('pi-statusBadge').style.display = 'flex';
+            mathDisplay.innerHTML = '';
+
+            let freeCols = [];
+            for(let c=0; c<n; c++) { if(!pivotCols.includes(c)) freeCols.push(c); }
+
+            // Generate Pi Terms from Null Space
+            freeCols.forEach((freeCol, piIndex) => {
+                let piVector = new Array(n).fill(0);
+                piVector[freeCol] = 1;
+
+                // Back substitution for pivots
+                for(let r=0; r<rank; r++) {
+                    let pCol = pivotCols[r];
+                    piVector[pCol] = -rrefMat[r][freeCol];
+                }
+
+                // Make exponents visually cleaner (e.g., rho V D / mu instead of mu / rho V D)
+                if(window.piVariables[freeCol].name === 'μ' || window.piVariables[freeCol].name === 'mu' || piVector.filter(x => x < -0.1).length > piVector.filter(x => x > 0.1).length) {
+                    piVector = piVector.map(x => -x);
+                }
+
+                let num = [], den = [];
+                
+                piVector.forEach((power, idx) => {
+                    if (Math.abs(power) < 1e-5) return;
+                    let vName = window.piVariables[idx].name;
+                    let pStr = Math.abs(power - 1) > 1e-5 && Math.abs(power + 1) > 1e-5 ? `<sup>${Math.abs(power)}</sup>` : '';
+                    if (power > 0) num.push(`${vName}${pStr}`);
+                    else den.push(`${vName}${pStr}`);
+                });
+
+                let termHTML = `<span>π<sub>${piIndex+1}</sub> = </span>`;
+                if (den.length === 0) { termHTML += `<span>${num.join(' ')}</span>`; } 
+                else if (num.length === 0) { termHTML += `<div class="pi-fraction"><div class="pi-num">1</div><div class="pi-den">${den.join(' ')}</div></div>`; } 
+                else { termHTML += `<div class="pi-fraction"><div class="pi-num">${num.join(' ')}</div><div class="pi-den">${den.join(' ')}</div></div>`; }
+
+                mathDisplay.innerHTML += termHTML + (piIndex < freeCols.length - 1 ? '<span style="margin: 0 20px;">,</span>' : '');
+            });
+            
+            // Check for known groups
+            let sortedInput = window.piVariables.map(v => (window.aliasMap[v.name.toLowerCase()] || v.name.toLowerCase())).slice().sort().join(',');
+            if(window.knownPiGroups[sortedInput]) {
+                let knownHtml = `<div style="width:100%; font-size:1rem; margin-top:1rem; color:var(--text-muted);"><strong>Known Dimensionless Group:</strong><br>${window.knownPiGroups[sortedInput]}</div>`;
+                mathDisplay.innerHTML += knownHtml;
+            }
         }
 
         // --- MODULE: BOSS BATTLE ARENA ---
@@ -1641,15 +1571,8 @@
 
         window.getUniqueQuestion = function(poolArray, categoryKey) {
             let available = poolArray.filter(q => !window.userStats.askedQIds[categoryKey].includes(q.id || q));
-            if(available.length === 0) { 
-                window.userStats.askedQIds[categoryKey] = []; 
-                // Shuffle the pool on reset for variety
-                available = poolArray.slice().sort(() => Math.random() - 0.5); 
-            }
-            let q = available[Math.floor(Math.random() * available.length)];
-            window.userStats.askedQIds[categoryKey].push(q.id || q); 
-            window.saveStats(); 
-            return q;
+            if(available.length === 0) { window.userStats.askedQIds[categoryKey] = []; available = poolArray.slice().sort(() => Math.random() - 0.5); }
+            let q = available[Math.floor(Math.random() * available.length)]; window.userStats.askedQIds[categoryKey].push(q.id || q); window.saveStats(); return q;
         }
 
         window.startChallengeLoader = function() {
@@ -1663,29 +1586,18 @@
                         <button class="primary-btn" style="max-width: 250px; margin-top: 1rem;" onclick="confirmPlayerName()">Enter Realm</button>
                     </div>
                 `;
-            } else {
-                window.beginSync();
-            }
+            } else { window.beginSync(); }
         }
 
         window.confirmPlayerName = function() {
             const nameInput = document.getElementById('player-name-input');
-            if (nameInput && nameInput.value.trim() !== '') {
-                window.userStats.playerName = nameInput.value.trim();
-                window.saveStats();
-                window.beginSync();
-            } else {
-                if(nameInput) {
-                    nameInput.style.borderColor = 'var(--error)';
-                    nameInput.placeholder = "Name is required!";
-                }
-            }
+            if (nameInput && nameInput.value.trim() !== '') { window.userStats.playerName = nameInput.value.trim(); window.saveStats(); window.beginSync(); } 
+            else { if(nameInput) { nameInput.style.borderColor = 'var(--error)'; nameInput.placeholder = "Name is required!"; } }
         }
 
         window.beginSync = function() {
             window.bossHP = 100; window.chalScore = 0; window.chalTotal = 0; window.sessionXP = 0;
-            const box = document.getElementById('challenge-box');
-            if(!box) return;
+            const box = document.getElementById('challenge-box'); if(!box) return;
             box.innerHTML = `<div class="animate-pop" style="font-size: 1.5rem; color: var(--accent); padding: 3rem 0;">⚡ Syncing Dimension Realm...</div>`;
             setTimeout(window.startChallenge, 800);
         }
@@ -1699,244 +1611,66 @@
             box.innerHTML = `<div class="${isHit ? 'shake-anim' : 'animate-pop'}" style="width:100%;">${bossBar}${contentHTML}</div>`;
         }
 
-        // ============================================================
-        // JEE PYQ QUESTION BANK — JEE Main 2024 April + Classic PYQs
-        // ============================================================
         window.jeePYQBank = [
-            // --- JEE MAIN 2024 APRIL (from uploaded PDF) ---
-            {
-                id: 'jee2024_q1', type: 'mcq', diff: 'jee-advanced', ch: 'mechanics', year: 'JEE Main 2024 Apr Shift 1',
-                question: 'The stationary wave equation is y = 2a sin(2πnt/λ)cos(2πx/λ). Which of the following is NOT correct?',
-                options: ['[n/λ] = [T]', '[n] = [LT⁻¹]', '[x] = [L]', '[nt] = [L]'],
-                answer: 0,
-                explanation: 'n/λ is the ratio of frequency to wavelength = [T⁻¹]/[L] = [L⁻¹T⁻¹] ≠ [T]. So option (1) "n/λ = [T]" is NOT correct. Note: [nt] = [T⁻¹][T] = dimensionless ≈ [λ/λ] = [L], [n] = [LT⁻¹] (wave speed / wavelength).',
-                source: 'JEE Main 2024 Apr Shift 1'
-            },
-            {
-                id: 'jee2024_q2', type: 'mcq', diff: 'jee-advanced', ch: 'mechanics', year: 'JEE Main 2024 Apr Shift 2',
-                question: 'By homogeneity of dimensions, which formula for orbital time period T (G = gravitational constant, M = mass, r = orbital radius) is correct?',
-                options: ['T² = 4π²r²/(GM)', 'T² = 4π²r/(GM²)', 'T² = 4π²r³/(GM)', 'T² = 4π²r³G'],
-                answer: 2,
-                explanation: '[T²] = [r³/(GM)] → [L³] / ([M⁻¹L³T⁻²][M]) = [L³/L³T⁻²] = [T²] ✓. This is Kepler\'s Third Law derivable purely by dimensional analysis.',
-                source: 'JEE Main 2024 Apr Shift 2'
-            },
-            {
-                id: 'jee2024_q3', type: 'mcq', diff: 'jee-advanced', ch: 'mechanics', year: 'JEE Main 2024 May Shift 1',
-                question: 'If G is gravitational constant and u is energy density, which quantity has same dimensions as √(uG)?',
-                options: ['Pressure gradient per unit mass', 'Gravitational potential', 'Energy per unit mass', 'Force per unit mass'],
-                answer: 3,
-                explanation: '[uG] = [ML⁻¹T⁻²][M⁻¹L³T⁻²] = [L²T⁻⁴], so [√(uG)] = [LT⁻²] = [Force/Mass] = Force per unit mass (= acceleration).',
-                source: 'JEE Main 2024 May Shift 1'
-            },
-            {
-                id: 'jee2024_q4', type: 'mcq', diff: 'jee-advanced', ch: 'mechanics', year: 'JEE Main 2024 May Shift 2',
-                question: 'In the Van der Waals equation (P + a/V²)(V − b) = RT, what is the dimensional formula of ab⁻¹?',
-                options: ['[M⁻¹L⁵T³]', '[M⁶L⁷T⁴]', '[ML²T⁻²]', '[M⁰L³T⁻²]'],
-                answer: 2,
-                explanation: 'Since [V]=[b]=[L³], and [P]=[a/V²] so [a]=[PV²]=[ML⁻¹T⁻²][L⁶]=[ML⁵T⁻²]. Then ab⁻¹ = [ML⁵T⁻²]/[L³] = [ML²T⁻²].',
-                source: 'JEE Main 2024 May Shift 2'
-            },
-            {
-                id: 'jee2024_q5', type: 'match', diff: 'jee-advanced', ch: 'em', year: 'JEE Main 2024 Apr Shift 1',
-                question: 'Match: Torque → ?, Magnetic field (B) → ?, Magnetic moment → ?, Permeability (μ₀) → ?',
-                options: ['A-III, B-I, C-II, D-IV', 'A-IV, B-II, C-III, D-I', 'A-IV, B-III, C-II, D-I', 'A-I, B-III, C-II, D-IV'],
-                answer: 2,
-                explanation: 'Torque τ = r×F → [ML²T⁻²] (IV). B = F/(qv) → [MT⁻²A⁻¹] (III). Magnetic moment M = IA → [L²A] (II). μ₀ from B = μ₀Id/(r²) → [MLT⁻²A⁻²] (I). Answer: A-IV, B-III, C-II, D-I.',
-                source: 'JEE Main 2024 Apr Shift 1'
-            },
-            {
-                id: 'jee2024_q6', type: 'mcq', diff: 'jee-advanced', ch: 'thermo', year: 'JEE Main 2024 Apr Shift 2',
-                question: 'Statement I: Dimensions of specific heat = [L²T⁻²K⁻¹]. Statement II: Dimensions of gas constant = [ML²T⁻¹K⁻¹]. Which is correct?',
-                options: ['Both correct', 'Only Statement I correct', 'Both incorrect', 'Only Statement II correct'],
-                answer: 1,
-                explanation: 'Specific heat: s = Q/(mΔT) = [ML²T⁻²]/([M][K]) = [L²T⁻²K⁻¹] ✓. Gas constant R = PV/(nT) = [ML⁻¹T⁻²][L³]/([mol][K]) = [ML²T⁻²mol⁻¹K⁻¹] ≠ [ML²T⁻¹K⁻¹]. Statement II is wrong.',
-                source: 'JEE Main 2024 Apr Shift 2'
-            },
-            {
-                id: 'jee2024_q7', type: 'mcq', diff: 'jee-advanced', ch: 'em', year: 'JEE Main 2024 Apr Shift 2',
-                question: 'If ε₀ is permittivity of free space and E is electric field, the dimensions of ε₀E² are:',
-                options: ['[M⁻¹L⁻³T⁴A²]', '[ML²T⁻²]', '[M⁰L⁻²TA]', '[ML⁻¹T⁻²]'],
-                answer: 3,
-                explanation: 'ε₀E² represents energy density (Energy/Volume). [ML²T⁻²]/[L³] = [ML⁻¹T⁻²]. Alternatively: [ε₀]=C²/(Nm²)=[M⁻¹L⁻³T⁴A²], [E]=[MLT⁻³A⁻¹] → product = [ML⁻¹T⁻²] ✓',
-                source: 'JEE Main 2024 Apr Shift 2'
-            },
-            {
-                id: 'jee2024_q8', type: 'mcq', diff: 'medium', ch: 'thermo', year: 'JEE Main 2024 Apr Shift 1',
-                question: 'The dimensional formula of latent heat is:',
-                options: ['[ML²T⁻²]', '[M⁰L²T⁻²]', '[MLT⁻²]', '[M⁰LT⁻²]'],
-                answer: 1,
-                explanation: 'Latent heat L = Q/m (heat per unit mass). [Q]/[m] = [ML²T⁻²]/[M] = [M⁰L²T⁻²]. Mass cancels out. Same as specific heat capacity (per Kelvin, but here no temperature division).',
-                source: 'JEE Main 2024 Apr Shift 1'
-            },
-            {
-                id: 'jee2024_q9', type: 'mcq', diff: 'jee-advanced', ch: 'modern', year: 'JEE Main 2024 Apr Shift 2',
-                question: 'De-Broglie wavelength: λ = h/√(2mE). Dimensional formula of Planck\'s constant h is:',
-                options: ['[ML²T⁻¹]', '[ML⁻¹T⁻²]', '[MLT⁻²]', '[M²L²T⁻²]'],
-                answer: 0,
-                explanation: 'From E = hν → h = E/ν = [ML²T⁻²]/[T⁻¹] = [ML²T⁻¹]. Verify via λ=h/√(2mE): [L] = h/√([M][ML²T⁻²]) = h/[MLT⁻¹] → h = [ML²T⁻¹] ✓',
-                source: 'JEE Main 2024 Apr Shift 2'
-            },
-            // --- CLASSIC JEE PYQs ---
-            {
-                id: 'jee_classic_1', type: 'mcq', diff: 'jee-advanced', ch: 'em', year: 'JEE Classic',
-                question: 'The dimensions of (μ₀ε₀)⁻¹/² are:',
-                options: ['[LT⁻¹]', '[L⁻¹T]', '[LT]', '[L⁻¹T⁻¹]'],
-                answer: 0,
-                explanation: 'c = 1/√(μ₀ε₀) is the speed of light. So [1/√(μ₀ε₀)] = [c] = [LT⁻¹]. This is a fundamental result of electromagnetism.',
-                source: 'JEE Classic'
-            },
-            {
-                id: 'jee_classic_2', type: 'mcq', diff: 'hard', ch: 'mechanics', year: 'JEE Classic',
-                question: 'The dimensions of angular momentum are the same as:',
-                options: ['Torque', 'Energy', 'Planck\'s constant', 'Power × Time²'],
-                answer: 2,
-                explanation: 'Angular momentum L = mvr → [ML²T⁻¹]. Planck\'s constant h = E/f → [ML²T⁻²]/[T⁻¹] = [ML²T⁻¹]. They match! Torque = [ML²T⁻²], Energy = [ML²T⁻²], Power×Time² = [ML²T⁻¹] also works but Planck\'s constant is the classic answer.',
-                source: 'JEE Classic'
-            },
-            {
-                id: 'jee_classic_3', type: 'mcq', diff: 'hard', ch: 'em', year: 'JEE Classic',
-                question: 'Which of the following has dimensions of [ML⁻¹T⁻²]?',
-                options: ['Surface tension', 'Pressure', 'Viscosity', 'Spring constant'],
-                answer: 1,
-                explanation: 'Pressure = Force/Area = [MLT⁻²]/[L²] = [ML⁻¹T⁻²] ✓. Surface tension = [MT⁻²], Viscosity = [ML⁻¹T⁻¹], Spring constant = [MT⁻²]. Stress and Young\'s Modulus also share [ML⁻¹T⁻²].',
-                source: 'JEE Classic'
-            },
-            {
-                id: 'jee_classic_4', type: 'mcq', diff: 'medium', ch: 'mechanics', year: 'JEE Classic',
-                question: 'If F = 6πηrv (Stokes\' Law), what are the dimensions of η (dynamic viscosity)?',
-                options: ['[ML⁻¹T⁻¹]', '[ML⁻¹T⁻²]', '[MLT⁻¹]', '[ML⁰T⁻¹]'],
-                answer: 0,
-                explanation: 'From F = 6πηrv: η = F/(rv) = [MLT⁻²]/([L][LT⁻¹]) = [MLT⁻²]/[L²T⁻¹] = [ML⁻¹T⁻¹]. This is the Reynolds Number denominator: Re = ρvL/η.',
-                source: 'JEE Classic'
-            },
-            {
-                id: 'jee_classic_5', type: 'mcq', diff: 'hard', ch: 'modern', year: 'JEE Classic',
-                question: 'The dimensions of the universal gravitational constant G are:',
-                options: ['[M⁻¹L³T⁻²]', '[ML³T⁻²]', '[M⁻¹L²T⁻²]', '[ML²T⁻²]'],
-                answer: 0,
-                explanation: 'From F = GM₁M₂/r²: G = Fr²/(M₁M₂) = [MLT⁻²][L²]/[M²] = [ML³T⁻²]/[M²] = [M⁻¹L³T⁻²]. The negative mass exponent is key!',
-                source: 'JEE Classic'
-            },
-            {
-                id: 'jee_classic_6', type: 'mcq', diff: 'jee-advanced', ch: 'em', year: 'JEE Classic',
-                question: 'The dimension of (1/2)ε₀E² (electric energy density) is:',
-                options: ['[MLT⁻²]', '[ML⁻¹T⁻²]', '[ML²T⁻²]', '[ML⁻²T⁻²]'],
-                answer: 1,
-                explanation: 'Energy density = Energy/Volume = [ML²T⁻²]/[L³] = [ML⁻¹T⁻²]. Same as pressure — energy density and pressure share identical dimensions.',
-                source: 'JEE Classic'
-            },
-            {
-                id: 'jee_classic_7', type: 'mcq', diff: 'medium', ch: 'mechanics', year: 'JEE Classic',
-                question: 'Which pair has the SAME dimensional formula?',
-                options: ['Work and Torque', 'Work and Power', 'Force and Momentum', 'Power and Pressure'],
-                answer: 0,
-                explanation: 'Work = [ML²T⁻²] and Torque = r × F = [ML²T⁻²]. They are dimensionally identical! This is a classic JEE trap — they differ physically (scalar vs vector, dot vs cross product).',
-                source: 'JEE Classic'
-            },
-            {
-                id: 'jee_classic_8', type: 'mcq', diff: 'hard', ch: 'em', year: 'JEE Classic',
-                question: 'What are the dimensions of magnetic flux (Φ = B·A)?',
-                options: ['[ML²T⁻²A⁻¹]', '[MT⁻²A⁻¹]', '[ML²T⁻¹A⁻¹]', '[MLT⁻²A⁻¹]'],
-                answer: 0,
-                explanation: 'Φ = B × A. [B] = [MT⁻²A⁻¹], [A] = [L²]. So [Φ] = [MT⁻²A⁻¹][L²] = [ML²T⁻²A⁻¹]. This is also = [V·s] = Volt-seconds, consistent with Faraday\'s law ε = −dΦ/dt.',
-                source: 'JEE Classic'
-            },
-            {
-                id: 'jee_classic_9', type: 'mcq', diff: 'easy', ch: 'mechanics', year: 'JEE Classic',
-                question: 'The dimensional formula of the coefficient of restitution is:',
-                options: ['[MLT⁻¹]', '[LT⁻¹]', 'Dimensionless', '[MT⁻¹]'],
-                answer: 2,
-                explanation: 'Coefficient of restitution e = (relative velocity of separation) / (relative velocity of approach) = [LT⁻¹]/[LT⁻¹] = dimensionless. It is a pure ratio between 0 and 1.',
-                source: 'JEE Classic'
-            },
-            {
-                id: 'jee_classic_10', type: 'mcq', diff: 'hard', ch: 'modern', year: 'JEE Classic',
-                question: 'The dimensions of the Boltzmann constant k_B are:',
-                options: ['[ML²T⁻²K⁻¹]', '[MLT⁻²K⁻¹]', '[ML²T⁻¹K⁻¹]', '[ML²T⁻²]'],
-                answer: 0,
-                explanation: 'From PV = NkT: k = PV/(NT) = [ML⁻¹T⁻²][L³]/[K] = [ML²T⁻²K⁻¹]. Same as Entropy (J/K) and Heat Capacity. Note: identical to R (gas constant) just without mol.',
-                source: 'JEE Classic'
-            },
+            { id: 'jee2024_q1', type: 'mcq', diff: 'jee-advanced', ch: 'mechanics', year: 'JEE Main 2024 Apr Shift 1', question: 'The stationary wave equation is y = 2a sin(2πnt/λ)cos(2πx/λ). Which of the following is NOT correct?', options: ['[n/λ] = [T]', '[n] = [LT⁻¹]', '[x] = [L]', '[nt] = [L]'], answer: 0, explanation: 'n/λ is the ratio of frequency to wavelength = [T⁻¹]/[L] = [L⁻¹T⁻¹] ≠ [T]. So option (1) "n/λ = [T]" is NOT correct. Note: [nt] = [T⁻¹][T] = dimensionless ≈ [λ/λ] = [L], [n] = [LT⁻¹] (wave speed / wavelength).', source: 'JEE Main 2024 Apr Shift 1' },
+            { id: 'jee2024_q2', type: 'mcq', diff: 'jee-advanced', ch: 'mechanics', year: 'JEE Main 2024 Apr Shift 2', question: 'By homogeneity of dimensions, which formula for orbital time period T (G = gravitational constant, M = mass, r = orbital radius) is correct?', options: ['T² = 4π²r²/(GM)', 'T² = 4π²r/(GM²)', 'T² = 4π²r³/(GM)', 'T² = 4π²r³G'], answer: 2, explanation: '[T²] = [r³/(GM)] → [L³] / ([M⁻¹L³T⁻²][M]) = [L³/L³T⁻²] = [T²] ✓. This is Kepler\'s Third Law derivable purely by dimensional analysis.', source: 'JEE Main 2024 Apr Shift 2' },
+            { id: 'jee2024_q3', type: 'mcq', diff: 'jee-advanced', ch: 'mechanics', year: 'JEE Main 2024 May Shift 1', question: 'If G is gravitational constant and u is energy density, which quantity has same dimensions as √(uG)?', options: ['Pressure gradient per unit mass', 'Gravitational potential', 'Energy per unit mass', 'Force per unit mass'], answer: 3, explanation: '[uG] = [ML⁻¹T⁻²][M⁻¹L³T⁻²] = [L²T⁻⁴], so [√(uG)] = [LT⁻²] = [Force/Mass] = Force per unit mass (= acceleration).', source: 'JEE Main 2024 May Shift 1' },
+            { id: 'jee2024_q4', type: 'mcq', diff: 'jee-advanced', ch: 'mechanics', year: 'JEE Main 2024 May Shift 2', question: 'In the Van der Waals equation (P + a/V²)(V − b) = RT, what is the dimensional formula of ab⁻¹?', options: ['[M⁻¹L⁵T³]', '[M⁶L⁷T⁴]', '[ML²T⁻²]', '[M⁰L³T⁻²]'], answer: 2, explanation: 'Since [V]=[b]=[L³], and [P]=[a/V²] so [a]=[PV²]=[ML⁻¹T⁻²][L⁶]=[ML⁵T⁻²]. Then ab⁻¹ = [ML⁵T⁻²]/[L³] = [ML²T⁻²].', source: 'JEE Main 2024 May Shift 2' },
+            { id: 'jee2024_q5', type: 'match', diff: 'jee-advanced', ch: 'em', year: 'JEE Main 2024 Apr Shift 1', question: 'Match: Torque → ?, Magnetic field (B) → ?, Magnetic moment → ?, Permeability (μ₀) → ?', options: ['A-III, B-I, C-II, D-IV', 'A-IV, B-II, C-III, D-I', 'A-IV, B-III, C-II, D-I', 'A-I, B-III, C-II, D-IV'], answer: 2, explanation: 'Torque τ = r×F → [ML²T⁻²] (IV). B = F/(qv) → [MT⁻²A⁻¹] (III). Magnetic moment M = IA → [L²A] (II). μ₀ from B = μ₀Id/(r²) → [MLT⁻²A⁻²] (I). Answer: A-IV, B-III, C-II, D-I.', source: 'JEE Main 2024 Apr Shift 1' },
+            { id: 'jee2024_q6', type: 'mcq', diff: 'jee-advanced', ch: 'thermo', year: 'JEE Main 2024 Apr Shift 2', question: 'Statement I: Dimensions of specific heat = [L²T⁻²K⁻¹]. Statement II: Dimensions of gas constant = [ML²T⁻¹K⁻¹]. Which is correct?', options: ['Both correct', 'Only Statement I correct', 'Both incorrect', 'Only Statement II correct'], answer: 1, explanation: 'Specific heat: s = Q/(mΔT) = [ML²T⁻²]/([M][K]) = [L²T⁻²K⁻¹] ✓. Gas constant R = PV/(nT) = [ML⁻¹T⁻²][L³]/([mol][K]) = [ML²T⁻²mol⁻¹K⁻¹] ≠ [ML²T⁻¹K⁻¹]. Statement II is wrong.', source: 'JEE Main 2024 Apr Shift 2' },
+            { id: 'jee2024_q7', type: 'mcq', diff: 'jee-advanced', ch: 'em', year: 'JEE Main 2024 Apr Shift 2', question: 'If ε₀ is permittivity of free space and E is electric field, the dimensions of ε₀E² are:', options: ['[M⁻¹L⁻³T⁴A²]', '[ML²T⁻²]', '[M⁰L⁻²TA]', '[ML⁻¹T⁻²]'], answer: 3, explanation: 'ε₀E² represents energy density (Energy/Volume). [ML²T⁻²]/[L³] = [ML⁻¹T⁻²]. Alternatively: [ε₀]=C²/(Nm²)=[M⁻¹L⁻³T⁴A²], [E]=[MLT⁻³A⁻¹] → product = [ML⁻¹T⁻²] ✓', source: 'JEE Main 2024 Apr Shift 2' },
+            { id: 'jee2024_q8', type: 'mcq', diff: 'medium', ch: 'thermo', year: 'JEE Main 2024 Apr Shift 1', question: 'The dimensional formula of latent heat is:', options: ['[ML²T⁻²]', '[M⁰L²T⁻²]', '[MLT⁻²]', '[M⁰LT⁻²]'], answer: 1, explanation: 'Latent heat L = Q/m (heat per unit mass). [Q]/[m] = [ML²T⁻²]/[M] = [M⁰L²T⁻²]. Mass cancels out. Same as specific heat capacity (per Kelvin, but here no temperature division).', source: 'JEE Main 2024 Apr Shift 1' },
+            { id: 'jee2024_q9', type: 'mcq', diff: 'jee-advanced', ch: 'modern', year: 'JEE Main 2024 Apr Shift 2', question: 'De-Broglie wavelength: λ = h/√(2mE). Dimensional formula of Planck\'s constant h is:', options: ['[ML²T⁻¹]', '[ML⁻¹T⁻²]', '[MLT⁻²]', '[M²L²T⁻²]'], answer: 0, explanation: 'From E = hν → h = E/ν = [ML²T⁻²]/[T⁻¹] = [ML²T⁻¹]. Verify via λ=h/√(2mE): [L] = h/√([M][ML²T⁻²]) = h/[MLT⁻¹] → h = [ML²T⁻¹] ✓', source: 'JEE Main 2024 Apr Shift 2' },
+            { id: 'jee_classic_1', type: 'mcq', diff: 'jee-advanced', ch: 'em', year: 'JEE Classic', question: 'The dimensions of (μ₀ε₀)⁻¹/² are:', options: ['[LT⁻¹]', '[L⁻¹T]', '[LT]', '[L⁻¹T⁻¹]'], answer: 0, explanation: 'c = 1/√(μ₀ε₀) is the speed of light. So [1/√(μ₀ε₀)] = [c] = [LT⁻¹]. This is a fundamental result of electromagnetism.', source: 'JEE Classic' },
+            { id: 'jee_classic_2', type: 'mcq', diff: 'hard', ch: 'mechanics', year: 'JEE Classic', question: 'The dimensions of angular momentum are the same as:', options: ['Torque', 'Energy', 'Planck\'s constant', 'Power × Time²'], answer: 2, explanation: 'Angular momentum L = mvr → [ML²T⁻¹]. Planck\'s constant h = E/f → [ML²T⁻²]/[T⁻¹] = [ML²T⁻¹]. They match! Torque = [ML²T⁻²], Energy = [ML²T⁻²], Power×Time² = [ML²T⁻¹] also works but Planck\'s constant is the classic answer.', source: 'JEE Classic' },
+            { id: 'jee_classic_3', type: 'mcq', diff: 'hard', ch: 'em', year: 'JEE Classic', question: 'Which of the following has dimensions of [ML⁻¹T⁻²]?', options: ['Surface tension', 'Pressure', 'Viscosity', 'Spring constant'], answer: 1, explanation: 'Pressure = Force/Area = [MLT⁻²]/[L²] = [ML⁻¹T⁻²] ✓. Surface tension = [MT⁻²], Viscosity = [ML⁻¹T⁻¹], Spring constant = [MT⁻²]. Stress and Young\'s Modulus also share [ML⁻¹T⁻²].', source: 'JEE Classic' },
+            { id: 'jee_classic_4', type: 'mcq', diff: 'medium', ch: 'mechanics', year: 'JEE Classic', question: 'If F = 6πηrv (Stokes\' Law), what are the dimensions of η (dynamic viscosity)?', options: ['[ML⁻¹T⁻¹]', '[ML⁻¹T⁻²]', '[MLT⁻¹]', '[ML⁰T⁻¹]'], answer: 0, explanation: 'From F = 6πηrv: η = F/(rv) = [MLT⁻²]/([L][LT⁻¹]) = [MLT⁻²]/[L²T⁻¹] = [ML⁻¹T⁻¹]. This is the Reynolds Number denominator: Re = ρvL/η.', source: 'JEE Classic' },
+            { id: 'jee_classic_5', type: 'mcq', diff: 'hard', ch: 'modern', year: 'JEE Classic', question: 'The dimensions of the universal gravitational constant G are:', options: ['[M⁻¹L³T⁻²]', '[ML³T⁻²]', '[M⁻¹L²T⁻²]', '[ML²T⁻²]'], answer: 0, explanation: 'From F = GM₁M₂/r²: G = Fr²/(M₁M₂) = [MLT⁻²][L²]/[M²] = [ML³T⁻²]/[M²] = [M⁻¹L³T⁻²]. The negative mass exponent is key!', source: 'JEE Classic' },
+            { id: 'jee_classic_6', type: 'mcq', diff: 'jee-advanced', ch: 'em', year: 'JEE Classic', question: 'The dimension of (1/2)ε₀E² (electric energy density) is:', options: ['[MLT⁻²]', '[ML⁻¹T⁻²]', '[ML²T⁻²]', '[ML⁻²T⁻²]'], answer: 1, explanation: 'Energy density = Energy/Volume = [ML²T⁻²]/[L³] = [ML⁻¹T⁻²]. Same as pressure — energy density and pressure share identical dimensions.', source: 'JEE Classic' },
+            { id: 'jee_classic_7', type: 'mcq', diff: 'medium', ch: 'mechanics', year: 'JEE Classic', question: 'Which pair has the SAME dimensional formula?', options: ['Work and Torque', 'Work and Power', 'Force and Momentum', 'Power and Pressure'], answer: 0, explanation: 'Work = [ML²T⁻²] and Torque = r × F = [ML²T⁻²]. They are dimensionally identical! This is a classic JEE trap — they differ physically (scalar vs vector, dot vs cross product).', source: 'JEE Classic' },
+            { id: 'jee_classic_8', type: 'mcq', diff: 'hard', ch: 'em', year: 'JEE Classic', question: 'What are the dimensions of magnetic flux (Φ = B·A)?', options: ['[ML²T⁻²A⁻¹]', '[MT⁻²A⁻¹]', '[ML²T⁻¹A⁻¹]', '[MLT⁻²A⁻¹]'], answer: 0, explanation: 'Φ = B × A. [B] = [MT⁻²A⁻¹], [A] = [L²]. So [Φ] = [MT⁻²A⁻¹][L²] = [ML²T⁻²A⁻¹]. This is also = [V·s] = Volt-seconds, consistent with Faraday\'s law ε = −dΦ/dt.', source: 'JEE Classic' },
+            { id: 'jee_classic_9', type: 'mcq', diff: 'easy', ch: 'mechanics', year: 'JEE Classic', question: 'The dimensional formula of the coefficient of restitution is:', options: ['[MLT⁻¹]', '[LT⁻¹]', 'Dimensionless', '[MT⁻¹]'], answer: 2, explanation: 'Coefficient of restitution e = (relative velocity of separation) / (relative velocity of approach) = [LT⁻¹]/[LT⁻¹] = dimensionless. It is a pure ratio between 0 and 1.', source: 'JEE Classic' },
+            { id: 'jee_classic_10', type: 'mcq', diff: 'hard', ch: 'modern', year: 'JEE Classic', question: 'The dimensions of the Boltzmann constant k_B are:', options: ['[ML²T⁻²K⁻¹]', '[MLT⁻²K⁻¹]', '[ML²T⁻¹K⁻¹]', '[ML²T⁻²]'], answer: 0, explanation: 'From PV = NkT: k = PV/(NT) = [ML⁻¹T⁻²][L³]/[K] = [ML²T⁻²K⁻¹]. Same as Entropy (J/K) and Heat Capacity. Note: identical to R (gas constant) just without mol.', source: 'JEE Classic' },
         ];
 
         window.startChallenge = function() {
-            const diffFilter = document.getElementById('chal-difficulty').value;
-            const chapterFilter = document.getElementById('chal-chapter').value;
-            const pName = window.userStats.playerName || 'Cadet';
+            const diffFilter = document.getElementById('chal-difficulty').value; const chapterFilter = document.getElementById('chal-chapter').value; const pName = window.userStats.playerName || 'Cadet';
 
-            // ---- JEE PYQ MODE ----
             if (diffFilter === 'jee') {
-                let pool = window.jeePYQBank;
-                if (chapterFilter !== 'all') pool = pool.filter(q => q.ch === chapterFilter);
-                if (pool.length === 0) pool = window.jeePYQBank;
-                const q = window.getUniqueQuestion(pool, 'jee');
-                window.currentQuestionDiff = 'jee-advanced';
-                window.currentQuestionChapter = q.ch;
-                const xp = 50;
+                let pool = window.jeePYQBank; if (chapterFilter !== 'all') pool = pool.filter(q => q.ch === chapterFilter); if (pool.length === 0) pool = window.jeePYQBank;
+                const q = window.getUniqueQuestion(pool, 'jee'); window.currentQuestionDiff = 'jee-advanced'; window.currentQuestionChapter = q.ch; const xp = 50;
                 const diffTag = `<div class="diff-tag" style="position:relative; float:right; background:rgba(251,191,36,0.15); border-color:var(--gold); color:var(--gold);">⚡ ${q.source} | +${xp} XP</div>`;
-                
-                window.chalCurrentAnswer = q.answer;
-                window.chalCurrentContext = { explanation: q.explanation, source: q.source };
-                const btns = q.options.map((opt, i) =>
-                    `<button onclick="checkChallenge(4, ${i})" style="text-align:left; padding:0.6rem 1rem;">${['A','B','C','D'][i]}. ${opt}</button>`
-                ).join('');
-                window.updateBossUI(`${diffTag}
-                    <div style="background:rgba(251,191,36,0.08); border:1px solid var(--gold); border-radius:6px; padding:0.75rem 1rem; margin-bottom:1rem; text-align:left;">
-                        <div style="color:var(--gold); font-size:0.8rem; font-weight:bold; letter-spacing:1px; margin-bottom:0.4rem;">📄 ${q.source}</div>
-                        <div style="font-size:1.05rem; color:var(--text-main); line-height:1.6;">${q.question}</div>
-                    </div>
-                    <div class="challenge-btn-group" style="flex-direction:column; max-width:500px; margin:0 auto;">${btns}</div>`, false);
-                return;
+                window.chalCurrentAnswer = q.answer; window.chalCurrentContext = { explanation: q.explanation, source: q.source };
+                const btns = q.options.map((opt, i) => `<button onclick="checkChallenge(4, ${i})" style="text-align:left; padding:0.6rem 1rem;">${['A','B','C','D'][i]}. ${opt}</button>`).join('');
+                window.updateBossUI(`${diffTag}<div style="background:rgba(251,191,36,0.08); border:1px solid var(--gold); border-radius:6px; padding:0.75rem 1rem; margin-bottom:1rem; text-align:left;"><div style="color:var(--gold); font-size:0.8rem; font-weight:bold; letter-spacing:1px; margin-bottom:0.4rem;">📄 ${q.source}</div><div style="font-size:1.05rem; color:var(--text-main); line-height:1.6;">${q.question}</div></div><div class="challenge-btn-group" style="flex-direction:column; max-width:500px; margin:0 auto;">${btns}</div>`, false); return;
             }
 
-            // ---- STANDARD BATTLE MODE ----
-            const types = [1, 2, 3];
-            const type = types[Math.floor(Math.random() * types.length)];
+            const types = [1, 2, 3]; const type = types[Math.floor(Math.random() * types.length)];
             let validKeys = Object.keys(window.dimDict).filter(k => !k.startsWith('__TMP') && window.dimDict[k].name !== 'Length' && window.dimDict[k].name !== 'Distance');
             let activeChapter = chapterFilter === 'all' ? ['mechanics','thermo','em','modern'][Math.floor(Math.random()*4)] : chapterFilter;
-            window.currentQuestionChapter = activeChapter;
-            let chapteredKeys = validKeys.filter(k => window.dimDict[k].chapter === activeChapter);
+            window.currentQuestionChapter = activeChapter; let chapteredKeys = validKeys.filter(k => window.dimDict[k].chapter === activeChapter);
 
-            // Filter by difficulty if set
             if (diffFilter !== 'all') {
-                const diffMap = { easy: ['easy'], medium: ['medium'], hard: ['hard', 'jee-advanced'] };
-                const allowed = diffMap[diffFilter] || null;
-                if (allowed) {
-                    let filtered = chapteredKeys.filter(k => allowed.includes(window.dimDict[k].diff));
-                    if (filtered.length >= 2) chapteredKeys = filtered;
-                }
+                const diffMap = { easy: ['easy'], medium: ['medium'], hard: ['hard', 'jee-advanced'] }; const allowed = diffMap[diffFilter] || null;
+                if (allowed) { let filtered = chapteredKeys.filter(k => allowed.includes(window.dimDict[k].diff)); if (filtered.length >= 2) chapteredKeys = filtered; }
             }
-
-            if (chapteredKeys.length < 4) {
-                document.getElementById('challenge-box').innerHTML = `<span class="error-text">Not enough quantities for this filter. Try "All Chapters" or "All Difficulties".</span>`; return;
-            }
+            if (chapteredKeys.length < 4) { document.getElementById('challenge-box').innerHTML = `<span class="error-text">Not enough quantities for this filter. Try "All Chapters" or "All Difficulties".</span>`; return; }
 
             if (type === 1 || type === 2) {
-                const randomKey = window.getUniqueQuestion(chapteredKeys, activeChapter);
-                const item = window.dimDict[randomKey];
-                window.currentQuestionDiff = item.diff;
-                const xp = item.diff==='easy'?10:item.diff==='medium'?15:item.diff==='hard'?25:50;
-                const diffColors = { easy:'var(--success)', medium:'var(--gold)', hard:'var(--chaos)', 'jee-advanced':'var(--xp-color)' };
+                const randomKey = window.getUniqueQuestion(chapteredKeys, activeChapter); const item = window.dimDict[randomKey]; window.currentQuestionDiff = item.diff;
+                const xp = item.diff==='easy'?10:item.diff==='medium'?15:item.diff==='hard'?25:50; const diffColors = { easy:'var(--success)', medium:'var(--gold)', hard:'var(--chaos)', 'jee-advanced':'var(--xp-color)' };
                 const diffTag = `<div class="diff-tag" style="position:relative;float:right;border-color:${diffColors[item.diff]||'var(--border)'};color:${diffColors[item.diff]||'var(--text-muted)'};">${item.diff.toUpperCase()} | +${xp} XP</div>`;
 
                 if (type === 1) {
                     window.chalCurrentAnswer = window.formatDim(item).replace(/\[|\]/g, '');
-                    window.updateBossUI(`${diffTag}<div class="marshall-text">⚡ Dimension Marshall:</div><div class="dialogue-quote">"Strike him by revealing the true dimensions of <strong style="color:var(--accent);">${item.name}</strong>, ${pName}."</div>
-                    <div style="color:var(--text-muted); font-size:0.9rem; margin-bottom:0.5rem;">Type like: ML2T-2 &nbsp;|&nbsp; M1L2T-2 &nbsp;|&nbsp; [ML2T-2]</div>
-                    <input type="text" id="chal-ans-input" placeholder="e.g., ML2T-2" style="max-width:300px;margin:0 auto;text-align:center;" onkeydown="if(event.key==='Enter') checkChallenge(1);">
-                    <div class="challenge-btn-group"><button onclick="checkChallenge(1)">⚔️ Attack</button></div>`, false);
+                    window.updateBossUI(`${diffTag}<div class="marshall-text">⚡ Dimension Marshall:</div><div class="dialogue-quote">"Strike him by revealing the true dimensions of <strong style="color:var(--accent);">${item.name}</strong>, ${pName}."</div><div style="color:var(--text-muted); font-size:0.9rem; margin-bottom:0.5rem;">Type like: ML2T-2 &nbsp;|&nbsp; M1L2T-2 &nbsp;|&nbsp; [ML2T-2]</div><input type="text" id="chal-ans-input" placeholder="e.g., ML2T-2" style="max-width:300px;margin:0 auto;text-align:center;" onkeydown="if(event.key==='Enter') checkChallenge(1);"><div class="challenge-btn-group"><button onclick="checkChallenge(1)">⚔️ Attack</button></div>`, false);
                 } else {
-                    window.chalCurrentAnswer = randomKey;
-                    let options = [randomKey];
-                    const allKeys = Object.keys(window.dimDict).filter(k => !k.startsWith('__TMP'));
+                    window.chalCurrentAnswer = randomKey; let options = [randomKey]; const allKeys = Object.keys(window.dimDict).filter(k => !k.startsWith('__TMP'));
                     while (options.length < 4) { let f = allKeys[Math.floor(Math.random()*allKeys.length)]; if (!options.includes(f) && window.formatDim(window.dimDict[f]) !== window.formatDim(item)) options.push(f); }
-                    options.sort(() => Math.random() - 0.5);
-                    const btnHtml = options.map(opt => `<button onclick="checkChallenge(2,'${opt}')">${window.dimDict[opt].name}</button>`).join('');
-                    window.updateBossUI(`${diffTag}<div class="chaos-text" style="font-size:1rem;">🌌 Chaos Dimensioneer:</div><div class="dialogue-quote">"You will never guess what quantity hides behind <strong style="color:var(--accent);">${window.formatDim(item)}</strong>, ${pName}!"</div>
-                    <div class="challenge-btn-group" style="flex-direction:column;max-width:400px;margin:0 auto;">${btnHtml}</div>`, false);
+                    options.sort(() => Math.random() - 0.5); const btnHtml = options.map(opt => `<button onclick="checkChallenge(2,'${opt}')">${window.dimDict[opt].name}</button>`).join('');
+                    window.updateBossUI(`${diffTag}<div class="chaos-text" style="font-size:1rem;">🌌 Chaos Dimensioneer:</div><div class="dialogue-quote">"You will never guess what quantity hides behind <strong style="color:var(--accent);">${window.formatDim(item)}</strong>, ${pName}!"</div><div class="challenge-btn-group" style="flex-direction:column;max-width:400px;margin:0 auto;">${btnHtml}</div>`, false);
                 }
             } else {
-                // Equation validity question
                 const baseEqs = [
                     { id:'eq1',  eq:'v = u + a·t',           valid:true,  lhs:'[LT⁻¹]',      rhs:'[LT⁻¹]',      diff:'easy',         ch:'mechanics'},
                     { id:'eq2',  eq:'s = u·t + ½·a·t²',      valid:true,  lhs:'[L]',          rhs:'[L]',          diff:'medium',       ch:'mechanics'},
@@ -1959,35 +1693,18 @@
                     { id:'eq19', eq:'de Broglie: λ = h/(mv)',  valid:true,  lhs:'[L]',          rhs:'[L]',          diff:'jee-advanced', ch:'modern'},
                     { id:'eq20', eq:'τ = r × F (torque)',     valid:true,  lhs:'[ML²T⁻²]',    rhs:'[ML²T⁻²]',    diff:'medium',       ch:'mechanics'},
                 ];
-
-                let eqPool = baseEqs;
-                if (chapterFilter !== 'all') eqPool = baseEqs.filter(e => e.ch === chapterFilter);
-                if (eqPool.length === 0) eqPool = baseEqs;
-                // Filter by difficulty
-                if (diffFilter !== 'all') {
-                    const diffMap = { easy:['easy'], medium:['medium'], hard:['hard','jee-advanced'] };
-                    const allowed = diffMap[diffFilter];
-                    if (allowed) { let df = eqPool.filter(e => allowed.includes(e.diff)); if (df.length > 0) eqPool = df; }
-                }
-
-                const cEq = { ...window.getUniqueQuestion(eqPool, 'eqs') };
-                window.currentQuestionChapter = cEq.ch;
-                window.currentQuestionDiff = cEq.diff;
-                const xp = cEq.diff==='easy'?10:cEq.diff==='medium'?15:cEq.diff==='hard'?25:50;
-                const diffColors = { easy:'var(--success)', medium:'var(--gold)', hard:'var(--chaos)', 'jee-advanced':'var(--xp-color)' };
+                let eqPool = baseEqs; if (chapterFilter !== 'all') eqPool = baseEqs.filter(e => e.ch === chapterFilter); if (eqPool.length === 0) eqPool = baseEqs;
+                if (diffFilter !== 'all') { const diffMap = { easy:['easy'], medium:['medium'], hard:['hard','jee-advanced'] }; const allowed = diffMap[diffFilter]; if (allowed) { let df = eqPool.filter(e => allowed.includes(e.diff)); if (df.length > 0) eqPool = df; } }
+                const cEq = { ...window.getUniqueQuestion(eqPool, 'eqs') }; window.currentQuestionChapter = cEq.ch; window.currentQuestionDiff = cEq.diff;
+                const xp = cEq.diff==='easy'?10:cEq.diff==='medium'?15:cEq.diff==='hard'?25:50; const diffColors = { easy:'var(--success)', medium:'var(--gold)', hard:'var(--chaos)', 'jee-advanced':'var(--xp-color)' };
                 const diffTag = `<div class="diff-tag" style="position:relative;float:right;border-color:${diffColors[cEq.diff]};color:${diffColors[cEq.diff]};">${cEq.diff.toUpperCase()} | +${xp} XP</div>`;
 
                 if (Math.random() > 0.5) {
-                    cEq.valid = false;
-                    const ruinMap = {'a':'v','v':'s','m':'s','F':'P','R_gas':'HC','I':'q'};
+                    cEq.valid = false; const ruinMap = {'a':'v','v':'s','m':'s','F':'P','R_gas':'HC','I':'q'};
                     for (let r in ruinMap) { if (cEq.eq.includes(r)) { cEq.eq = cEq.eq.replace(r, ruinMap[r]); cEq.rhs = '[Mismatch]'; break; } }
                 }
-                window.chalCurrentAnswer = cEq.valid;
-                window.chalCurrentContext = { lhs: cEq.lhs, rhs: cEq.rhs };
-                window.updateBossUI(`${diffTag}
-                    <div class="chaos-text" style="font-size:1rem;">🌌 Chaos Dimensioneer:</div><div class="dialogue-quote">"Behold my perfect physics: <strong>${cEq.eq}</strong>. Flawless!"</div>
-                    <div class="marshall-text" style="font-size:1rem;margin-top:-10px;">⚡ Dimension Marshall:</div><div class="dialogue-quote" style="font-size:0.9rem;">"${pName}, is this dimensionally correct, or is it a trap?"</div>
-                    <div class="challenge-btn-group"><button onclick="checkChallenge(3,true)">✅ Valid</button><button onclick="checkChallenge(3,false)">❌ Trap (Invalid)</button></div>`, false);
+                window.chalCurrentAnswer = cEq.valid; window.chalCurrentContext = { lhs: cEq.lhs, rhs: cEq.rhs };
+                window.updateBossUI(`${diffTag}<div class="chaos-text" style="font-size:1rem;">🌌 Chaos Dimensioneer:</div><div class="dialogue-quote">"Behold my perfect physics: <strong>${cEq.eq}</strong>. Flawless!"</div><div class="marshall-text" style="font-size:1rem;margin-top:-10px;">⚡ Dimension Marshall:</div><div class="dialogue-quote" style="font-size:0.9rem;">"${pName}, is this dimensionally correct, or is it a trap?"</div><div class="challenge-btn-group"><button onclick="checkChallenge(3,true)">✅ Valid</button><button onclick="checkChallenge(3,false)">❌ Trap (Invalid)</button></div>`, false);
             }
         }
 
@@ -1999,201 +1716,88 @@
                 while((match = regex.exec(cleanStr)) !== null) { let dim = match[1], pow = parseFloat((match[2] || "1").replace('²', '2').replace('³', '3').replace('⁴', '4').replace('⁵', '5').replace('⁻', '-')); if(dim==='M') M=pow; if(dim==='L') L=pow; if(dim==='T') T=pow; if(dim==='I') I=pow; if(dim==='K') K=pow; if(dim==='MOL') mol=pow; }
                 if(window.formatDim(window.createDim(M, L, T, I, K, mol)).replace(/\[|\]/g, '') === window.chalCurrentAnswer || (!window.chalCurrentAnswer && M===0&&L===0&&T===0&&I===0)) isCorrect = true;
                 explanation = `Correct Dimensions: <strong>[${window.chalCurrentAnswer || 'Dimensionless'}]</strong>`;
-            } else if(type === 2) {
+            } else if(type === 2) { isCorrect = (answer === window.chalCurrentAnswer); explanation = `Correct Quantity: <strong>${window.dimDict[window.chalCurrentAnswer].name}</strong>`; } 
+            else if(type === 3) { isCorrect = (answer === window.chalCurrentAnswer); explanation = `LHS = ${window.chalCurrentContext.lhs} &nbsp;|&nbsp; RHS = ${window.chalCurrentContext.rhs}`; } 
+            else if(type === 4) {
                 isCorrect = (answer === window.chalCurrentAnswer);
-                explanation = `Correct Quantity: <strong>${window.dimDict[window.chalCurrentAnswer].name}</strong>`;
-            } else if(type === 3) {
-                isCorrect = (answer === window.chalCurrentAnswer);
-                explanation = `LHS = ${window.chalCurrentContext.lhs} &nbsp;|&nbsp; RHS = ${window.chalCurrentContext.rhs}`;
-            } else if(type === 4) {
-                // JEE PYQ MCQ — answer is the index (0-3)
-                isCorrect = (answer === window.chalCurrentAnswer);
-                explanation = `<div style="background:rgba(59,130,246,0.08);border-left:3px solid var(--accent);padding:0.75rem;border-radius:4px;margin-top:0.5rem;text-align:left;font-size:0.95rem;line-height:1.7;">
-                    <strong style="color:var(--accent);">📖 Full Explanation:</strong><br>${window.chalCurrentContext.explanation}<br>
-                    <span style="color:var(--text-muted);font-size:0.85rem;">Source: ${window.chalCurrentContext.source}</span>
-                </div>`;
+                explanation = `<div style="background:rgba(59,130,246,0.08);border-left:3px solid var(--accent);padding:0.75rem;border-radius:4px;margin-top:0.5rem;text-align:left;font-size:0.95rem;line-height:1.7;"><strong style="color:var(--accent);">📖 Full Explanation:</strong><br>${window.chalCurrentContext.explanation}<br><span style="color:var(--text-muted);font-size:0.85rem;">Source: ${window.chalCurrentContext.source}</span></div>`;
             }
 
-            window.chalTotal++; window.userStats.totalQsSolved++;
-            
-            let chapterKey = window.currentQuestionChapter || 'mechanics'; 
-            window.userStats.chapterTotal[chapterKey]++;
-            
+            window.chalTotal++; window.userStats.totalQsSolved++; let chapterKey = window.currentQuestionChapter || 'mechanics'; window.userStats.chapterTotal[chapterKey]++;
             let earnedXP = 0, mResponse = "";
             if(isCorrect) {
                 window.chalScore++; window.userStats.streak++; window.userStats.chapterCorrect[chapterKey]++;
                 if(window.userStats.streak > window.userStats.highestStreak) window.userStats.highestStreak = window.userStats.streak;
                 earnedXP = window.currentQuestionDiff==='easy'?10:window.currentQuestionDiff==='medium'?15:window.currentQuestionDiff==='hard'?25:50;
-                window.bossHP = Math.max(0, window.bossHP - 10);
-                mResponse = `"Direct hit! The dimensions are balanced."`;
-                window.sessionXP += earnedXP; window.userStats.xp += earnedXP;
+                window.bossHP = Math.max(0, window.bossHP - 10); mResponse = `"Direct hit! The dimensions are balanced."`; window.sessionXP += earnedXP; window.userStats.xp += earnedXP;
             } else { window.userStats.streak = 0; mResponse = `"Missed! Re-examine your assumptions."`; }
 
             let questUi = document.getElementById('daily-quest-ui');
             if(window.chalScore >= 7 && !window.userStats.dailyCompleted && questUi) { window.userStats.dailyCompleted = true; window.sessionXP += 100; window.userStats.xp += 100; if(!window.userStats.badges.includes('daily_scholar')) window.userStats.badges.push('daily_scholar'); }
             if(window.chalTotal === window.chalMaxQuestions && window.chalScore === window.chalMaxQuestions) { window.sessionXP += 50; window.userStats.xp += 50; window.userStats.perfectRounds++; window.userStats.bossesDefeated++; }
             else if(window.chalTotal === window.chalMaxQuestions && window.chalScore >= 7) { window.userStats.bossesDefeated++; }
-            // Award streak badge
             if(window.userStats.highestStreak >= 10 && !window.userStats.badges.includes('streak_10')) window.userStats.badges.push('streak_10');
-            // Award century badge
             if(window.userStats.totalQsSolved >= 100 && !window.userStats.badges.includes('century')) window.userStats.badges.push('century');
-            // Award boss slayer badge
             if(window.userStats.bossesDefeated >= 5 && !window.userStats.badges.includes('boss_slayer')) window.userStats.badges.push('boss_slayer');
-            // Award dimension lord badge
             if(window.getLevelInfo(window.userStats.xp).level >= 5 && !window.userStats.badges.includes('dimension_lord')) window.userStats.badges.push('dimension_lord');
             window.saveStats();
 
             let nextAction = window.bossHP <= 0 || window.chalTotal >= window.chalMaxQuestions ? `<button class="primary-btn" style="background: var(--gold); color: #000; max-width:250px; margin: 0 auto;" onclick="showResults()">View Battle Results</button>` : `<button class="primary-btn" style="max-width:250px; margin: 0 auto;" onclick="startChallenge()">Next Strike</button>`;
-            window.updateBossUI(`
-                <div class="marshall-text" style="font-size:1rem;">⚡ Dimension Marshall:</div><div class="dialogue-quote">${mResponse}</div>
-                <div style="font-size: 2rem; color: ${isCorrect?'var(--success)':'var(--error)'}; margin-bottom: 0.5rem;">${isCorrect?'Direct Hit! ⚔️':'Blocked! 🛡️'} <span style="font-size: 1rem; color: var(--xp-color);">${isCorrect?'+'+earnedXP+' XP':''}</span></div>
-                <div style="margin-bottom: 1.5rem; color: var(--text-muted); font-size: 1.1rem;">${explanation}</div>${nextAction}
-            `, isCorrect);
+            window.updateBossUI(`<div class="marshall-text" style="font-size:1rem;">⚡ Dimension Marshall:</div><div class="dialogue-quote">${mResponse}</div><div style="font-size: 2rem; color: ${isCorrect?'var(--success)':'var(--error)'}; margin-bottom: 0.5rem;">${isCorrect?'Direct Hit! ⚔️':'Blocked! 🛡️'} <span style="font-size: 1rem; color: var(--xp-color);">${isCorrect?'+'+earnedXP+' XP':''}</span></div><div style="margin-bottom: 1.5rem; color: var(--text-muted); font-size: 1.1rem;">${explanation}</div>${nextAction}`, isCorrect);
         }
 
         window.showResults = function() {
             const percent = window.chalTotal > 0 ? Math.round((window.chalScore / window.chalTotal) * 100) : 0;
-            if(percent === 100 && !window.userStats.badges.includes('first_perfect')){
-                window.userStats.badges.push('first_perfect');
-            } 
-            window.saveStats();
-            let title = percent === 100 ? '👑 FLAWLESS VICTORY' : percent >= 70 ? '🏆 BOSS DEFEATED' : '💀 RETREAT';
-            window.shareTitle = title;
+            if(percent === 100 && !window.userStats.badges.includes('first_perfect')){ window.userStats.badges.push('first_perfect'); } window.saveStats();
+            let title = percent === 100 ? '👑 FLAWLESS VICTORY' : percent >= 70 ? '🏆 BOSS DEFEATED' : '💀 RETREAT'; window.shareTitle = title;
             document.getElementById('challenge-box').innerHTML = `
-                <div class="challenge-result animate-pop">
-                    <h4 style="color:var(--text-muted); letter-spacing:2px; margin-bottom:0.5rem;">⚡ BATTLE REPORT</h4>
-                    <h2>${title}</h2>
-                    <div class="stats"><strong>Boss Damage:</strong> ${window.chalScore * 10}% <br><strong>Accuracy:</strong> ${percent}% <br><strong style="color:var(--xp-color);">XP Gained:</strong> +${window.sessionXP}</div>
-                    <div class="marshall-text">⚡ Dimension Marshall:</div><div class="message" style="font-style: italic;">"${percent >= 70 ? 'The Chaos Dimensioneer has fled. The realm is secure.' : 'We must train harder before facing him again.'}"</div>
-                    <div style="display:flex; gap:1rem; justify-content:center; max-width: 500px; margin: 0 auto; flex-wrap: wrap;">
-                        <button class="primary-btn" style="flex: 1; min-width: 150px;" onclick="startChallengeLoader()">Battle Again</button>
-                        <button class="secondary-btn" style="flex: 1; min-width: 150px; border-color: var(--gold); color: var(--gold); margin-left: 0;" onclick="shareResults(${percent}, '${title}')">Share Result 📱</button>
-                    </div>
-                </div>`;
+                <div class="challenge-result animate-pop"><h4 style="color:var(--text-muted); letter-spacing:2px; margin-bottom:0.5rem;">⚡ BATTLE REPORT</h4><h2>${title}</h2><div class="stats"><strong>Boss Damage:</strong> ${window.chalScore * 10}% <br><strong>Accuracy:</strong> ${percent}% <br><strong style="color:var(--xp-color);">XP Gained:</strong> +${window.sessionXP}</div><div class="marshall-text">⚡ Dimension Marshall:</div><div class="message" style="font-style: italic;">"${percent >= 70 ? 'The Chaos Dimensioneer has fled. The realm is secure.' : 'We must train harder before facing him again.'}"</div><div style="display:flex; gap:1rem; justify-content:center; max-width: 500px; margin: 0 auto; flex-wrap: wrap;"><button class="primary-btn" style="flex: 1; min-width: 150px;" onclick="startChallengeLoader()">Battle Again</button><button class="secondary-btn" style="flex: 1; min-width: 150px; border-color: var(--gold); color: var(--gold); margin-left: 0;" onclick="shareResults(${percent}, '${title}')">Share Result 📱</button></div></div>`;
         }
 
 
         // --- MODULE: TEACHER WORKSHEET ---
         window.generateWorksheet = function() {
-            const chapter = document.getElementById('teacher-chapter').value;
-            const count = parseInt(document.getElementById('teacher-count').value) || 10;
-            const wsType = document.getElementById('teacher-type').value;
-
+            const chapter = document.getElementById('teacher-chapter').value; const count = parseInt(document.getElementById('teacher-count').value) || 10; const wsType = document.getElementById('teacher-type').value;
             let validKeys = Object.keys(window.dimDict).filter(k => !k.startsWith('__TMP') && window.dimDict[k].name !== 'Length' && window.dimDict[k].name !== 'Distance');
             if (chapter !== 'all') validKeys = validKeys.filter(k => window.dimDict[k].chapter === chapter);
-
-            let jeePool = window.jeePYQBank;
-            if (chapter !== 'all') jeePool = window.jeePYQBank.filter(q => q.ch === chapter);
-            if (jeePool.length === 0) jeePool = window.jeePYQBank;
-
+            let jeePool = window.jeePYQBank; if (chapter !== 'all') jeePool = window.jeePYQBank.filter(q => q.ch === chapter); if (jeePool.length === 0) jeePool = window.jeePYQBank;
             let questions = [], answers = [];
 
             if (wsType === 'standard' || wsType === 'mixed') {
                 let stdCount = wsType === 'mixed' ? Math.ceil(count / 2) : count;
                 for (let i = 0; i < stdCount; i++) {
-                    const randomKey = validKeys[Math.floor(Math.random() * validKeys.length)];
-                    const d = window.dimDict[randomKey];
-                    questions.push({
-                        num: questions.length + 1,
-                        type: 'standard',
-                        text: `Derive the dimensional formula for <strong>${d.name}</strong>.`,
-                        answer: `${d.name} = ${window.formatDim(d)}`,
-                        hint: `Derivation: ${d.concept.join(` ${d.op||'→'} `)}`
-                    });
+                    const randomKey = validKeys[Math.floor(Math.random() * validKeys.length)]; const d = window.dimDict[randomKey];
+                    questions.push({ num: questions.length + 1, type: 'standard', text: `Derive the dimensional formula for <strong>${d.name}</strong>.`, answer: `${d.name} = ${window.formatDim(d)}`, hint: `Derivation: ${d.concept.join(` ${d.op||'→'} `)}` });
                 }
             }
 
             if (wsType === 'jee' || wsType === 'mixed') {
-                let jeeCount = wsType === 'mixed' ? Math.floor(count / 2) : count;
-                let usedIds = new Set();
+                let jeeCount = wsType === 'mixed' ? Math.floor(count / 2) : count; let usedIds = new Set();
                 for (let i = 0; i < jeeCount; i++) {
-                    let available = jeePool.filter(q => !usedIds.has(q.id));
-                    if (available.length === 0) { available = jeePool; usedIds = new Set(); }
-                    const q = available[Math.floor(Math.random() * available.length)];
-                    usedIds.add(q.id);
-                    const optLetters = ['A', 'B', 'C', 'D'];
+                    let available = jeePool.filter(q => !usedIds.has(q.id)); if (available.length === 0) { available = jeePool; usedIds = new Set(); }
+                    const q = available[Math.floor(Math.random() * available.length)]; usedIds.add(q.id); const optLetters = ['A', 'B', 'C', 'D'];
                     const optHtml = q.options.map((o, idx) => `<li style="margin-bottom:0.3rem;">(${optLetters[idx]}) ${o}</li>`).join('');
-                    questions.push({
-                        num: questions.length + 1,
-                        type: 'jee',
-                        text: `<span style="font-size:0.8rem;color:#555;font-weight:bold;">[${q.source}]</span><br>${q.question}<br><ul style="list-style:none;padding-left:1rem;margin-top:0.5rem;">${optHtml}</ul>`,
-                        answer: `(${optLetters[q.answer]}) ${q.options[q.answer]}`,
-                        hint: q.explanation
-                    });
+                    questions.push({ num: questions.length + 1, type: 'jee', text: `<span style="font-size:0.8rem;color:#555;font-weight:bold;">[${q.source}]</span><br>${q.question}<br><ul style="list-style:none;padding-left:1rem;margin-top:0.5rem;">${optHtml}</ul>`, answer: `(${optLetters[q.answer]}) ${q.options[q.answer]}`, hint: q.explanation });
                 }
             }
 
-            // Shuffle combined questions
-            questions.sort(() => Math.random() - 0.5);
-            questions.forEach((q, i) => q.num = i + 1);
+            questions.sort(() => Math.random() - 0.5); questions.forEach((q, i) => q.num = i + 1);
+            const qHtml = questions.map(q => `<div style="margin-bottom:${q.type==='jee'?'2.5':'3'}rem; page-break-inside:avoid;"><div style="font-size:1rem;"><strong>Q${q.num}.</strong> ${q.text}</div>${q.type === 'standard' ? `<div style="border-bottom:1px dotted #aaa;margin-top:2rem;width:100%;"></div>` : ''}</div>`).join('');
+            const ansHtml = questions.map(q => `<div style="margin-bottom:1rem; border-left:3px solid ${q.type==='jee'?'#3b82f6':'#22c55e'}; padding-left:0.75rem;"><strong>Q${q.num}.</strong> ${q.answer}<br><span style="color:#555;font-size:0.9rem;">${q.hint}</span></div>`).join('');
+            const typeLabel = wsType === 'jee' ? 'JEE PYQ MCQ Mode' : wsType === 'mixed' ? 'Mixed Mode (Standard + JEE PYQ)' : 'Standard Mode'; const chapterLabel = chapter === 'all' ? 'All Chapters' : chapter.charAt(0).toUpperCase() + chapter.slice(1);
 
-            const qHtml = questions.map(q =>
-                `<div style="margin-bottom:${q.type==='jee'?'2.5':'3'}rem; page-break-inside:avoid;">
-                    <div style="font-size:1rem;"><strong>Q${q.num}.</strong> ${q.text}</div>
-                    ${q.type === 'standard' ? `<div style="border-bottom:1px dotted #aaa;margin-top:2rem;width:100%;"></div>` : ''}
-                </div>`
-            ).join('');
-
-            const ansHtml = questions.map(q =>
-                `<div style="margin-bottom:1rem; border-left:3px solid ${q.type==='jee'?'#3b82f6':'#22c55e'}; padding-left:0.75rem;">
-                    <strong>Q${q.num}.</strong> ${q.answer}<br>
-                    <span style="color:#555;font-size:0.9rem;">${q.hint}</span>
-                </div>`
-            ).join('');
-
-            const typeLabel = wsType === 'jee' ? 'JEE PYQ MCQ Mode' : wsType === 'mixed' ? 'Mixed Mode (Standard + JEE PYQ)' : 'Standard Mode';
-            const chapterLabel = chapter === 'all' ? 'All Chapters' : chapter.charAt(0).toUpperCase() + chapter.slice(1);
-
-            const html = `<!DOCTYPE html>
-<html><head><title>CinePhysicsHQ — Dimensional Analysis Worksheet</title>
-<style>
-  body { font-family: Arial, sans-serif; padding: 2rem; max-width: 850px; margin: 0 auto; line-height: 1.7; color: #111; }
-  h1 { text-align: center; border-bottom: 3px solid #3b82f6; padding-bottom: 0.5rem; color: #1e293b; }
-  .meta { display: flex; justify-content: space-between; margin-bottom: 2rem; font-weight: bold; color: #475569; }
-  .badge { display:inline-block; background:#dbeafe; color:#1d4ed8; padding:0.2rem 0.6rem; border-radius:4px; font-size:0.85rem; margin-bottom:1rem; }
-  h2 { color: #1e293b; border-top: 2px dashed #cbd5e1; padding-top: 1rem; margin-top: 3rem; }
-  .ans-block { background:#f8fafc; border-radius:6px; padding:1rem; }
-  .footer { text-align:center; margin-top:3rem; color:#94a3b8; font-size:0.85rem; border-top:1px solid #e2e8f0; padding-top:1rem; }
-  @media print { .no-print { display: none; } body { padding: 1rem; } }
-</style></head><body>
-<button class="no-print" style="padding:10px 20px;font-size:16px;margin-bottom:20px;cursor:pointer;background:#3b82f6;color:white;border:none;border-radius:6px;" onclick="window.print()">🖨️ Print Worksheet</button>
-<h1>⚡ Dimensional Analysis Practice</h1>
-<div class="meta">
-  <span>Name: _________________________</span>
-  <span>Date: ____________</span>
-  <span>Score: _____ / ${questions.length}</span>
-</div>
-<div>
-  <span class="badge">📚 Chapter: ${chapterLabel}</span>
-  <span class="badge" style="background:#dcfce7;color:#166534;margin-left:0.5rem;">🎯 ${typeLabel}</span>
-  <span class="badge" style="background:#fef9c3;color:#92400e;margin-left:0.5rem;">Questions: ${questions.length}</span>
-</div>
-<p style="color:#475569;font-style:italic;margin-bottom:2rem;">Instructions: ${wsType!=='standard' ? 'For MCQ questions, circle the correct option. For standard questions, show your dimensional derivation step by step.' : 'Write the dimensional formula for each physical quantity. Show your derivation steps clearly.'}</p>
-<div class="q-list">${qHtml}</div>
-<h2>📋 Answer Key <span style="font-weight:normal;font-size:0.9rem;color:#475569;">(For Teacher Use Only)</span></h2>
-<div class="ans-block">${ansHtml}</div>
-<div class="footer">Generated by <strong>CinePhysicsHQ-Labs</strong> | Dimensional Analysis Lab | abhijit-cinephysics.github.io</div>
-</body></html>`;
-
-            const newWin = window.open('', '_blank');
-            newWin.document.write(html);
-            newWin.document.close();
+            const html = `<!DOCTYPE html><html><head><title>CinePhysicsHQ — Dimensional Analysis Worksheet</title><style> body { font-family: Arial, sans-serif; padding: 2rem; max-width: 850px; margin: 0 auto; line-height: 1.7; color: #111; } h1 { text-align: center; border-bottom: 3px solid #3b82f6; padding-bottom: 0.5rem; color: #1e293b; } .meta { display: flex; justify-content: space-between; margin-bottom: 2rem; font-weight: bold; color: #475569; } .badge { display:inline-block; background:#dbeafe; color:#1d4ed8; padding:0.2rem 0.6rem; border-radius:4px; font-size:0.85rem; margin-bottom:1rem; } h2 { color: #1e293b; border-top: 2px dashed #cbd5e1; padding-top: 1rem; margin-top: 3rem; } .ans-block { background:#f8fafc; border-radius:6px; padding:1rem; } .footer { text-align:center; margin-top:3rem; color:#94a3b8; font-size:0.85rem; border-top:1px solid #e2e8f0; padding-top:1rem; } @media print { .no-print { display: none; } body { padding: 1rem; } } </style></head><body><button class="no-print" style="padding:10px 20px;font-size:16px;margin-bottom:20px;cursor:pointer;background:#3b82f6;color:white;border:none;border-radius:6px;" onclick="window.print()">🖨️ Print Worksheet</button><h1>⚡ Dimensional Analysis Practice</h1><div class="meta"><span>Name: _________________________</span><span>Date: ____________</span><span>Score: _____ / ${questions.length}</span></div><div><span class="badge">📚 Chapter: ${chapterLabel}</span><span class="badge" style="background:#dcfce7;color:#166534;margin-left:0.5rem;">🎯 ${typeLabel}</span><span class="badge" style="background:#fef9c3;color:#92400e;margin-left:0.5rem;">Questions: ${questions.length}</span></div><p style="color:#475569;font-style:italic;margin-bottom:2rem;">Instructions: ${wsType!=='standard' ? 'For MCQ questions, circle the correct option. For standard questions, show your dimensional derivation step by step.' : 'Write the dimensional formula for each physical quantity. Show your derivation steps clearly.'}</p><div class="q-list">${qHtml}</div><h2>📋 Answer Key <span style="font-weight:normal;font-size:0.9rem;color:#475569;">(For Teacher Use Only)</span></h2><div class="ans-block">${ansHtml}</div><div class="footer">Generated by <strong>CinePhysicsHQ-Labs</strong> | Dimensional Analysis Lab | abhijit-cinephysics.github.io</div></body></html>`;
+            const newWin = window.open('', '_blank'); newWin.document.write(html); newWin.document.close();
         }
 
         // --- BOOTSTRAP INITIALIZATION ---
         document.addEventListener('DOMContentLoaded', () => {
-            if(localStorage.getItem('cinePhysicsTheme') === 'light') { 
-                document.body.classList.add('light-mode'); 
-                document.getElementById('theme-meta').content = '#f8fafc'; 
-            }
-            window.populateDropdowns('');
-            window.discoverQuantity(); 
-            window.initStats(); 
+            if(localStorage.getItem('cinePhysicsTheme') === 'light') { document.body.classList.add('light-mode'); document.getElementById('theme-meta').content = '#f8fafc'; }
+            window.populateDropdowns(''); window.discoverQuantity(); window.initStats(); 
+            if (!localStorage.getItem('cinePhysicsOnboarded')) { document.getElementById('onboarding-overlay').style.display = 'flex'; }
             
-            // Trigger onboarding if it's their first time
-            if (!localStorage.getItem('cinePhysicsOnboarded')) {
-                document.getElementById('onboarding-overlay').style.display = 'flex';
-            }
+            // Pre-load Reynolds Number on startup so the table isn't blank
+            setTimeout(() => { window.loadPiPreset('rho, v, d, mu'); }, 500);
         });
 
     </script>
