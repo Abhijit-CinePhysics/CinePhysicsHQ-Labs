@@ -245,7 +245,7 @@
     <header>
         <button class="theme-toggle" onclick="toggleTheme()">☀️ / 🌙 Theme</button>
         <h1>⚡ CinePhysicsHQ-Labs</h1>
-        <div class="version-tag">VERSION 4.2 — PI MATRIX EDITION</div>
+        <div class="version-tag">VERSION 4.3 — EQUATION MATRIX EDITION</div>
         <p>Interactive Physics Learning • Research • Exploration</p>
     </header>
 
@@ -722,8 +722,6 @@
             'density': 'rho', 'viscosity': 'mu', 'mass': 'm', 'time': 't',
             'distance': 'd', 'length': 'l', 'displacement': 's', 'volume': 'Vol',
             'momentum': 'p', 'torque': 'Tau', 'frequency': 'f',
-            // CRITICAL FIX: 'T' is NOT aliased to Temp. T is used as period/time variable
-            // in equations like "v = u + a*T". Use 'Temp' explicitly for temperature.
             'temperature': 'Temp', 'Temperature': 'Temp', 'temp': 'Temp',
             'current': 'I', 'charge': 'q', 'voltage': 'V', 'resistance': 'R',
             'entropy': 'Entropy', 'latentheat': 'LatentHeat', 'springconstant': 'SpringConst',
@@ -757,9 +755,6 @@
             "d,g,rho,st":   "Bo = ρgd² / ST  (Bond Number — gravity vs surface tension)",
         };
 
-        // Differential variable pseudo-entries (used by diff/int parser)
-        // These give the 'variable' its dimension when used as d(x) in diff(f, x)
-        // They shadow the same symbols in dimDict but only for the diff/int resolver
         window.diffVarMap = {
             't': window.createDim(0,0,1),   // dt → [T]
             'x': window.createDim(0,1,0),   // dx → [L]
@@ -786,35 +781,23 @@
         };
 
         window.mathFuncNames = [
-            // Roots
             'sqrt', 'cbrt', 'nthroot',
-            // Trigonometric
             'sin', 'cos', 'tan', 'cot', 'sec', 'csc',
-            'sind', 'cosd', 'tand',           // degree variants
-            // Inverse trig
+            'sind', 'cosd', 'tand',           
             'arcsin', 'arccos', 'arctan', 'arccot', 'arcsec', 'arccsc',
             'asin', 'acos', 'atan', 'atan2', 'acot',
-            // Hyperbolic
             'sinh', 'cosh', 'tanh', 'coth', 'sech', 'csch',
-            // Inverse hyperbolic
             'arcsinh', 'arccosh', 'arctanh', 'asinh', 'acosh', 'atanh',
-            // Exponential & logarithm
             'exp', 'log', 'ln', 'log2', 'log10', 'lg',
-            // Calculus operators (handled specially by parser)
             'diff', 'int', 'integral', 'deriv',
-            // Misc math
             'abs', 'sgn', 'sign', 'floor', 'ceil', 'round',
-            // Constants (treated as dimensionless numbers)
             'pi', 'π',
         ];
 
-        // ---------------------------------------------------------------
-        // MATH FUNCTION DIMENSION RULES
-        // ---------------------------------------------------------------
         window.mathFuncRules = {
             'sqrt':    'sqrt',
             'cbrt':    'cbrt',
-            'nthroot': 'sqrt',          // fallback; ideally user provides power separately
+            'nthroot': 'sqrt',          
             'sin': 'dimensionless_arg_out', 'cos': 'dimensionless_arg_out', 'tan': 'dimensionless_arg_out',
             'cot': 'dimensionless_arg_out', 'sec': 'dimensionless_arg_out', 'csc': 'dimensionless_arg_out',
             'sind':'dimensionless_arg_out', 'cosd':'dimensionless_arg_out', 'tand':'dimensionless_arg_out',
@@ -1230,13 +1213,66 @@
             const lhsData = evaluateSide('LHS', lhsTerms); if(globalError) { outputPanel.innerHTML = outputHTML + `<div class="edu-note"><span class="marshall-text">⚡ Dimension Marshall:</span><br><span class="dialogue-quote">"Math error detected. ${globalError}"</span></div></div>`; window.cleanupTempTokens(); return; }
             const rhsData = evaluateSide('RHS', rhsTerms); if(globalError) { outputPanel.innerHTML = outputHTML + `<div class="edu-note"><span class="marshall-text">⚡ Dimension Marshall:</span><br><span class="dialogue-quote">"Math error detected. ${globalError}"</span></div></div>`; window.cleanupTempTokens(); return; }
 
-            outputHTML += lhsData.html + rhsData.html + `<strong>Final Verification:</strong>\n`;
+            outputHTML += lhsData.html + rhsData.html;
+
+            // Generate Comparative Matrix Here
+            let matrixHTML = `
+                <div style="margin: 2rem 0; background: var(--bg-color); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem; overflow-x: auto;">
+                <h3 style="color: var(--text-main); font-size: 1.1rem; text-transform: uppercase; margin-bottom: 1rem; letter-spacing: 0.5px;">Dimensional Balance Matrix</h3>
+                <table class="pi-matrix-table">
+                    <thead>
+                        <tr>
+                            <th style="color: var(--gold); border: none; text-align: left; padding-left: 0;">Dimension</th>
+                            <th>LHS Term</th>
+                            <th>RHS Term</th>
+                            <th>Balance</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            const dims = ['M', 'L', 'T', 'I', 'K', 'mol'];
+            const dimLabels = {M: 'Mass [M]', L: 'Length [L]', T: 'Time [T]', I: 'Current [I]', K: 'Temp [K]', mol: 'Amount [mol]'};
+            let anyMismatch = false;
+            let rowsRendered = 0;
+
+            dims.forEach(d => {
+                let lhsVal = lhsData.dimObj ? (lhsData.dimObj[d] || 0) : 0;
+                let rhsVal = rhsData.dimObj ? (rhsData.dimObj[d] || 0) : 0;
+                
+                if (lhsVal !== 0 || rhsVal !== 0 || lhsVal !== rhsVal) {
+                    let isBalanced = lhsVal === rhsVal;
+                    if (!isBalanced) anyMismatch = true;
+                    rowsRendered++;
+                    
+                    let lhsColor = lhsVal !== rhsVal ? 'color: var(--error); font-weight: bold;' : 'color: var(--text-main);';
+                    let rhsColor = lhsVal !== rhsVal ? 'color: var(--error); font-weight: bold;' : 'color: var(--text-main);';
+
+                    matrixHTML += `
+                        <tr>
+                            <td style="color: var(--gold); text-align: left; font-weight: bold; border: none; padding-left: 0;">${dimLabels[d]}</td>
+                            <td style="${lhsColor}">${lhsVal}</td>
+                            <td style="${rhsColor}">${rhsVal}</td>
+                            <td style="font-size: 1.2rem;">${isBalanced ? '<span style="color: var(--success);">✔</span>' : '<span style="color: var(--error);">✖</span>'}</td>
+                        </tr>
+                    `;
+                }
+            });
+
+            if (rowsRendered === 0) {
+                matrixHTML += `<tr><td colspan="4" style="color:var(--text-muted); padding: 1rem;">Both sides are perfectly dimensionless [1].</td></tr>`;
+            }
+
+            matrixHTML += `</tbody></table></div>`;
+            outputHTML += matrixHTML;
+            outputHTML += `<strong>Final Verification:</strong>\n`;
+
             let marshallTutor = ""; let pName = window.userStats.playerName || "Cadet";
 
             if (!lhsData.isInternallyConsistent) { outputHTML += `<span class="error-text">✖ LHS terms are not dimensionally identical.</span>`; marshallTutor = `"${pName}, you cannot add apples to oranges. The terms on the left side of the equation have different dimensions."`; } 
             else if (!rhsData.isInternallyConsistent) { outputHTML += `<span class="error-text">✖ RHS terms are not dimensionally identical.</span>`; marshallTutor = `"The terms on the right side are mathematically incompatible. Check your addition/subtraction."`; } 
-            else if (lhsData.dimStr !== rhsData.dimStr) { outputHTML += `[LHS] = ${lhsData.dimStr}\n[RHS] = ${rhsData.dimStr}\n<span class="error-text">✖ [LHS] ≠ [RHS] -> Invalid</span>`; marshallTutor = `"The dimensions disagree. Here is exactly why:<br>• ` + window.getDimExplanation(lhsData.dimObj, rhsData.dimObj) + `"`; } 
-            else { outputHTML += `[LHS] = ${lhsData.dimStr}\n[RHS] = ${rhsData.dimStr}\n<span class="success-text">✔ [LHS] = [RHS] -> Homogeneous</span>`; marshallTutor = `"Well done, ${pName}. The equation is perfectly balanced."`; }
+            else if (lhsData.dimStr !== rhsData.dimStr) { outputHTML += `[LHS] = ${lhsData.dimStr}\n[RHS] = ${rhsData.dimStr}\n<span class="error-text">✖ [LHS] ≠ [RHS] -> Invalid</span>`; marshallTutor = `"The dimensions disagree. Look at the matrix above to see exactly where the exponents mismatch."`; } 
+            else { outputHTML += `[LHS] = ${lhsData.dimStr}\n[RHS] = ${rhsData.dimStr}\n<span class="success-text">✔ [LHS] = [RHS] -> Homogeneous</span>`; marshallTutor = `"Well done, ${pName}. The equation is perfectly balanced across all fundamental dimensions."`; }
             
             outputHTML += `\n\n<div class="edu-note"><span class="marshall-text">⚡ Dimension Marshall:</span><br><span class="dialogue-quote">${marshallTutor}</span></div></div>`; outputPanel.innerHTML = outputHTML; window.cleanupTempTokens();
         }
@@ -1414,7 +1450,6 @@
             const thead = document.getElementById('pi-varHeader');
             tbody.innerHTML = '';
             
-            // Dynamically show columns if they are used by ANY variable, keeping M, L, T always visible
             let useI = window.piVariables.some(v => v.I !== 0);
             let useK = window.piVariables.some(v => v.K !== 0);
             let useMol = window.piVariables.some(v => v.mol !== 0);
@@ -1455,7 +1490,6 @@
             let matrix = [];
             let activeDimensions = [];
 
-            // Build Matrix removing rows of absolute zero to find true rank
             dimensions.forEach(dim => {
                 let row = window.piVariables.map(v => v[dim]);
                 if (row.some(x => x !== 0)) {
@@ -1467,7 +1501,6 @@
             let n = window.piVariables.length;
             let k = matrix.length; 
 
-            // RREF to find precise rank
             let rrefMat = matrix.length > 0 ? window.rref(matrix) : [];
             let rank = 0;
             let pivotCols = [];
@@ -1487,13 +1520,11 @@
             k = rank;
             let numTerms = n - k;
 
-            // UI Updates - Summary
             document.getElementById('pi-sumN').innerText = n;
             document.getElementById('pi-sumK').innerText = k;
             document.getElementById('pi-sumPi').innerText = numTerms;
             document.getElementById('pi-glowPi').innerText = numTerms;
 
-            // UI Updates - Matrix rendering
             document.getElementById('pi-matrixHeader').innerHTML = '<th style="border:none;"></th>' + window.piVariables.map(v => `<th>${v.name}</th>`).join('');
             
             let matrixBodyHTML = "";
@@ -1508,7 +1539,6 @@
             else infoHTML += `<span style="color:var(--error);">No dimensionless terms possible.</span>`;
             document.getElementById('pi-matrixInfo').innerHTML = infoHTML;
 
-            // UI Updates - Pi terms calculation
             let mathDisplay = document.getElementById('pi-mathDisplay');
             if (numTerms <= 0) {
                 mathDisplay.innerHTML = `<span style="color:var(--text-muted); font-size:1.1rem;">Requires more variables than fundamental dimensions.</span>`;
@@ -1522,18 +1552,15 @@
             let freeCols = [];
             for(let c=0; c<n; c++) { if(!pivotCols.includes(c)) freeCols.push(c); }
 
-            // Generate Pi Terms from Null Space
             freeCols.forEach((freeCol, piIndex) => {
                 let piVector = new Array(n).fill(0);
                 piVector[freeCol] = 1;
 
-                // Back substitution for pivots
                 for(let r=0; r<rank; r++) {
                     let pCol = pivotCols[r];
                     piVector[pCol] = -rrefMat[r][freeCol];
                 }
 
-                // Make exponents visually cleaner (e.g., rho V D / mu instead of mu / rho V D)
                 if(window.piVariables[freeCol].name === 'μ' || window.piVariables[freeCol].name === 'mu' || piVector.filter(x => x < -0.1).length > piVector.filter(x => x > 0.1).length) {
                     piVector = piVector.map(x => -x);
                 }
@@ -1556,7 +1583,6 @@
                 mathDisplay.innerHTML += termHTML + (piIndex < freeCols.length - 1 ? '<span style="margin: 0 20px;">,</span>' : '');
             });
             
-            // Check for known groups
             let sortedInput = window.piVariables.map(v => (window.aliasMap[v.name.toLowerCase()] || v.name.toLowerCase())).slice().sort().join(',');
             if(window.knownPiGroups[sortedInput]) {
                 let knownHtml = `<div style="width:100%; font-size:1rem; margin-top:1rem; color:var(--text-muted);"><strong>Known Dimensionless Group:</strong><br>${window.knownPiGroups[sortedInput]}</div>`;
@@ -1796,7 +1822,6 @@
             window.populateDropdowns(''); window.discoverQuantity(); window.initStats(); 
             if (!localStorage.getItem('cinePhysicsOnboarded')) { document.getElementById('onboarding-overlay').style.display = 'flex'; }
             
-            // Pre-load Reynolds Number on startup so the table isn't blank
             setTimeout(() => { window.loadPiPreset('rho, v, d, mu'); }, 500);
         });
 
